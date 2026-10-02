@@ -70,15 +70,16 @@ export const StatCard: React.FC<StatCardProps> = ({ stat }) => {
         <div className="w-20 h-10 flex items-end justify-end">
           {stat.chartType === 'bar' ? (
             <div className="flex items-end gap-1.5 h-full">
-              <div className="w-2 bg-indigo-200 rounded-t-xs h-3"></div>
-              <div className="w-2 bg-indigo-300 rounded-t-xs h-6"></div>
-              <div className="w-2 bg-indigo-500 rounded-t-xs h-8"></div>
-              <div className="w-2 bg-indigo-800 rounded-t-xs h-10"></div>
-              <div className="w-2 bg-indigo-900 rounded-t-xs h-7"></div>
+              <div className="chart-bar-enter w-2 bg-indigo-200 rounded-t-xs h-3" style={{ animationDelay: '100ms' }}></div>
+              <div className="chart-bar-enter w-2 bg-indigo-300 rounded-t-xs h-6" style={{ animationDelay: '160ms' }}></div>
+              <div className="chart-bar-enter w-2 bg-indigo-500 rounded-t-xs h-8" style={{ animationDelay: '220ms' }}></div>
+              <div className="chart-bar-enter w-2 bg-indigo-800 rounded-t-xs h-10" style={{ animationDelay: '280ms' }}></div>
+              <div className="chart-bar-enter w-2 bg-indigo-900 rounded-t-xs h-7" style={{ animationDelay: '340ms' }}></div>
             </div>
           ) : (
             <svg className="w-20 h-9" viewBox="0 0 80 36" fill="none">
               <path
+                className="chart-line-enter"
                 d={
                   stat.isPositive
                     ? 'M 2 30 Q 20 28, 35 18 T 60 12 T 78 4'
@@ -88,6 +89,7 @@ export const StatCard: React.FC<StatCardProps> = ({ stat }) => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 fill="none"
+                style={{ animationDelay: '150ms' }}
               />
             </svg>
           )}

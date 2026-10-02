@@ -1,4 +1,5 @@
 import React from 'react';
+import { Calendar, Plus } from 'lucide-react';
 import { statsData } from '../data/mockData';
 import { StatCard } from '../components/dashboard/StatCard';
 import { AppointmentStatsChart } from '../components/dashboard/AppointmentStatsChart';
@@ -9,8 +10,18 @@ export const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title Header */}
-      <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-bold text-slate-900 tracking-tight">Admin Dashboard</h1>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-900 hover:bg-indigo-950 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer">
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Appointment</span>
+          </button>
+          <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer">
+            <Calendar className="w-3.5 h-3.5 text-slate-500" />
+            <span>Schedule Availability</span>
+          </button>
+        </div>
       </div>
 
       {/* Top 4 Stat Cards */}

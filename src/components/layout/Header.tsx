@@ -1,9 +1,9 @@
 import React from 'react';
-import { Search, Sparkles, Calendar, Settings, Moon, Bell, Plus } from 'lucide-react';
+import { Search, Sparkles, Calendar, Settings, Moon, Bell } from 'lucide-react';
 
 export const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between shadow-xs">
+    <header className="sticky top-0 z-30 h-14 shrink-0 bg-white border-b border-slate-100 px-6 flex items-center justify-between shadow-xs">
       {/* Search Input */}
       <div className="relative w-72">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
       {/* Right Controls */}
       <div className="flex items-center gap-3">
         {/* AI Assistance Button */}
-        <button className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-800 hover:bg-teal-900 text-white text-xs font-medium rounded-lg shadow-xs transition-colors cursor-pointer">
+        <button className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-800 hover:bg-teal-900 text-white text-xs font-medium whitespace-nowrap rounded-lg shadow-xs transition-colors cursor-pointer">
           <Sparkles className="w-3.5 h-3.5 text-teal-300" />
           <span>AI Assistance</span>
         </button>
@@ -55,18 +55,6 @@ export const Header: React.FC = () => {
           />
         </div>
 
-        {/* Quick Action Buttons */}
-        <div className="flex items-center gap-2.5 ml-2">
-          <button className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-900 hover:bg-indigo-950 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer">
-            <Plus className="w-3.5 h-3.5" />
-            <span>New Appointment</span>
-          </button>
-
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
-            <span>Schedule Availability</span>
-          </button>
-        </div>
       </div>
     </header>
   );

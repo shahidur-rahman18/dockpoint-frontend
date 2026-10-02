@@ -48,7 +48,7 @@ export const AppointmentStatsChart: React.FC = () => {
           <div className="absolute inset-x-0 top-3/4 border-b border-slate-100 text-[10px] text-slate-300 pl-1">1K</div>
           <div className="absolute inset-x-0 bottom-6 border-b border-slate-200 text-[10px] text-slate-300 pl-1">0K</div>
 
-          {monthlyData.map((item) => {
+          {monthlyData.map((item, index) => {
             const total = item.completed + item.ongoing + item.rescheduled;
             const totalHeightPercent = (total / maxTotal) * 100;
 
@@ -65,8 +65,8 @@ export const AppointmentStatsChart: React.FC = () => {
 
                 {/* Stacked bar */}
                 <div
-                  className="w-full max-w-[20px] rounded-t-sm overflow-hidden flex flex-col justify-end transition-all duration-300 group-hover:opacity-90"
-                  style={{ height: `${totalHeightPercent}%` }}
+                  className="chart-bar-enter w-full max-w-[20px] rounded-t-sm overflow-hidden flex flex-col justify-end transition-all duration-300 group-hover:opacity-90"
+                  style={{ height: `${totalHeightPercent}%`, animationDelay: `${index * 45}ms` }}
                 >
                   {/* Rescheduled bar (Purple) */}
                   <div
