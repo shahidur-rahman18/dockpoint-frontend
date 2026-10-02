@@ -13,7 +13,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-bold text-slate-900 tracking-tight">Admin Dashboard</h1>
         <div className="flex flex-wrap items-center gap-2.5">
-          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-900 hover:bg-indigo-950 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer">
+          <button style={{ background: 'var(--theme-accent)' }} className="flex items-center gap-1.5 px-3.5 py-2 hover:brightness-90 text-white text-xs font-semibold rounded-lg shadow-xs transition-all cursor-pointer">
             <Plus className="w-3.5 h-3.5" />
             <span>New Appointment</span>
           </button>

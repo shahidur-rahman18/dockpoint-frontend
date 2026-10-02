@@ -15,7 +15,11 @@ import {
   PanelLeftClose
 } from 'lucide-react';
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  background: string;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ background }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [dashboardOpen, setDashboardOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('Admin Dashboard');
@@ -30,7 +34,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className={`${collapsed ? 'w-[72px]' : 'w-64'} bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 overflow-y-auto select-none shrink-0 transition-[width] duration-200`}>
+    <aside style={{ background }} className={`${collapsed ? 'w-[72px]' : 'w-64'} bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 overflow-y-auto select-none shrink-0 transition-[width] duration-200`}>
       {/* Brand Header */}
       <div className={`h-14 shrink-0 flex items-center border-b border-slate-100 ${collapsed ? 'px-3 justify-center' : 'px-4 justify-between'}`}>
         <div className="flex items-center gap-2.5">
@@ -94,9 +98,11 @@ export const Sidebar: React.FC = () => {
                     <button
                       key={item}
                       onClick={() => setActiveItem(item)}
+                      aria-current={activeItem === item ? 'page' : undefined}
+                      style={activeItem === item ? { background: 'var(--theme-accent)', color: '#fff' } : undefined}
                       className={`w-full text-left px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer block ${
                         activeItem === item
-                          ? 'text-blue-600 bg-blue-50/70 font-semibold'
+                          ? 'font-semibold'
                           : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                       }`}
                     >

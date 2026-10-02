@@ -24,6 +24,7 @@ export const AppointmentsList: React.FC = () => {
           {recentAppointments.map((apt, index) => (
             <div
               key={apt.id}
+              data-appointment-index={index}
               className={`p-4 rounded-xl border transition-all ${
                 index === 1
                   ? 'bg-rose-50/30 border-rose-100'

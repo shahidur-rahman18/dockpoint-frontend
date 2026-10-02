@@ -28,6 +28,7 @@ export const AppointmentStatsChart: React.FC = () => {
         {appointmentSummaries.map((summary) => (
           <div
             key={summary.label}
+            data-theme-surface="summary"
             className={`${summary.bgColor} p-3.5 rounded-xl border border-slate-200/60 text-center flex flex-col justify-center`}
           >
             <span className="text-xs font-medium text-slate-500">{summary.label}</span>

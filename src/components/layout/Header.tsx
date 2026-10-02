@@ -1,9 +1,13 @@
 import React from 'react';
 import { Search, Sparkles, Calendar, Settings, Moon, Bell } from 'lucide-react';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  background: string;
+}
+
+export const Header: React.FC<HeaderProps> = ({ background }) => {
   return (
-    <header className="sticky top-0 z-30 h-14 shrink-0 bg-white border-b border-slate-100 px-6 flex items-center justify-between shadow-xs">
+    <header style={{ background }} className="sticky top-0 z-30 h-14 shrink-0 bg-white border-b border-slate-100 px-6 flex items-center justify-between shadow-xs">
       {/* Search Input */}
       <div className="relative w-72">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
