@@ -1,14 +1,11 @@
 import React, { useCallback, useState } from 'react';
+import { Outlet } from 'react-router';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Settings } from 'lucide-react';
 import { ThemeCustomizer, type ThemeSettings } from './ThemeCustomizer';
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+export const DashboardLayout: React.FC = () => {
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
     colorMode: 'light',
@@ -47,7 +44,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           onToggleColorMode={toggleColorMode}
         />
         <main className="p-6 flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </main>
       </div>
 

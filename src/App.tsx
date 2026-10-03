@@ -1,13 +1,9 @@
 import React from 'react';
-import { DashboardLayout } from './components/layout/DashboardLayout';
-import { AdminDashboard } from './pages/AdminDashboard';
+import { RouterProvider } from 'react-router/dom';
+import { router } from './router/routes';
 
 export const App: React.FC = () => {
-  return (
-    <DashboardLayout>
-      <AdminDashboard />
-    </DashboardLayout>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

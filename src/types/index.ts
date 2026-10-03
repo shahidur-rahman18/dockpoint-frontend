@@ -109,3 +109,15 @@ export interface LeaveRequest {
   reason: string;
   avatar: string;
 }
+
+export interface DoctorListItem {
+  id: string;
+  name: string;
+  designation: string;
+  department: string;
+  phone: string;
+  email: string;
+  fees: string;
+  status: 'Available' | 'Unavailable';
+  avatar: string;
+}
