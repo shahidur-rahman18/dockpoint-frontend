@@ -14,10 +14,13 @@ import {
   Stethoscope,
   Award,
   PanelLeftClose,
+  X,
 } from 'lucide-react';
 
 interface SidebarProps {
   background: string;
+  mobileOpen?: boolean;
+  onClose?: () => void;
 }
 
 interface NavItem {
@@ -71,7 +74,7 @@ const NAV_GROUPS: NavGroup[] = [
   { id: 'specializations', label: 'Specializations', icon: Award, path: '/specializations' },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ background }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false, onClose }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(
     NAV_GROUPS.filter((group) => group.defaultOpen).map((group) => group.id),
@@ -91,45 +94,68 @@ export const Sidebar: React.FC<SidebarProps> = ({ background }) => {
   };
 
   return (
-    <aside
-      style={{ background }}
-      className={`${collapsed ? 'w-[72px]' : 'w-64'} bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 overflow-y-auto select-none shrink-0 transition-[width] duration-200`}
-    >
-      {/* Brand Header */}
-      <div
-        className={`h-14 shrink-0 flex items-center border-b border-slate-100 ${collapsed ? 'px-3 justify-center' : 'px-4 justify-between'}`}
+    <>
+      {/* Mobile Backdrop */}
+      {mobileOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden"
+        />
+      )}
+
+      <aside
+        style={{ background }}
+        className={`fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 h-screen overflow-y-auto select-none shrink-0 transition-[width,transform] duration-200 ${
+          collapsed ? 'lg:w-[72px]' : 'lg:w-64'
+        } w-64 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        } bg-white border-r border-slate-200 flex flex-col`}
       >
-        {collapsed ? (
-          <button
-            onClick={() => setCollapsed(false)}
-            aria-label="Expand sidebar"
-            title="Expand sidebar"
-            className="w-8 h-8 rounded-xl bg-indigo-900 flex items-center justify-center text-white font-bold shadow-xs cursor-pointer"
-          >
-            <span className="text-lg leading-none font-black tracking-tight">P</span>
-          </button>
-        ) : (
-          <>
+        {/* Brand Header */}
+        <div
+          className={`h-14 shrink-0 flex items-center border-b border-slate-100 ${collapsed ? 'px-3 justify-center' : 'px-4 justify-between'}`}
+        >
+          {collapsed ? (
             <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2.5 cursor-pointer"
+              onClick={() => setCollapsed(false)}
+              aria-label="Expand sidebar"
+              title="Expand sidebar"
+              className="w-8 h-8 rounded-xl bg-indigo-900 flex items-center justify-center text-white font-bold shadow-xs cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-xl bg-indigo-900 flex items-center justify-center text-white font-bold shadow-xs">
-                <span className="text-lg leading-none font-black tracking-tight">D</span>
-              </div>
-              <span className="text-xl font-bold tracking-tight text-slate-800">Dockpoint</span>
+              <span className="text-lg leading-none font-black tracking-tight">P</span>
             </button>
-            <button
-              onClick={() => setCollapsed(true)}
-              aria-label="Collapse sidebar"
-              title="Collapse sidebar"
-              className="p-1.5 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
-            >
-              <PanelLeftClose className="w-4 h-4" />
-            </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2.5 cursor-pointer"
+              >
+                <div className="w-8 h-8 rounded-xl bg-indigo-900 flex items-center justify-center text-white font-bold shadow-xs">
+                  <span className="text-lg leading-none font-black tracking-tight">D</span>
+                </div>
+                <span className="text-xl font-bold tracking-tight text-slate-800">Dockpoint</span>
+              </button>
+              <button
+                onClick={() => setCollapsed(true)}
+                aria-label="Collapse sidebar"
+                title="Collapse sidebar"
+                className="p-1.5 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer hidden lg:block"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+              {onClose && (
+                <button
+                  onClick={onClose}
+                  aria-label="Close sidebar"
+                  title="Close sidebar"
+                  className="p-1.5 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer lg:hidden"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </>
+          )}
+        </div>
 
       {/* Sidebar Nav Links */}
       <div className={`pt-0 pb-4 space-y-6 flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
@@ -312,5 +338,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ background }) => {
         </div>
       </div>
     </aside>
+    </>
   );
 };

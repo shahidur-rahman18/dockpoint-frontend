@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Outlet } from 'react-router';
+import React, { useCallback, useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Settings } from 'lucide-react';
@@ -7,12 +7,19 @@ import { ThemeCustomizer, type ThemeSettings } from './ThemeCustomizer';
 
 export const DashboardLayout: React.FC = () => {
   const [customizerOpen, setCustomizerOpen] = useState(false);
+  const location = useLocation();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
     colorMode: 'light',
     sidebarColor: '#ffffff',
     topBarColor: '#ffffff',
     themeColor: '#3730a3',
   });
+
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [location.pathname]);
+
   const closeCustomizer = useCallback(() => setCustomizerOpen(false), []);
   const toggleColorMode = useCallback(() => {
     setThemeSettings((prev) => ({
@@ -34,7 +41,11 @@ export const DashboardLayout: React.FC = () => {
       style={{ '--theme-accent': themeSettings.themeColor } as React.CSSProperties}
     >
       {/* Sidebar */}
-      <Sidebar background={sidebarBackground} />
+      <Sidebar
+        background={sidebarBackground}
+        mobileOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 dashboard-content">
@@ -42,6 +53,7 @@ export const DashboardLayout: React.FC = () => {
           background={topBarBackground}
           colorMode={themeSettings.colorMode}
           onToggleColorMode={toggleColorMode}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
         <main className="p-6 flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
