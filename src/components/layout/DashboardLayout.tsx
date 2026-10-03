@@ -73,20 +73,18 @@ export const DashboardLayout: React.FC = () => {
       >
         <Settings className="w-5 h-5" />
       </button>
-      {customizerOpen && (
-        <ThemeCustomizer
-          open={customizerOpen}
-          onClose={closeCustomizer}
-          settings={themeSettings}
-          onSettingsChange={setThemeSettings}
-          onReset={() => setThemeSettings({
-            colorMode: 'light',
-            sidebarColor: '#ffffff',
-            topBarColor: '#ffffff',
-            themeColor: '#3730a3',
-          })}
-        />
-      )}
+      <ThemeCustomizer
+        open={customizerOpen}
+        onClose={closeCustomizer}
+        settings={themeSettings}
+        onSettingsChange={setThemeSettings}
+        onReset={() => setThemeSettings({
+          colorMode: 'light',
+          sidebarColor: '#ffffff',
+          topBarColor: '#ffffff',
+          themeColor: '#3730a3',
+        })}
+      />
     </div>
   );
 };

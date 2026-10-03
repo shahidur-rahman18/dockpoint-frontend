@@ -96,16 +96,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
   return (
     <>
       {/* Mobile Backdrop */}
-      {mobileOpen && (
-        <div
-          onClick={onClose}
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden"
-        />
-      )}
+      <div
+        onClick={onClose}
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
+        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300 ease-in-out ${
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      />
 
       <aside
         style={{ background }}
-        className={`fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 h-screen overflow-y-auto select-none shrink-0 transition-[width,transform] duration-200 ${
+        className={`fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 h-screen overflow-y-auto select-none shrink-0 transition-[width,translate] duration-300 ease-in-out motion-reduce:transition-none ${
           collapsed ? 'lg:w-[72px]' : 'lg:w-64'
         } w-64 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'

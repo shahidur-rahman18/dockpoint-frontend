@@ -55,7 +55,7 @@ export function DataTable<TData>({
         );
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
