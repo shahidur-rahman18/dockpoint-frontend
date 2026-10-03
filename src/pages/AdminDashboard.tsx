@@ -4,7 +4,11 @@ import { statsData } from '../data/mockData';
 import { StatCard } from '../components/dashboard/StatCard';
 import { AppointmentStatsChart } from '../components/dashboard/AppointmentStatsChart';
 import { AppointmentsList } from '../components/dashboard/AppointmentsList';
+import { TopDepartments } from '../components/dashboard/TopDepartments';
+import { DoctorsSchedule } from '../components/dashboard/DoctorsSchedule';
+import { IncomeByTreatment } from '../components/dashboard/IncomeByTreatment';
 import { PopularDoctors } from '../components/dashboard/PopularDoctors';
+import { AllAppointmentsTable } from '../components/dashboard/AllAppointmentsTable';
 
 export const AdminDashboard: React.FC = () => {
   return (
@@ -41,9 +45,21 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom Row: Popular Doctors */}
+      {/* Popular Doctors Section */}
       <div>
         <PopularDoctors />
+      </div>
+
+      {/* 3-Column Section: Top Departments, Doctors Schedule, Income By Treatment */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+        <TopDepartments />
+        <DoctorsSchedule />
+        <IncomeByTreatment />
+      </div>
+
+      {/* All Appointments Table Section */}
+      <div>
+        <AllAppointmentsTable />
       </div>
     </div>
   );

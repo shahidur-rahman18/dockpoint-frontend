@@ -1,4 +1,4 @@
-import type { StatItem, AppointmentSummary, MonthlyChartData, RecentAppointment, PopularDoctor } from '../types';
+import type { StatItem, AppointmentSummary, MonthlyChartData, RecentAppointment, PopularDoctor, DepartmentStat, DoctorScheduleSummary, ScheduleDoctor, IncomeTreatment, AllAppointmentItem } from '../types';
 
 export const statsData: StatItem[] = [
   {
@@ -117,5 +117,135 @@ export const popularDoctors: PopularDoctor[] = [
     avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&auto=format&fit=crop&q=80',
     rating: 4.9,
     reviewsCount: 156,
+  },
+];
+
+export const departmentStats: DepartmentStat[] = [
+  { name: 'Cardiology', count: 214, color: 'bg-sky-400' },
+  { name: 'Dental', count: 150, color: 'bg-purple-600' },
+  { name: 'Neurology', count: 121, color: 'bg-indigo-600' },
+];
+
+export const doctorScheduleSummary: DoctorScheduleSummary = {
+  available: 48,
+  unavailable: 28,
+  leave: 12,
+};
+
+export const scheduleDoctors: ScheduleDoctor[] = [
+  {
+    id: '1',
+    name: 'Dr. Sarah Johnson',
+    specialty: 'Orthopedic Surgeon',
+    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '2',
+    name: 'Dr. Emily Carter',
+    specialty: 'Pediatrician',
+    avatar: 'https://images.unsplash.com/photo-1594824813566-78a933758f46?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '3',
+    name: 'Dr. David Lee',
+    specialty: 'Gynecologist',
+    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '4',
+    name: 'Dr. Michael Smith',
+    specialty: 'Cardiologist',
+    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+  },
+];
+
+export const incomeTreatments: IncomeTreatment[] = [
+  { id: '1', treatment: 'Cardiology', appointmentsCount: 4556, amount: '$5,985' },
+  { id: '2', treatment: 'Radiology', appointmentsCount: 4125, amount: '$5,194' },
+  { id: '3', treatment: 'Dental Surgery', appointmentsCount: 1796, amount: '$2,710' },
+  { id: '4', treatment: 'Orthopaedics', appointmentsCount: 3827, amount: '$4,682' },
+  { id: '5', treatment: 'General Medicine', appointmentsCount: 9894, amount: '$9,450' },
+];
+
+export const allAppointmentsData: AllAppointmentItem[] = [
+  {
+    id: '1',
+    doctor: {
+      name: 'Dr. John Smith',
+      specialty: 'Neurosurgeon',
+      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+    },
+    patient: {
+      name: 'Jesus Adams',
+      phone: '+1 41254 45214',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    },
+    dateTime: '28 May 2025 - 11:15 AM',
+    mode: 'Online',
+    status: 'Confirmed',
+  },
+  {
+    id: '2',
+    doctor: {
+      name: 'Dr. Lisa White',
+      specialty: 'Oncologist',
+      avatar: 'https://images.unsplash.com/photo-1594824813566-78a933758f46?w=150&auto=format&fit=crop&q=80',
+    },
+    patient: {
+      name: 'Ezra Belcher',
+      phone: '+1 65895 41247',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    },
+    dateTime: '29 May 2025 - 11:30 AM',
+    mode: 'In-Person',
+    status: 'Cancelled',
+  },
+  {
+    id: '3',
+    doctor: {
+      name: 'Dr. Patricia Brown',
+      specialty: 'Pulmonologist',
+      avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
+    },
+    patient: {
+      name: 'Glen Lentz',
+      phone: '+1 62458 45845',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
+    },
+    dateTime: '30 May 2025 - 09:30 AM',
+    mode: 'Online',
+    status: 'Confirmed',
+  },
+  {
+    id: '4',
+    doctor: {
+      name: 'Dr. Rachel Green',
+      specialty: 'Urologist',
+      avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&auto=format&fit=crop&q=80',
+    },
+    patient: {
+      name: 'Bernard Griffith',
+      phone: '+1 61422 45214',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    },
+    dateTime: '30 May 2025 - 10:00 AM',
+    mode: 'Online',
+    status: 'Checked Out',
+  },
+  {
+    id: '5',
+    doctor: {
+      name: 'Dr. Michael Smith',
+      specialty: 'Cardiologist',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    },
+    patient: {
+      name: 'John Elsass',
+      phone: '+1 47851 26371',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    },
+    dateTime: '30 May 2025 - 11:00 AM',
+    mode: 'Online',
+    status: 'Schedule',
   },
 ];

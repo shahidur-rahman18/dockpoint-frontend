@@ -56,6 +56,21 @@
 	animation: chart-draw 900ms ease-out both;
 }
 
+@keyframes chart-scale-in {
+	from {
+		opacity: 0;
+		transform: scale(0.85) rotate(-10deg);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1) rotate(0deg);
+	}
+}
+
+.chart-scale-enter {
+	animation: chart-scale-in 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Dark mode overrides for layout & dashboard elements using CSS Variables */
 .theme-root[data-color-mode="dark"] > .dashboard-content {
 	background-color: var(--bg-base) !important;

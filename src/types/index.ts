@@ -41,3 +41,46 @@ export interface PopularDoctor {
   rating?: number;
   reviewsCount?: number;
 }
+
+export interface DepartmentStat {
+  name: string;
+  count: number;
+  color: string;
+}
+
+export interface DoctorScheduleSummary {
+  available: number;
+  unavailable: number;
+  leave: number;
+}
+
+export interface ScheduleDoctor {
+  id: string;
+  name: string;
+  specialty: string;
+  avatar: string;
+}
+
+export interface IncomeTreatment {
+  id: string;
+  treatment: string;
+  appointmentsCount: number;
+  amount: string;
+}
+
+export interface AllAppointmentItem {
+  id: string;
+  doctor: {
+    name: string;
+    specialty: string;
+    avatar: string;
+  };
+  patient: {
+    name: string;
+    phone: string;
+    avatar: string;
+  };
+  dateTime: string;
+  mode: 'Online' | 'In-Person';
+  status: 'Confirmed' | 'Cancelled' | 'Checked Out' | 'Schedule';
+}
