@@ -197,7 +197,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="theme-customizer-title"
-        className={`absolute inset-y-0 right-0 flex w-full max-w-[380px] flex-col bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+        className={`theme-customizer-panel absolute inset-y-0 right-0 flex w-full max-w-[380px] flex-col bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

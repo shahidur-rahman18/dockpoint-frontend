@@ -1,11 +1,13 @@
 import React from 'react';
-import { Search, Sparkles, Calendar, Settings, Moon, Bell } from 'lucide-react';
+import { Search, Sparkles, Calendar, Settings, Moon, Sun, Bell } from 'lucide-react';
 
 interface HeaderProps {
   background: string;
+  colorMode: 'light' | 'dark';
+  onToggleColorMode: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ background }) => {
+export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleColorMode }) => {
   return (
     <header style={{ background }} className="sticky top-0 z-30 h-14 shrink-0 bg-white border-b border-slate-100 px-6 flex items-center justify-between shadow-xs">
       {/* Search Input */}
@@ -41,8 +43,13 @@ export const Header: React.FC<HeaderProps> = ({ background }) => {
           <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer" title="Settings">
             <Settings className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer" title="Theme">
-            <Moon className="w-4 h-4" />
+          <button
+            type="button"
+            onClick={onToggleColorMode}
+            className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
+            title={colorMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {colorMode === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
           </button>
           <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer relative" title="Notifications">
             <Bell className="w-4 h-4" />

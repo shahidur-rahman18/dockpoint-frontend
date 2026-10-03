@@ -17,6 +17,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     themeColor: '#3730a3',
   });
   const closeCustomizer = useCallback(() => setCustomizerOpen(false), []);
+  const toggleColorMode = useCallback(() => {
+    setThemeSettings((prev) => ({
+      ...prev,
+      colorMode: prev.colorMode === 'dark' ? 'light' : 'dark',
+    }));
+  }, []);
   const sidebarBackground = themeSettings.colorMode === 'dark' && themeSettings.sidebarColor === '#ffffff'
     ? '#03051f'
     : themeSettings.sidebarColor;
@@ -34,8 +40,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       <Sidebar background={sidebarBackground} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header background={topBarBackground} />
+      <div className="flex-1 flex flex-col min-w-0 dashboard-content">
+        <Header
+          background={topBarBackground}
+          colorMode={themeSettings.colorMode}
+          onToggleColorMode={toggleColorMode}
+        />
         <main className="p-6 flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>

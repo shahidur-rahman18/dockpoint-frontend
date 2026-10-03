@@ -1,0 +1,273 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-base: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --sidebar-bg: #ffffff;
+    --topbar-bg: #ffffff;
+    --theme-accent: #3730a3;
+  }
+
+  .theme-root[data-color-mode="dark"] {
+    color-scheme: dark;
+    --bg-base: #05071f;
+    --bg-surface: #090c2b;
+    --bg-subtle: #111633;
+    --text-primary: #d6e5ff;
+    --text-secondary: #b4c9eb;
+    --text-muted: #7890b8;
+    --border-color: #202746;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+  }
+}
+
+@keyframes chart-rise {
+	from {
+		opacity: 0.4;
+		transform: scaleY(0);
+	}
+	to {
+		opacity: 1;
+		transform: scaleY(1);
+	}
+}
+
+@keyframes chart-draw {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+.chart-bar-enter {
+	transform-origin: bottom;
+	animation: chart-rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.chart-line-enter {
+	stroke-dasharray: 120;
+	stroke-dashoffset: 120;
+	animation: chart-draw 900ms ease-out both;
+}
+
+/* Dark mode overrides for layout & dashboard elements using CSS Variables */
+.theme-root[data-color-mode="dark"] > .dashboard-content {
+	background-color: var(--bg-base) !important;
+	color: var(--text-primary);
+}
+
+.theme-root[data-color-mode="dark"] > aside {
+	color: #c9d9f5;
+}
+
+.theme-root[data-color-mode="dark"] > aside .border-slate-100,
+.theme-root[data-color-mode="dark"] > aside .border-slate-200 {
+	border-color: var(--border-color);
+}
+
+.theme-root[data-color-mode="dark"] > aside .text-slate-800,
+.theme-root[data-color-mode="dark"] > aside .text-slate-700 {
+	color: #e0eaff;
+}
+
+.theme-root[data-color-mode="dark"] > aside .text-slate-600,
+.theme-root[data-color-mode="dark"] > aside .text-slate-500 {
+	color: #a8bee3;
+}
+
+.theme-root[data-color-mode="dark"] > aside .text-slate-400 {
+	color: #7186ad;
+}
+
+.theme-root[data-color-mode="dark"] > aside [aria-current="page"] {
+	background-color: transparent !important;
+	color: #308cff !important;
+}
+
+.theme-root[data-color-mode="dark"] > aside [class~="hover:bg-slate-50"]:hover,
+.theme-root[data-color-mode="dark"] > aside [class~="hover:bg-slate-100"]:hover {
+	background-color: var(--bg-subtle);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-white {
+	background-color: var(--bg-base) !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50,
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50\/50,
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50\/60,
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-100 {
+	background-color: var(--bg-surface) !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50\/30 {
+	background-color: #350d15 !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-indigo-50,
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-blue-50 {
+	background-color: #101c47 !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-rose-50,
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-rose-50\/50 {
+	background-color: #350d1a !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-emerald-50,
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-emerald-50\/50 {
+	background-color: #062e30 !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .bg-amber-50\/50 {
+	background-color: #30260e !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-theme-surface="summary"] {
+	background-color: var(--bg-surface) !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-slate-900,
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-slate-800,
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-slate-700 {
+	color: var(--text-primary);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-slate-600 {
+	color: var(--text-secondary);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-slate-500 {
+	color: var(--text-muted);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-slate-400 {
+	color: #7890b8;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-emerald-600 {
+	color: #34d399;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-rose-600 {
+	color: #fb7185;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .text-amber-600 {
+	color: #fbbf24;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-slate-100,
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-slate-200,
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-slate-200\/60,
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-slate-200\/80 {
+	border-color: var(--border-color);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-rose-100 {
+	border-color: #521521;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-rose-200\/60,
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-emerald-200\/60 {
+	border-color: #33415d;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-indigo-100,
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-blue-100,
+.theme-root[data-color-mode="dark"] > .dashboard-content .border-emerald-100 {
+	border-color: #243354;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content [class~="hover:bg-slate-50"]:hover,
+.theme-root[data-color-mode="dark"] > .dashboard-content [class~="hover:bg-slate-200/80"]:hover {
+	background-color: var(--bg-subtle) !important;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content .ring-white {
+	--tw-ring-color: var(--bg-base);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content [data-appointment-index="0"] {
+	background-color: var(--bg-surface) !important;
+	border-color: var(--bg-surface);
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content [data-appointment-index="1"] {
+	background-color: #350d15 !important;
+	border-color: #350d15;
+}
+
+.theme-root[data-color-mode="dark"] > .dashboard-content [data-appointment-index="2"] {
+	background-color: #032e32 !important;
+	border-color: #032e32;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel {
+	background-color: var(--bg-base);
+	color: var(--text-primary);
+	border-left: 1px solid var(--border-color);
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel section {
+	background-color: var(--bg-surface) !important;
+	border-color: var(--border-color) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel section button {
+	color: #e0eaff !important;
+	border-color: var(--border-color) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel section button:hover {
+	background-color: var(--bg-subtle) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel p {
+	color: var(--text-secondary) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel footer {
+	background-color: var(--bg-base) !important;
+	border-color: var(--border-color) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel footer button {
+	background-color: var(--bg-subtle) !important;
+	color: var(--text-primary) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel footer button:hover {
+	background-color: #1a214d !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel [aria-pressed="true"] {
+	border-color: #308cff !important;
+	background-color: #101c47 !important;
+	color: #308cff !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel [aria-pressed="false"] {
+	border-color: var(--border-color) !important;
+	color: var(--text-muted) !important;
+}
+
+.theme-root[data-color-mode="dark"] .theme-customizer-panel [aria-pressed="false"]:hover {
+	background-color: var(--bg-subtle) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.chart-bar-enter,
+	.chart-line-enter {
+		animation: none;
+		transform: none;
+		stroke-dasharray: none;
+		stroke-dashoffset: 0;
+	}
+}
