@@ -125,6 +125,13 @@
 	background-color: #350d15 !important;
 }
 
+.theme-root[data-color-mode="dark"] > .dashboard-content select,
+.theme-root[data-color-mode="dark"] > .dashboard-content select option {
+	color-scheme: dark;
+	background-color: var(--bg-surface);
+	color: var(--text-primary);
+}
+
 .theme-root[data-color-mode="dark"] > .dashboard-content .bg-indigo-50,
 .theme-root[data-color-mode="dark"] > .dashboard-content .bg-blue-50 {
 	background-color: #101c47 !important;

@@ -77,7 +77,7 @@ export function DataTable<TData>({
           <tbody className="divide-y divide-slate-100 text-xs">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:bg-slate-50/60 transition-colors">
+                <tr key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="py-4 px-4 first:pl-5">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

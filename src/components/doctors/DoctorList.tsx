@@ -19,6 +19,10 @@ import type { DoctorListItem } from '../../types';
 
 export const DoctorList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<DoctorListItem['status'] | ''>('');
+  const [sortOrder, setSortOrder] = useState('default');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [pageIndex, setPageIndex] = useState(0);
   const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
@@ -54,15 +58,48 @@ export const DoctorList: React.FC = () => {
 
   const filteredDoctors = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
+    const result = doctorsListData.filter((doc) => {
+      const matchesQuery =
+        !query ||
+        [doc.name, doc.designation, doc.department, doc.email, doc.status].some((field) =>
+          field.toLowerCase().includes(query),
+        );
 
-    if (!query) return doctorsListData;
+      return (
+        matchesQuery &&
+        (!departmentFilter || doc.department === departmentFilter) &&
+        (!statusFilter || doc.status === statusFilter)
+      );
+    });
 
-    return doctorsListData.filter((doc) =>
-      [doc.name, doc.designation, doc.department, doc.email, doc.status].some((field) =>
-        field.toLowerCase().includes(query),
-      ),
-    );
-  }, [searchTerm]);
+    switch (sortOrder) {
+      case 'name-asc':
+        return result.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return result.sort((a, b) => b.name.localeCompare(a.name));
+      case 'department':
+        return result.sort((a, b) => a.department.localeCompare(b.department));
+      case 'fees-asc':
+        return result.sort(
+          (a, b) =>
+            Number(a.fees.replace(/[^\d.]/g, '')) -
+            Number(b.fees.replace(/[^\d.]/g, '')),
+        );
+      case 'fees-desc':
+        return result.sort(
+          (a, b) =>
+            Number(b.fees.replace(/[^\d.]/g, '')) -
+            Number(a.fees.replace(/[^\d.]/g, '')),
+        );
+      default:
+        return result;
+    }
+  }, [searchTerm, departmentFilter, statusFilter, sortOrder]);
+
+  const departments = useMemo(
+    () => [...new Set(doctorsListData.map((doctor) => doctor.department))].sort(),
+    [],
+  );
 
   const paginatedGridDoctors = useMemo(() => {
     const start = pageIndex * pageSize;
@@ -243,14 +280,95 @@ export const DoctorList: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
-            <span>Filters</span>
-          </button>
-          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer">
-            <span>Sort By : Recent</span>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen((open) => !open)}
+              aria-expanded={isFilterOpen}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+            >
+              <Filter className="w-3.5 h-3.5 text-slate-500" />
+              <span>
+                Filters
+                {Number(Boolean(departmentFilter)) + Number(Boolean(statusFilter)) > 0 &&
+                  ` (${Number(Boolean(departmentFilter)) + Number(Boolean(statusFilter))})`}
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+            {isFilterOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-64 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
+                <label className="block space-y-1.5 text-xs font-semibold text-slate-600">
+                  Department
+                  <select
+                    value={departmentFilter}
+                    onChange={(event) => {
+                      setDepartmentFilter(event.target.value);
+                      setPageIndex(0);
+                    }}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-normal text-slate-700"
+                  >
+                    <option value="">All departments</option>
+                    {departments.map((department) => (
+                      <option key={department} value={department}>
+                        {department}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block space-y-1.5 text-xs font-semibold text-slate-600">
+                  Status
+                  <select
+                    value={statusFilter}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setStatusFilter(
+                        value === 'Available' || value === 'Unavailable' ? value : '',
+                      );
+                      setPageIndex(0);
+                    }}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-normal text-slate-700"
+                  >
+                    <option value="">All statuses</option>
+                    <option value="Available">Available</option>
+                    <option value="Unavailable">Unavailable</option>
+                  </select>
+                </label>
+                {(departmentFilter || statusFilter) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDepartmentFilter('');
+                      setStatusFilter('');
+                      setPageIndex(0);
+                    }}
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          <label className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl">
+            <span>Sort By:</span>
+            <select
+              aria-label="Sort doctors"
+              value={sortOrder}
+              onChange={(event) => {
+                setSortOrder(event.target.value);
+                setPageIndex(0);
+              }}
+              className="max-w-36 bg-transparent outline-none cursor-pointer"
+            >
+              <option value="default">Default</option>
+              <option value="name-asc">Name (A–Z)</option>
+              <option value="name-desc">Name (Z–A)</option>
+              <option value="department">Department</option>
+              <option value="fees-asc">Fees (Low to high)</option>
+              <option value="fees-desc">Fees (High to low)</option>
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+          </label>
         </div>
       </div>
 
