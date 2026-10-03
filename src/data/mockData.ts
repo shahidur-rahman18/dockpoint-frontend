@@ -1,4 +1,4 @@
-import type { StatItem, AppointmentSummary, MonthlyChartData, RecentAppointment, PopularDoctor, DepartmentStat, DoctorScheduleSummary, ScheduleDoctor, IncomeTreatment, AllAppointmentItem } from '../types';
+import type { StatItem, AppointmentSummary, MonthlyChartData, RecentAppointment, PopularDoctor, DepartmentStat, DoctorScheduleSummary, ScheduleDoctor, IncomeTreatment, AllAppointmentItem, TopPatient, RecentTransaction, LeaveRequest } from '../types';
 
 export const statsData: StatItem[] = [
   {
@@ -247,5 +247,124 @@ export const allAppointmentsData: AllAppointmentItem[] = [
     dateTime: '30 May 2025 - 11:00 AM',
     mode: 'Online',
     status: 'Schedule',
+  },
+];
+
+export const topPatientsData: TopPatient[] = [
+  {
+    id: '1',
+    name: 'Jesus Adams',
+    totalPaid: 'Total Paid : $6589',
+    appointmentsCount: 80,
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '2',
+    name: 'Ezra Belcher',
+    totalPaid: 'Total Paid : $5632',
+    appointmentsCount: 60,
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '3',
+    name: 'Glen Lentz',
+    totalPaid: 'Total Paid : $4125',
+    appointmentsCount: 40,
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '4',
+    name: 'Bernard Griffith',
+    totalPaid: 'Total Paid : $3140',
+    appointmentsCount: 25,
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '5',
+    name: 'John Elsass',
+    totalPaid: 'Total Paid : $2654',
+    appointmentsCount: 25,
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+  },
+];
+
+export const recentTransactionsData: RecentTransaction[] = [
+  {
+    id: '1',
+    title: 'General Check-up',
+    invoiceId: '#INV5889',
+    amount: '+ $234',
+    isPositive: true,
+    provider: 'stripe',
+  },
+  {
+    id: '2',
+    title: 'Online Consultation',
+    invoiceId: '#INV7874',
+    amount: '+ $234',
+    isPositive: true,
+    provider: 'paypal',
+  },
+  {
+    id: '3',
+    title: 'Purchase Product',
+    invoiceId: '#INV4458',
+    amount: '- $69',
+    isPositive: false,
+    provider: 'stripe',
+  },
+  {
+    id: '4',
+    title: 'Online Consultation',
+    invoiceId: '#INV5456',
+    amount: '+ $234',
+    isPositive: true,
+    provider: 'paypal',
+  },
+  {
+    id: '5',
+    title: 'Online Consultation',
+    invoiceId: '#INV4557',
+    amount: '+ $234',
+    isPositive: true,
+    provider: 'stripe',
+  },
+];
+
+export const leaveRequestsData: LeaveRequest[] = [
+  {
+    id: '1',
+    doctorName: 'James Allaire',
+    duration: '4 Days - Personal Reason',
+    reason: 'Personal Reason',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '2',
+    doctorName: 'Esther Schmidt',
+    duration: '2 Days - Going to Hospital',
+    reason: 'Going to Hospital',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '3',
+    doctorName: 'Valerie Padgett',
+    duration: '1 Day - Changing Account',
+    reason: 'Changing Account',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '4',
+    doctorName: 'Diane Nash',
+    duration: '1 Day - Not Well',
+    reason: 'Not Well',
+    avatar: 'https://images.unsplash.com/photo-1594824813566-78a933758f46?w=150&auto=format&fit=crop&q=80',
+  },
+  {
+    id: '5',
+    doctorName: 'Sally Cavazos',
+    duration: '2 Days - Going to Checkup',
+    reason: 'Going to Checkup',
+    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
   },
 ];

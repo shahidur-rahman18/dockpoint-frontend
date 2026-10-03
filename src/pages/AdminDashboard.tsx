@@ -9,10 +9,13 @@ import { DoctorsSchedule } from '../components/dashboard/DoctorsSchedule';
 import { IncomeByTreatment } from '../components/dashboard/IncomeByTreatment';
 import { PopularDoctors } from '../components/dashboard/PopularDoctors';
 import { AllAppointmentsTable } from '../components/dashboard/AllAppointmentsTable';
+import { TopPatients } from '../components/dashboard/TopPatients';
+import { RecentTransactions } from '../components/dashboard/RecentTransactions';
+import { LeaveRequests } from '../components/dashboard/LeaveRequests';
 
 export const AdminDashboard: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6">
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-bold text-slate-900 tracking-tight">Admin Dashboard</h1>
@@ -60,6 +63,18 @@ export const AdminDashboard: React.FC = () => {
       {/* All Appointments Table Section */}
       <div>
         <AllAppointmentsTable />
+      </div>
+
+      {/* 3-Column Section: Top 5 Patients, Recent Transactions, Leave Requests */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+        <TopPatients />
+        <RecentTransactions />
+        <LeaveRequests />
+      </div>
+
+      {/* Footer Copyright */}
+      <div className="text-center pt-6 pb-2 text-xs font-medium text-slate-500 border-t border-slate-200/60">
+        2026 &copy;Preclinic, All Rights Reserved
       </div>
     </div>
   );

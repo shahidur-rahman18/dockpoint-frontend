@@ -84,3 +84,28 @@ export interface AllAppointmentItem {
   mode: 'Online' | 'In-Person';
   status: 'Confirmed' | 'Cancelled' | 'Checked Out' | 'Schedule';
 }
+
+export interface TopPatient {
+  id: string;
+  name: string;
+  totalPaid: string;
+  appointmentsCount: number;
+  avatar: string;
+}
+
+export interface RecentTransaction {
+  id: string;
+  title: string;
+  invoiceId: string;
+  amount: string;
+  isPositive: boolean;
+  provider: 'stripe' | 'paypal';
+}
+
+export interface LeaveRequest {
+  id: string;
+  doctorName: string;
+  duration: string;
+  reason: string;
+  avatar: string;
+}
