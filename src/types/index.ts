@@ -120,4 +120,45 @@ export interface DoctorListItem {
   fees: string;
   status: 'Available' | 'Unavailable';
   avatar: string;
+  profile?: DoctorProfile;
+}
+
+export interface DoctorProfile {
+  username: string;
+  dateOfBirth: string;
+  experienceYears: string;
+  medicalLicenseNumber: string;
+  bloodGroup: string;
+  gender: string;
+  languages: string;
+  bio: string;
+  featured: boolean;
+  address: {
+    address1: string;
+    address2: string;
+    country: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  schedule: Record<
+    string,
+    { session: string; from: string; to: string }[]
+  >;
+  scheduleDetails?: {
+    location: string;
+    fromDate: string;
+    toDate: string;
+    recursEvery: string;
+  };
+  appointment: {
+    type: string;
+    advanceBookingDays: string;
+    durationMinutes: string;
+    maxBookingsPerSlot: string;
+    showChargeOnBookingPage: boolean;
+  };
+  education: { degree: string; university: string; from: string; to: string }[];
+  awards: { name: string; from: string }[];
+  certifications: { name: string; from: string }[];
 }

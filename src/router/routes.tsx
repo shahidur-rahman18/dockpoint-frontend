@@ -3,6 +3,8 @@ import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AdminDashboard } from '../pages/AdminDashboard';
 import { DoctorList } from '../components/doctors/DoctorList';
 import { DoctorDetails } from '../components/doctors/DoctorDetails';
+import { AddDoctor } from '../components/doctors/AddDoctor';
+import { DoctorSchedule } from '../components/doctors/DoctorSchedule';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 
 const pending = (title: string, description: string) => ({
@@ -17,8 +19,8 @@ export const routes: RouteObject[] = [
       { index: true, element: <AdminDashboard /> },
       { path: 'doctors', element: <DoctorList /> },
       { path: 'doctor-details/:doctorId/:doctorSlug', element: <DoctorDetails /> },
-      { path: 'add-doctor', ...pending('Add Doctor', 'A complete doctor onboarding form will appear here.') },
-      { path: 'doctor-schedule', ...pending('Doctor Schedule', 'Weekly availability and slot management will appear here.') },
+      { path: 'add-doctor', element: <AddDoctor /> },
+      { path: 'doctor-schedule', element: <DoctorSchedule /> },
       { path: 'doctor-dashboard', ...pending('Doctor Dashboard', 'Doctor-facing dashboard will appear here.') },
       { path: 'patient-dashboard', ...pending('Patient Dashboard', 'Patient-facing dashboard will appear here.') },
       { path: 'pharmacist-dashboard', ...pending('Pharmacist Dashboard', 'Pharmacy dashboard will appear here.') },

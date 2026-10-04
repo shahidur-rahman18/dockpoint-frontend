@@ -51,7 +51,6 @@ export const DoctorDetails: React.FC = () => {
   const { doctorId } = useParams();
   const [selectedDay, setSelectedDay] = useState(schedule[0].day);
   const doctor = doctorsListData.find(({ id }) => id === doctorId);
-  const selectedSlots = schedule.find(({ day }) => day === selectedDay)?.slots ?? [];
 
   if (!doctor) {
     return (
@@ -69,13 +68,23 @@ export const DoctorDetails: React.FC = () => {
     );
   }
 
+  const doctorSchedule = doctor.profile?.schedule;
+  const displayedSchedule = doctorSchedule
+    ? Object.entries(doctorSchedule).map(([day, slots]) => ({
+        day,
+        slots: slots
+          .filter((slot) => slot.from && slot.to)
+          .map((slot) => `${slot.session ? `${slot.session}: ` : ''}${slot.from} - ${slot.to}`),
+      }))
+    : schedule;
+  const selectedSlots = displayedSchedule.find(({ day }) => day === selectedDay)?.slots ?? [];
   const profileDetails = [
     { label: 'Phone Number', value: doctor.phone, Icon: Phone },
     { label: 'Email Address', value: doctor.email, Icon: Mail },
     { label: 'Specialty', value: doctor.department, Icon: Stethoscope },
     { label: 'Availability', value: doctor.status, Icon: UserRound },
   ];
-  const hasSupplementalProfile = doctor.id === doctorsListData[0]?.id;
+  const hasSupplementalProfile = Boolean(doctor.profile) || doctor.id === doctorsListData[0]?.id;
 
   return (
     <div className="space-y-5">
@@ -142,7 +151,7 @@ export const DoctorDetails: React.FC = () => {
               role="tablist"
               className="flex gap-2 overflow-x-auto border-b border-slate-200"
             >
-              {schedule.map(({ day }) => (
+              {displayedSchedule.map(({ day }) => (
                 <button
                   key={day}
                   type="button"
@@ -160,7 +169,7 @@ export const DoctorDetails: React.FC = () => {
               ))}
             </div>
             <div role="tabpanel" className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-              {hasSupplementalProfile ? (
+              {hasSupplementalProfile && selectedSlots.length > 0 ? (
                 selectedSlots.map((slot) => (
                   <div
                     key={slot}

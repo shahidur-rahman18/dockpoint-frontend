@@ -270,6 +270,8 @@ export const DoctorList: React.FC = () => {
           </div>
 
           <button
+            type="button"
+            onClick={() => navigate('/add-doctor')}
             style={{ background: 'var(--theme-accent)' }}
             className="flex items-center gap-1.5 px-3.5 py-2 hover:brightness-90 text-white text-xs font-semibold rounded-lg shadow-xs transition-all cursor-pointer"
           >
