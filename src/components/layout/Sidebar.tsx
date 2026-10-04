@@ -61,7 +61,6 @@ const NAV_GROUPS: NavGroup[] = [
     defaultOpen: true,
     items: [
       { label: 'Doctors', path: '/doctors' },
-      { label: 'Doctor Details', path: '/doctor-details' },
       { label: 'Add Doctor', path: '/add-doctor' },
       { label: 'Doctor Schedule', path: '/doctor-schedule' },
     ],

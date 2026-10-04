@@ -15,6 +15,7 @@ interface DataTableProps<TData> {
   emptyDescription?: string;
   initialPageSize?: number;
   pageSizeOptions?: number[];
+  onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData>({
@@ -24,6 +25,7 @@ export function DataTable<TData>({
   emptyDescription = 'Try adjusting your search or filters.',
   initialPageSize = 5,
   pageSizeOptions = [5, 10, 15],
+  onRowClick,
 }: DataTableProps<TData>) {
   const pageSizeSelectId = useId();
   const [pagination, setPagination] = useState({
@@ -77,7 +79,32 @@ export function DataTable<TData>({
           <tbody className="divide-y divide-slate-100 text-xs">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
+                <tr
+                  key={row.id}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  onClick={(event) => {
+                    if (
+                      !onRowClick ||
+                      (event.target instanceof Element &&
+                        event.target.closest('button, a, input, select, textarea, [role="button"]'))
+                    ) {
+                      return;
+                    }
+                    onRowClick(row.original);
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      !onRowClick ||
+                      event.target !== event.currentTarget ||
+                      (event.key !== 'Enter' && event.key !== ' ')
+                    ) {
+                      return;
+                    }
+                    event.preventDefault();
+                    onRowClick(row.original);
+                  }}
+                  className={onRowClick ? 'cursor-pointer hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-indigo-600' : undefined}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="py-4 px-4 first:pl-5">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

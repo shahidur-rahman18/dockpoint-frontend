@@ -2,6 +2,7 @@ import { createBrowserRouter, type RouteObject } from 'react-router';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AdminDashboard } from '../pages/AdminDashboard';
 import { DoctorList } from '../components/doctors/DoctorList';
+import { DoctorDetails } from '../components/doctors/DoctorDetails';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 
 const pending = (title: string, description: string) => ({
@@ -15,7 +16,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, element: <AdminDashboard /> },
       { path: 'doctors', element: <DoctorList /> },
-      { path: 'doctor-details', ...pending('Doctor Details', 'Full doctor profile, qualifications and availability will appear here.') },
+      { path: 'doctor-details/:doctorId/:doctorSlug', element: <DoctorDetails /> },
       { path: 'add-doctor', ...pending('Add Doctor', 'A complete doctor onboarding form will appear here.') },
       { path: 'doctor-schedule', ...pending('Doctor Schedule', 'Weekly availability and slot management will appear here.') },
       { path: 'doctor-dashboard', ...pending('Doctor Dashboard', 'Doctor-facing dashboard will appear here.') },

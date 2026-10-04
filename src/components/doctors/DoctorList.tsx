@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
+import { useNavigate } from 'react-router';
 import {
   Search,
   Filter,
@@ -17,7 +18,18 @@ import { EditDoctorDrawer } from './EditDoctorDrawer';
 import { doctorsListData } from '../../data/mockData';
 import type { DoctorListItem } from '../../types';
 
+const doctorDetailsPath = (doctor: DoctorListItem) => {
+  const slug = doctor.name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  return `/doctor-details/${doctor.id}/${slug}`;
+};
+
 export const DoctorList: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<DoctorListItem['status'] | ''>('');
@@ -49,6 +61,10 @@ export const DoctorList: React.FC = () => {
 
   const handleDeleteDoctor = (doctor: DoctorListItem) => {
     console.log('Delete doctor:', doctor);
+  };
+
+  const handleViewDoctor = (doctor: DoctorListItem) => {
+    navigate(doctorDetailsPath(doctor));
   };
 
   const goToPage = (page: number) => {
@@ -203,7 +219,7 @@ export const DoctorList: React.FC = () => {
         ),
       },
     ],
-    [openActionMenuId, toggleActionMenu, handleEditDoctor, handleDeleteDoctor],
+    [openActionMenuId, toggleActionMenu, handleEditDoctor, handleDeleteDoctor, handleViewDoctor],
   );
 
   return (
@@ -381,7 +397,18 @@ export const DoctorList: React.FC = () => {
                 return (
                   <div
                     key={doctor.id}
-                    className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs hover:shadow-md transition-all relative flex flex-col justify-between group"
+                    role="link"
+                    tabIndex={0}
+                    aria-label={`View details for ${doctor.name}`}
+                    onClick={() => handleViewDoctor(doctor)}
+                    onKeyDown={(event) => {
+                      if (event.target !== event.currentTarget) return;
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handleViewDoctor(doctor);
+                      }
+                    }}
+                    className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs hover:shadow-md focus-visible:outline-2 focus-visible:outline-indigo-600 transition-all relative flex flex-col justify-between group cursor-pointer"
                   >
                     <div>
                       {/* Top Action Menu & Card Header */}
@@ -401,12 +428,14 @@ export const DoctorList: React.FC = () => {
                             </p>
                           </div>
                         </div>
-                        <ActionDropdown
-                          isOpen={openActionMenuId === doctor.id}
-                          onToggle={() => toggleActionMenu(doctor.id)}
-                          onEdit={() => handleEditDoctor(doctor)}
-                          onDelete={() => handleDeleteDoctor(doctor)}
-                        />
+                        <div onClick={(event) => event.stopPropagation()}>
+                          <ActionDropdown
+                            isOpen={openActionMenuId === doctor.id}
+                            onToggle={() => toggleActionMenu(doctor.id)}
+                            onEdit={() => handleEditDoctor(doctor)}
+                            onDelete={() => handleDeleteDoctor(doctor)}
+                          />
+                        </div>
                       </div>
 
                       {/* Availability & Fees */}
@@ -439,6 +468,7 @@ export const DoctorList: React.FC = () => {
                       <button
                         aria-label={`Schedule ${doctor.name}`}
                         title="Schedule Appointment"
+                        onClick={(event) => event.stopPropagation()}
                         className="p-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-500 rounded-xl border border-slate-200 transition-colors cursor-pointer flex items-center justify-center shadow-xs"
                       >
                         <Calendar className="w-4 h-4" />
@@ -510,6 +540,7 @@ export const DoctorList: React.FC = () => {
         <DataTable
           data={filteredDoctors}
           columns={columns}
+          onRowClick={handleViewDoctor}
           emptyMessage="No doctors found"
           emptyDescription="Try adjusting your search keywords."
         />
