@@ -6,6 +6,8 @@ import { DoctorDetails } from '../components/doctors/DoctorDetails';
 import { AddDoctor } from '../components/doctors/AddDoctor';
 import { DoctorSchedule } from '../components/doctors/DoctorSchedule';
 import { DoctorDashboard } from '../pages/DoctorDashboard';
+import { AdminSettingsPage } from '../pages/AdminSettingsPage';
+import { DoctorSettingsPage } from '../pages/DoctorSettingsPage';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 import { SignInPage } from '../components/auth/SignInPage';
 import { SignUpPage } from '../components/auth/SignUpPage';
@@ -32,7 +34,8 @@ export const routes: RouteObject[] = [
       { path: 'doctor-dashboard/prescriptions', ...pending('Prescriptions', 'Your prescriptions will appear here.') },
       { path: 'doctor-dashboard/leave', ...pending('Leave', 'Your leave requests will appear here.') },
       { path: 'doctor-dashboard/reviews', ...pending('Reviews', 'Your patient reviews will appear here.') },
-      { path: 'doctor-dashboard/settings', ...pending('Settings', 'Your account settings will appear here.') },
+      { path: 'doctor-dashboard/settings', element: <DoctorSettingsPage /> },
+      { path: 'settings', element: <AdminSettingsPage /> },
       { path: 'patient-dashboard', ...pending('Patient Dashboard', 'Patient-facing dashboard will appear here.') },
       { path: 'pharmacist-dashboard', ...pending('Pharmacist Dashboard', 'Pharmacy dashboard will appear here.') },
       { path: 'nurse-dashboard', ...pending('Nurse Dashboard', 'Nurse dashboard will appear here.') },

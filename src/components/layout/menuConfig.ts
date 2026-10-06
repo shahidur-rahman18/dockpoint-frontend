@@ -68,6 +68,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   { id: 'locations', label: 'Locations', icon: MapPin, section: 'Clinic', path: '/locations' },
   { id: 'services', label: 'Services', icon: Stethoscope, section: 'Clinic', path: '/services' },
   { id: 'specializations', label: 'Specializations', icon: Award, section: 'Clinic', path: '/specializations' },
+   { id: 'doctor-settings', label: 'Settings', icon: Settings, section: 'Clinic', path: '/doctor-dashboard/settings' },
 ];
 
 export const DOCTOR_NAV_GROUPS: NavGroup[] = [
