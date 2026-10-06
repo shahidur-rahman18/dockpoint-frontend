@@ -6,12 +6,16 @@ import { DoctorDetails } from '../components/doctors/DoctorDetails';
 import { AddDoctor } from '../components/doctors/AddDoctor';
 import { DoctorSchedule } from '../components/doctors/DoctorSchedule';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
+import { SignInPage } from '../components/auth/SignInPage';
+import { SignUpPage } from '../components/auth/SignUpPage';
 
 const pending = (title: string, description: string) => ({
   element: <PlaceholderPage title={title} description={description} />,
 });
 
 export const routes: RouteObject[] = [
+  { path: '/sign-in', element: <SignInPage /> },
+  { path: '/sign-up', element: <SignUpPage /> },
   {
     path: '/',
     element: <DashboardLayout />,
