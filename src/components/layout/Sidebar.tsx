@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import {
   ChevronDown,
@@ -23,6 +23,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
   const [openGroups, setOpenGroups] = useState<string[]>(
     navGroups.filter((group) => group.defaultOpen).map((group) => group.id),
   );
+
+  useEffect(() => {
+    const activeExpandableGroups = navGroups
+      .filter((group) => group.items?.some((item) => isItemActive(item.path)))
+      .map((group) => group.id);
+
+    if (activeExpandableGroups.length > 0) {
+      setOpenGroups((current) => [...new Set([...current, ...activeExpandableGroups])]);
+    }
+  }, [location.pathname]);
 
   const isItemActive = (path?: string) => {
     if (!path) return false;
@@ -104,14 +114,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
 
       {/* Sidebar Nav Links */}
       <div className={`pt-0 pb-4 space-y-6 flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
-        {(['Main Menu', 'Clinic'] as const).map((section) => (
+        {(['Main Menu', 'Clinic', 'Settings'] as const).map((section) => (
           <div key={section}>
             {!collapsed && (
               <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 {section}
               </span>
             )}
-            <div className="mt-2 space-y-1">
+            <div className={`${section === 'Settings' ? 'mt-2 border-t border-slate-100 pt-3' : 'mt-2'} space-y-1`}>
               {navGroups.filter((group) => group.section === section).map((group) => {
                 const Icon = group.icon;
 

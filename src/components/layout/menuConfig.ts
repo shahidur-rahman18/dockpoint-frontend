@@ -26,7 +26,7 @@ export interface NavGroup {
   id: string;
   label: string;
   icon: LucideIcon;
-  section: 'Main Menu' | 'Clinic';
+  section: 'Main Menu' | 'Clinic' | 'Settings';
   path?: string;
   items?: NavItem[];
   defaultOpen?: boolean;
@@ -68,7 +68,19 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   { id: 'locations', label: 'Locations', icon: MapPin, section: 'Clinic', path: '/locations' },
   { id: 'services', label: 'Services', icon: Stethoscope, section: 'Clinic', path: '/services' },
   { id: 'specializations', label: 'Specializations', icon: Award, section: 'Clinic', path: '/specializations' },
-   { id: 'doctor-settings', label: 'Settings', icon: Settings, section: 'Clinic', path: '/doctor-dashboard/settings' },
+  {
+    id: 'admin-settings',
+    label: 'Settings',
+    icon: Settings,
+    section: 'Settings',
+    defaultOpen: true,
+    items: [
+      { label: 'Profile', path: '/settings/profile' },
+      { label: 'Security', path: '/settings/security' },
+      { label: 'Notifications', path: '/settings/notifications' },
+      { label: 'Integrations', path: '/settings/integrations' },
+    ],
+  },
 ];
 
 export const DOCTOR_NAV_GROUPS: NavGroup[] = [
@@ -84,7 +96,18 @@ export const DOCTOR_NAV_GROUPS: NavGroup[] = [
   { id: 'doctor-prescriptions', label: 'Prescriptions', icon: ClipboardList, section: 'Clinic', path: '/doctor-dashboard/prescriptions' },
   { id: 'doctor-leave', label: 'Leave', icon: CalendarOff, section: 'Clinic', path: '/doctor-dashboard/leave' },
   { id: 'doctor-reviews', label: 'Reviews', icon: MessageSquare, section: 'Clinic', path: '/doctor-dashboard/reviews' },
-  { id: 'doctor-settings', label: 'Settings', icon: Settings, section: 'Clinic', path: '/doctor-dashboard/settings' },
+  {
+    id: 'doctor-settings',
+    label: 'Settings',
+    icon: Settings,
+    section: 'Settings',
+    defaultOpen: true,
+    items: [
+      { label: 'Profile Settings', path: '/doctor-dashboard/settings/profile' },
+      { label: 'Change Password', path: '/doctor-dashboard/settings/password' },
+      { label: 'Notifications', path: '/doctor-dashboard/settings/notifications' },
+    ],
+  },
 ];
 
 export const isDoctorDashboardPath = (pathname: string): boolean =>
