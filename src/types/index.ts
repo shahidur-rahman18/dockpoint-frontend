@@ -162,3 +162,46 @@ export interface DoctorProfile {
   awards: { name: string; from: string }[];
   certifications: { name: string; from: string }[];
 }
+
+export interface DoctorDashboardStat {
+  id: string;
+  title: string;
+  value: string;
+  change: string;
+  isPositive: boolean;
+  icon: string;
+  miniChartData: number[];
+  chartColor: string;
+}
+
+export interface DoctorUpcomingAppointment {
+  id: string;
+  patientName: string;
+  patientId: string;
+  time: string;
+  department: string;
+  consultationType: string;
+  avatar: string;
+}
+
+export interface DoctorAppointmentChartData {
+  month: string;
+  appointments: number;
+  completed: number;
+}
+
+export interface DoctorDashboardMetric {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+  iconBgColor: string;
+  change: string;
+  isPositive: boolean;
+}
+
+export interface DoctorUpgradeCard {
+  title: string;
+  description: string;
+  buttonText: string;
+}

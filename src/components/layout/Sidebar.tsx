@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import {
-  LayoutDashboard,
   ChevronDown,
   ChevronRight,
-  AppWindow,
-  Layers,
-  UserCheck,
-  Users,
-  CalendarCheck,
-  ListOrdered,
-  MapPin,
-  Stethoscope,
-  Award,
   PanelLeftClose,
   X,
 } from 'lucide-react';
+import { getNavGroups, isDoctorDashboardPath } from './menuConfig';
+import { UpgradeProCard } from '../doctor-dashboard/UpgradeProCard';
 
 interface SidebarProps {
   background: string;
@@ -23,67 +15,19 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-interface NavItem {
-  label: string;
-  path: string;
-}
-
-interface NavGroup {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  path?: string;
-  items?: NavItem[];
-  defaultOpen?: boolean;
-}
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    defaultOpen: true,
-    items: [
-      { label: 'Admin Dashboard', path: '/' },
-      { label: 'Doctor Dashboard', path: '/doctor-dashboard' },
-      { label: 'Patient Dashboard', path: '/patient-dashboard' },
-      { label: 'Pharmacist Dashboard', path: '/pharmacist-dashboard' },
-      { label: 'Nurse Dashboard', path: '/nurse-dashboard' },
-      { label: 'Receptionist Dashboard', path: '/receptionist-dashboard' },
-    ],
-  },
-  { id: 'applications', label: 'Applications', icon: AppWindow, path: '/applications' },
-  { id: 'layouts', label: 'Layouts', icon: Layers, path: '/layouts' },
-  {
-    id: 'doctors',
-    label: 'Doctors',
-    icon: UserCheck,
-    defaultOpen: true,
-    items: [
-      { label: 'Doctors', path: '/doctors' },
-      { label: 'Add Doctor', path: '/add-doctor' },
-      { label: 'Doctor Schedule', path: '/doctor-schedule' },
-    ],
-  },
-  { id: 'patients', label: 'Patients', icon: Users, path: '/patients' },
-  { id: 'appointments', label: 'Appointments', icon: CalendarCheck, path: '/appointments' },
-  { id: 'queue', label: 'Queue Management', icon: ListOrdered, path: '/queue-management' },
-  { id: 'locations', label: 'Locations', icon: MapPin, path: '/locations' },
-  { id: 'services', label: 'Services', icon: Stethoscope, path: '/services' },
-  { id: 'specializations', label: 'Specializations', icon: Award, path: '/specializations' },
-];
-
 export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false, onClose }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [openGroups, setOpenGroups] = useState<string[]>(
-    NAV_GROUPS.filter((group) => group.defaultOpen).map((group) => group.id),
-  );
   const location = useLocation();
   const navigate = useNavigate();
+  const navGroups = getNavGroups(location.pathname);
+  const [openGroups, setOpenGroups] = useState<string[]>(
+    navGroups.filter((group) => group.defaultOpen).map((group) => group.id),
+  );
 
   const isItemActive = (path?: string) => {
     if (!path) return false;
-    return path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+    if (path === '/' || path === '/doctor-dashboard') return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   const toggleGroup = (id: string) => {
@@ -160,184 +104,98 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
 
       {/* Sidebar Nav Links */}
       <div className={`pt-0 pb-4 space-y-6 flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
-        {/* Main Menu Section */}
-        <div>
-          {!collapsed && (
-            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Main Menu
-            </span>
-          )}
-          <div className="mt-2 space-y-1">
-            {NAV_GROUPS.slice(0, 3).map((group) => {
-              const Icon = group.icon;
+        {(['Main Menu', 'Clinic'] as const).map((section) => (
+          <div key={section}>
+            {!collapsed && (
+              <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {section}
+              </span>
+            )}
+            <div className="mt-2 space-y-1">
+              {navGroups.filter((group) => group.section === section).map((group) => {
+                const Icon = group.icon;
 
-              if (!group.items) {
+                if (!group.items) {
+                  return (
+                    <button
+                      key={group.id}
+                      onClick={() => group.path && navigate(group.path)}
+                      title={collapsed ? group.label : undefined}
+                      aria-current={isItemActive(group.path) ? 'page' : undefined}
+                      className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
+                        isItemActive(group.path)
+                          ? 'bg-indigo-50/70 text-slate-800'
+                          : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon
+                          className={`w-4 h-4 ${isItemActive(group.path) ? 'text-slate-500' : 'text-slate-400'}`}
+                        />
+                        {!collapsed && <span>{group.label}</span>}
+                      </span>
+                      {!collapsed && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+                    </button>
+                  );
+                }
+
+                const isOpen = openGroups.includes(group.id);
+
                 return (
-                  <button
-                    key={group.id}
-                    onClick={() => navigate(group.path!)}
-                    title={collapsed ? group.label : undefined}
-                    className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
-                      isItemActive(group.path)
-                        ? 'bg-indigo-50/70 text-slate-800'
-                        : 'text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <Icon
-                        className={`w-4 h-4 ${isItemActive(group.path) ? 'text-slate-500' : 'text-slate-400'}`}
-                      />
-                      {!collapsed && <span>{group.label}</span>}
-                    </span>
-                    {!collapsed && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
-                  </button>
+                  <div key={group.id}>
+                    <button
+                      onClick={() => (collapsed ? setCollapsed(false) : toggleGroup(group.id))}
+                      title={collapsed ? group.label : undefined}
+                      aria-expanded={!collapsed ? isOpen : undefined}
+                      className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
+                        group.items.some((item) => isItemActive(item.path))
+                          ? 'text-slate-800'
+                          : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className="w-4 h-4 text-slate-500" />
+                        {!collapsed && <span>{group.label}</span>}
+                      </span>
+                      {!collapsed &&
+                        (isOpen ? (
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                        ))}
+                    </button>
+
+                    {!collapsed && isOpen && (
+                      <div className="ml-4 pl-3 border-l border-slate-100 my-1 space-y-1">
+                        {group.items.map((item) => {
+                          const isActive = isItemActive(item.path);
+
+                          return (
+                            <button
+                              key={item.path}
+                              onClick={() => navigate(item.path)}
+                              aria-current={isActive ? 'page' : undefined}
+                              style={isActive ? { background: 'var(--theme-accent)', color: '#fff' } : undefined}
+                              className={`w-full text-left px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer block ${
+                                isActive
+                                  ? 'font-semibold'
+                                  : 'font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                              }`}
+                            >
+                              {item.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
-              }
-
-              const isOpen = openGroups.includes(group.id);
-
-              return (
-                <div key={group.id}>
-                  <button
-                    onClick={() => (collapsed ? setCollapsed(false) : toggleGroup(group.id))}
-                    title={collapsed ? group.label : undefined}
-                    aria-expanded={!collapsed ? isOpen : undefined}
-                    className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
-                      group.items.some((item) => isItemActive(item.path))
-                        ? 'text-slate-800'
-                        : 'text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <Icon className="w-4 h-4 text-slate-500" />
-                      {!collapsed && <span>{group.label}</span>}
-                    </span>
-                    {!collapsed &&
-                      (isOpen ? (
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                      ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                      ))}
-                  </button>
-
-                  {!collapsed && isOpen && (
-                    <div className="ml-4 pl-3 border-l border-slate-100 my-1 space-y-1">
-                      {group.items.map((item) => {
-                        const isActive = isItemActive(item.path);
-
-                        return (
-                          <button
-                            key={item.path}
-                            onClick={() => navigate(item.path)}
-                            aria-current={isActive ? 'page' : undefined}
-                            style={isActive ? { background: 'var(--theme-accent)', color: '#fff' } : undefined}
-                            className={`w-full text-left px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer block ${
-                              isActive
-                                ? 'font-semibold'
-                                : 'font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                            }`}
-                          >
-                            {item.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+              })}
+            </div>
           </div>
-        </div>
-
-        {/* Clinic Section */}
-        <div>
-          {!collapsed && (
-            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Clinic
-            </span>
-          )}
-          <div className="mt-2 space-y-0.5">
-            {NAV_GROUPS.slice(3).map((group) => {
-              const Icon = group.icon;
-
-              if (!group.items) {
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => navigate(group.path!)}
-                    title={collapsed ? group.label : undefined}
-                    className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
-                      isItemActive(group.path)
-                        ? 'bg-indigo-50/70 text-slate-800'
-                        : 'text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <Icon
-                        className={`w-4 h-4 ${isItemActive(group.path) ? 'text-slate-500' : 'text-slate-400'}`}
-                      />
-                      {!collapsed && <span>{group.label}</span>}
-                    </span>
-                    {!collapsed && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
-                  </button>
-                );
-              }
-
-              const isOpen = openGroups.includes(group.id);
-
-              return (
-                <div key={group.id}>
-                  <button
-                    onClick={() => (collapsed ? setCollapsed(false) : toggleGroup(group.id))}
-                    title={collapsed ? group.label : undefined}
-                    aria-expanded={!collapsed ? isOpen : undefined}
-                    className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
-                      group.items.some((item) => isItemActive(item.path))
-                        ? 'text-slate-800'
-                        : 'text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <Icon className="w-4 h-4 text-slate-500" />
-                      {!collapsed && <span>{group.label}</span>}
-                    </span>
-                    {!collapsed &&
-                      (isOpen ? (
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                      ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                      ))}
-                  </button>
-
-                  {!collapsed && isOpen && (
-                    <div className="ml-4 pl-3 border-l border-slate-100 my-1 space-y-1">
-                      {group.items.map((item) => {
-                        const isActive = isItemActive(item.path);
-
-                        return (
-                          <button
-                            key={item.path}
-                            onClick={() => navigate(item.path)}
-                            aria-current={isActive ? 'page' : undefined}
-                            style={isActive ? { background: 'var(--theme-accent)', color: '#fff' } : undefined}
-                            className={`w-full text-left px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer block ${
-                              isActive
-                                ? 'font-semibold'
-                                : 'font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                            }`}
-                          >
-                            {item.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        ))}
       </div>
+      {isDoctorDashboardPath(location.pathname) && !collapsed && <UpgradeProCard />}
     </aside>
     </>
   );
