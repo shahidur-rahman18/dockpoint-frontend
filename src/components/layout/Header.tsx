@@ -1,5 +1,19 @@
 import React from 'react';
-import { Search, Sparkles, Calendar, Settings, Moon, Sun, Bell, Menu } from 'lucide-react';
+import {
+  Search,
+  Sparkles,
+  Calendar,
+  Settings,
+  Moon,
+  Sun,
+  Bell,
+  Menu,
+  UserRound,
+  Shield,
+} from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router';
+import { isDoctorDashboardPath } from './menuConfig';
+import { ProfileDropdown, type ProfileDropdownItem } from '../common/ProfileDropdown';
 
 interface HeaderProps {
   background: string;
@@ -9,6 +23,37 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleColorMode, onMenuClick }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isDoctorDashboard = isDoctorDashboardPath(location.pathname);
+  const settingsPath = isDoctorDashboard
+    ? '/doctor-dashboard/settings'
+    : '/settings';
+  const profileMenuItems: ProfileDropdownItem[] = [
+    {
+      id: 'profile',
+      label: 'Profile Settings',
+      icon: <UserRound className="h-4 w-4 text-slate-400" />,
+      onClick: () => navigate(`${settingsPath}/profile`),
+    },
+    {
+      id: 'account',
+      label: 'Account Settings',
+      icon: <Shield className="h-4 w-4 text-slate-400" />,
+      onClick: () => navigate(
+        isDoctorDashboard
+          ? `${settingsPath}/password`
+          : `${settingsPath}/security`,
+      ),
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: <Bell className="h-4 w-4 text-slate-400" />,
+      onClick: () => navigate(`${settingsPath}/notifications`),
+    },
+  ];
+
   return (
     <header style={{ background }} className="sticky top-0 z-30 h-14 shrink-0 bg-white border-b border-slate-100 px-4 sm:px-6 flex items-center justify-between shadow-xs">
       {/* Left Side: Hamburger (Mobile) & Search (Desktop) */}
@@ -52,7 +97,17 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
           <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer hidden sm:block" title="Calendar">
             <Calendar className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer hidden sm:block" title="Settings">
+          <button
+            type="button"
+            onClick={() => navigate(
+              isDoctorDashboard
+                ? '/doctor-dashboard/settings/profile'
+                : '/settings/profile',
+            )}
+            aria-label="Settings"
+            className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer hidden sm:block"
+            title="Settings"
+          >
             <Settings className="w-4 h-4" />
           </button>
           <button
@@ -69,12 +124,13 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
           </button>
         </div>
 
-        {/* User Profile Avatar */}
-        <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-          <img
-            src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100&auto=format&fit=crop&q=80"
-            alt="User Avatar"
-            className="w-8 h-8 rounded-full object-cover border border-slate-200"
+        {/* User Profile Menu */}
+        <div className="flex items-center pl-2 border-l border-slate-200">
+          <ProfileDropdown
+            name="Jimmy Anderson"
+            role={isDoctorDashboard ? 'Doctor' : 'Administrator'}
+            avatarUrl="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100&auto=format&fit=crop&q=80"
+            items={profileMenuItems}
           />
         </div>
 
