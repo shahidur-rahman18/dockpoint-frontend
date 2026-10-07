@@ -42,6 +42,7 @@ export const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                     />
                   )}
                 </div>
+
                 <label className="absolute bottom-0 right-0 bg-slate-900 text-white p-1.5 rounded-full cursor-pointer hover:bg-indigo-600 shadow-md transition-colors">
                   <Camera className="w-3.5 h-3.5" />
                   <input
