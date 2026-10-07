@@ -13,7 +13,9 @@ interface SignInPageProps {
   title?: string;
   subtitle?: string;
   copyrightText?: string;
-  onSubmit?: (credentials: SignInCredentials) => void;
+  onSubmit?: (credentials: SignInCredentials) => void | Promise<void>;
+  errorMessage?: string;
+  isSubmitting?: boolean;
   onForgotPassword?: () => void;
   onRegister?: () => void;
 }
@@ -24,19 +26,21 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   subtitle = 'Please enter your details to access the dashboard',
   copyrightText = `Copyright © ${new Date().getFullYear()} - ${brandName}`,
   onSubmit,
+  errorMessage,
+  isSubmitting = false,
   onForgotPassword,
   onRegister,
 }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!onSubmit) return;
 
     const formData = new FormData(event.currentTarget);
-    onSubmit({
+    await onSubmit({
       email: String(formData.get('email') ?? ''),
       password: String(formData.get('password') ?? ''),
       rememberMe,
@@ -74,6 +78,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           </header>
 
           <form className="flex flex-col gap-[17px]" onSubmit={handleSubmit}>
+            {errorMessage && (
+              <p
+                className="m-0 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+                role="alert"
+              >
+                {errorMessage}
+              </p>
+            )}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium" htmlFor="sign-in-email">Email Address</label>
               <div className="flex min-h-10 items-center gap-[11px] rounded-md border border-[var(--border-color)] px-3 text-[var(--text-primary)] transition focus-within:border-[var(--theme-accent)] focus-within:ring-2 focus-within:ring-[var(--theme-accent)]/15">
@@ -139,10 +151,11 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </div>
 
             <button
-              className="mt-px min-h-10 cursor-pointer rounded-[5px] border-0 bg-[var(--theme-accent)] text-[13px] font-bold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+              className="mt-px min-h-10 cursor-pointer rounded-[5px] border-0 bg-[var(--theme-accent)] text-[13px] font-bold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
               type="submit"
+              disabled={isSubmitting}
             >
-              Login
+              {isSubmitting ? 'Signing in...' : 'Login'}
             </button>
           </form>
 

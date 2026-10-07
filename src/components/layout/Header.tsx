@@ -14,6 +14,7 @@ import {
 import { useLocation, useNavigate } from 'react-router';
 import { isDoctorDashboardPath } from './menuConfig';
 import { ProfileDropdown, type ProfileDropdownItem } from '../common/ProfileDropdown';
+import { useAuth } from '../../auth/AuthContext';
 
 interface HeaderProps {
   background: string;
@@ -25,6 +26,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleColorMode, onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { doctor, logout } = useAuth();
   const isDoctorDashboard = isDoctorDashboardPath(location.pathname);
   const settingsPath = isDoctorDashboard
     ? '/doctor-dashboard/settings'
@@ -127,10 +129,14 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
         {/* User Profile Menu */}
         <div className="flex items-center pl-2 border-l border-slate-200">
           <ProfileDropdown
-            name="Jimmy Anderson"
-            role={isDoctorDashboard ? 'Doctor' : 'Administrator'}
-            avatarUrl="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100&auto=format&fit=crop&q=80"
+            name={doctor?.name ?? 'Doctor'}
+            role="Doctor"
+            avatarUrl={doctor?.avatar ?? ''}
             items={profileMenuItems}
+            onLogout={() => {
+              logout();
+              navigate('/sign-in', { replace: true });
+            }}
           />
         </div>
 

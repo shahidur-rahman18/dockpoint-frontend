@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { LogOut } from 'lucide-react';
 
 export interface ProfileDropdownItem {
   id: string;
@@ -14,6 +15,7 @@ interface ProfileDropdownProps {
   role: string;
   avatarUrl: string;
   items: ProfileDropdownItem[];
+  onLogout: () => void;
 }
 
 export function ProfileDropdown({
@@ -21,6 +23,7 @@ export function ProfileDropdown({
   role,
   avatarUrl,
   items,
+  onLogout,
 }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -108,6 +111,20 @@ export function ProfileDropdown({
                 </button>
               </div>
             ))}
+          </div>
+          <div className="border-t border-slate-200 pt-1">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                onLogout();
+                setIsOpen(false);
+              }}
+              className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       )}
