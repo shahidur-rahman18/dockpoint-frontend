@@ -13,7 +13,7 @@ export interface ProfileDropdownItem {
 interface ProfileDropdownProps {
   name: string;
   role: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   items: ProfileDropdownItem[];
   onLogout: () => void;
 }
@@ -27,6 +27,29 @@ export function ProfileDropdown({
 }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  const avatar = (size: 'small' | 'large') =>
+    avatarUrl ? (
+      <img
+        src={avatarUrl}
+        alt=""
+        className={`${size === 'small' ? 'w-8 h-8' : 'h-9 w-9'} rounded-full border border-slate-200 object-cover`}
+      />
+    ) : (
+      <span
+        aria-hidden="true"
+        className={`grid ${size === 'small' ? 'size-8 text-xs' : 'h-9 w-9 text-sm'} place-items-center rounded-full bg-indigo-100 font-semibold text-indigo-800`}
+      >
+        {initials}
+      </span>
+    );
 
   useEffect(() => {
     if (!isOpen) return;
@@ -62,11 +85,7 @@ export function ProfileDropdown({
         aria-expanded={isOpen}
         className="rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
       >
-        <img
-          src={avatarUrl}
-          alt=""
-          className="w-8 h-8 rounded-full object-cover border border-slate-200"
-        />
+        {avatar('small')}
       </button>
 
       {isOpen && (
@@ -76,11 +95,7 @@ export function ProfileDropdown({
           className="absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
         >
           <div className="mb-1 flex items-center gap-2.5 rounded-lg bg-slate-50 px-2.5 py-2">
-            <img
-              src={avatarUrl}
-              alt=""
-              className="h-9 w-9 rounded-full object-cover"
-            />
+            {avatar('large')}
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-slate-800">{name}</p>
               <p className="truncate text-xs text-slate-500">{role}</p>

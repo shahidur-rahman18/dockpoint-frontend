@@ -9,6 +9,7 @@ import { AdminSettingsPage } from '../pages/AdminSettingsPage';
 import { DoctorSettingsPage } from '../pages/DoctorSettingsPage';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 import { RequireAuth, SignInRoute } from '../components/auth/AuthRoutes';
+import { AdminDashboard } from '../pages/AdminDashboard';
 import { SignUpPage } from '../components/auth/SignUpPage';
 
 const pending = (title: string, description: string) => ({
@@ -16,7 +17,9 @@ const pending = (title: string, description: string) => ({
 });
 
 export const routes: RouteObject[] = [
-  { path: '/sign-in', element: <SignInRoute /> },
+  { path: '/admin/sign-in', element: <SignInRoute role="admin" /> },
+  { path: '/doctor/sign-in', element: <SignInRoute role="doctor" /> },
+  { path: '/sign-in', element: <Navigate to="/doctor/sign-in" replace /> },
   { path: '/sign-up', element: <SignUpPage /> },
   {
     path: '/',
@@ -26,7 +29,8 @@ export const routes: RouteObject[] = [
       </RequireAuth>
     ),
     children: [
-      { index: true, element: <Navigate to="/doctor-dashboard" replace /> },
+      { index: true, element: <Navigate to="/admin-dashboard" replace /> },
+      { path: 'admin-dashboard', element: <AdminDashboard /> },
       { path: 'doctors', element: <DoctorList /> },
       { path: 'doctor-details/:doctorId/:doctorSlug', element: <DoctorDetails /> },
       { path: 'add-doctor', element: <AddDoctor /> },

@@ -26,7 +26,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleColorMode, onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { doctor, logout } = useAuth();
+  const { doctor, role, logout } = useAuth();
   const isDoctorDashboard = isDoctorDashboardPath(location.pathname);
   const settingsPath = isDoctorDashboard
     ? '/doctor-dashboard/settings'
@@ -129,13 +129,15 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
         {/* User Profile Menu */}
         <div className="flex items-center pl-2 border-l border-slate-200">
           <ProfileDropdown
-            name={doctor?.name ?? 'Doctor'}
-            role="Doctor"
+            name={doctor?.name ?? 'Administrator'}
+            role={role === 'admin' ? 'Admin' : 'Doctor'}
             avatarUrl={doctor?.avatar ?? ''}
             items={profileMenuItems}
             onLogout={() => {
               logout();
-              navigate('/sign-in', { replace: true });
+              navigate(role === 'admin' ? '/admin/sign-in' : '/doctor/sign-in', {
+                replace: true,
+              });
             }}
           />
         </div>

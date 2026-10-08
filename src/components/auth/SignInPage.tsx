@@ -16,6 +16,7 @@ interface SignInPageProps {
   onSubmit?: (credentials: SignInCredentials) => void | Promise<void>;
   errorMessage?: string;
   isSubmitting?: boolean;
+  showRegister?: boolean;
   onForgotPassword?: () => void;
   onRegister?: () => void;
 }
@@ -28,6 +29,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   onSubmit,
   errorMessage,
   isSubmitting = false,
+  showRegister = true,
   onForgotPassword,
   onRegister,
 }) => {
@@ -159,25 +161,27 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </button>
           </form>
 
-          <p className="mt-[17px] text-center text-[13px] sm:text-sm">
-            Don&apos;t have an account yet?{' '}
-            {onRegister ? (
-              <button
-                className="cursor-pointer border-0 bg-transparent p-0 text-[var(--theme-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
-                type="button"
-                onClick={onRegister}
-              >
-                Register
-              </button>
-            ) : (
-              <Link
-                className="text-[var(--theme-accent)] no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
-                to="/sign-up"
-              >
-                Register
-              </Link>
-            )}
-          </p>
+          {showRegister && (
+            <p className="mt-[17px] text-center text-[13px] sm:text-sm">
+              Don&apos;t have an account yet?{' '}
+              {onRegister ? (
+                <button
+                  className="cursor-pointer border-0 bg-transparent p-0 text-[var(--theme-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+                  type="button"
+                  onClick={onRegister}
+                >
+                  Register
+                </button>
+              ) : (
+                <Link
+                  className="text-[var(--theme-accent)] no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+                  to="/sign-up"
+                >
+                  Register
+                </Link>
+              )}
+            </p>
+          )}
         </section>
 
         <footer className="mt-5 text-center text-xs text-[var(--text-secondary)] sm:mt-6 sm:text-sm">

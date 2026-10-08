@@ -6,36 +6,40 @@ import {
   type ReactNode,
 } from 'react';
 import {
-  clearStoredDoctor,
-  getStoredDoctor,
+  clearStoredAuth,
+  getStoredAuth,
   loginWithMockCredentials,
   type LoginCredentials,
+  type UserRole,
 } from './authService';
 import type { DoctorListItem } from '../types';
 
 interface AuthContextValue {
   doctor: DoctorListItem | null;
-  login: (credentials: LoginCredentials) => Promise<void>;
+  role: UserRole | null;
+  login: (credentials: LoginCredentials, role: UserRole) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [doctor, setDoctor] = useState<DoctorListItem | null>(getStoredDoctor);
+  const [session, setSession] = useState(getStoredAuth);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    const authenticatedDoctor = loginWithMockCredentials(credentials);
-    setDoctor(authenticatedDoctor);
+  const login = useCallback(async (credentials: LoginCredentials, role: UserRole) => {
+    const authenticatedSession = loginWithMockCredentials(role, credentials);
+    setSession(authenticatedSession);
   }, []);
 
   const logout = useCallback(() => {
-    clearStoredDoctor();
-    setDoctor(null);
+    clearStoredAuth();
+    setSession(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ doctor, login, logout }}>
+    <AuthContext.Provider
+      value={{ doctor: session?.doctor ?? null, role: session?.role ?? null, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -3,16 +3,19 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
 import { SignInPage, type SignInCredentials } from './SignInPage';
 import { useAuth } from '../../auth/AuthContext';
+import type { UserRole } from '../../auth/authService';
 
-export function SignInRoute() {
-  const { doctor, login } = useAuth();
-  const location = useLocation();
+const getHomePath = (role: UserRole) =>
+  role === 'admin' ? '/admin-dashboard' : '/doctor-dashboard';
+
+export function SignInRoute({ role }: { role: UserRole }) {
+  const { role: authenticatedRole, login } = useAuth();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (doctor) {
-    return <Navigate to="/doctor-dashboard" replace />;
+  if (authenticatedRole) {
+    return <Navigate to={getHomePath(authenticatedRole)} replace />;
   }
 
   const handleSubmit = async (credentials: SignInCredentials) => {
@@ -20,13 +23,8 @@ export function SignInRoute() {
     setIsSubmitting(true);
 
     try {
-      await login(credentials);
-      const from = location.state?.from;
-      const returnPath =
-        from && typeof from.pathname === 'string'
-          ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`
-          : '/doctor-dashboard';
-      navigate(returnPath, { replace: true });
+      await login(credentials, role);
+      navigate(getHomePath(role), { replace: true });
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -40,19 +38,34 @@ export function SignInRoute() {
 
   return (
     <SignInPage
+      title={role === 'admin' ? 'Admin Sign In' : 'Doctor Sign In'}
+      subtitle={
+        role === 'admin'
+          ? 'Sign in to access the administration dashboard'
+          : 'Sign in to access your doctor dashboard'
+      }
       onSubmit={handleSubmit}
       errorMessage={errorMessage}
       isSubmitting={isSubmitting}
+      showRegister={role === 'doctor'}
     />
   );
 }
 
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { doctor } = useAuth();
+  const { role } = useAuth();
   const location = useLocation();
+  const requiredRole: UserRole = location.pathname.startsWith('/doctor-dashboard')
+    ? 'doctor'
+    : 'admin';
 
-  if (!doctor) {
-    return <Navigate to="/sign-in" replace state={{ from: location }} />;
+  if (!role) {
+    const signInPath = requiredRole === 'admin' ? '/admin/sign-in' : '/doctor/sign-in';
+    return <Navigate to={signInPath} replace state={{ from: location }} />;
+  }
+
+  if (role !== requiredRole) {
+    return <Navigate to={getHomePath(role)} replace />;
   }
 
   return children;

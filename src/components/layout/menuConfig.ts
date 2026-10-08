@@ -40,7 +40,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     section: 'Main Menu',
     defaultOpen: true,
     items: [
-      { label: 'Admin Dashboard', path: '/' },
+      { label: 'Admin Dashboard', path: '/admin-dashboard' },
       { label: 'Doctor Dashboard', path: '/doctor-dashboard' },
       { label: 'Patient Dashboard', path: '/patient-dashboard' },
       { label: 'Pharmacist Dashboard', path: '/pharmacist-dashboard' },
