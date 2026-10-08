@@ -1,156 +1,137 @@
-import React from 'react';
+import type { FormEvent } from 'react';
+
+export interface FormFieldOption {
+  label: string;
+  value: string;
+}
+
+export interface FormFieldConfig {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'number' | 'date' | 'password' | 'url' | 'select' | 'textarea';
+  required?: boolean;
+  placeholder?: string;
+  autoComplete?: string;
+  min?: string;
+  max?: string;
+  span?: 'half' | 'full';
+  options?: FormFieldOption[];
+}
 
 export interface FormLayout01Props {
   title?: string;
   subtitle?: string;
+  fields: FormFieldConfig[];
   submitLabel?: string;
   cancelLabel?: string;
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (values: Record<string, string>, event: FormEvent<HTMLFormElement>) => void;
   onCancel?: () => void;
 }
 
-export const FormLayout01: React.FC<FormLayout01Props> = ({
+export function FormLayout01({
   title = 'Register to workspace',
-  subtitle = "Take a few moments to register for your company's workspace",
+  subtitle,
+  fields,
   submitLabel = 'Submit',
   cancelLabel = 'Cancel',
   onSubmit,
   onCancel,
-}) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (onSubmit) {
-      onSubmit(event);
-      return;
-    }
-
+}: FormLayout01Props) {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const values = Object.fromEntries(
+      fields.map((field) => [field.name, String(formData.get(field.name) ?? '')]),
+    );
+
+    onSubmit(values, event);
   };
 
   return (
-    <div className="flex items-center justify-center p-6 sm:p-10">
-      <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-8">
-        <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{subtitle}</p>
+    <div className="flex items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-2xl rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-5 shadow-sm sm:p-8">
+        <h1 className="text-2xl font-semibold text-[var(--text-primary)]">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>}
 
-        <form onSubmit={handleSubmit} className="mt-8" noValidate>
-          <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
-            <div className="col-span-full sm:col-span-3">
-              <label htmlFor="first-name" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                First name
-                <span className="ml-1 text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="first-name"
-                name="first-name"
-                autoComplete="given-name"
-                placeholder="First name"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-                required
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="mt-8">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+            {fields.map((field) => {
+              const id = `form-${field.name}`;
+              const className =
+                'mt-2 h-10 w-full rounded-md border border-[var(--border-color)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)] shadow-sm outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--theme-accent)] focus:ring-2 focus:ring-[var(--theme-accent)]/20';
+              const wrapperClass =
+                field.span === 'full' ? 'col-span-full' : 'col-span-full sm:col-span-1';
 
-            <div className="col-span-full sm:col-span-3">
-              <label htmlFor="last-name" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                Last name
-                <span className="ml-1 text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="last-name"
-                name="last-name"
-                autoComplete="family-name"
-                placeholder="Last name"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-                required
-              />
-            </div>
+              return (
+                <div key={field.name} className={wrapperClass}>
+                  <label
+                    htmlFor={id}
+                    className="text-sm font-medium text-[var(--text-secondary)]"
+                  >
+                    {field.label}
+                    {field.required && <span className="ml-1 text-rose-500">*</span>}
+                  </label>
 
-            <div className="col-span-full">
-              <label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                Email
-                <span className="ml-1 text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                autoComplete="email"
-                placeholder="Email"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-                required
-              />
-            </div>
-
-            <div className="col-span-full">
-              <label htmlFor="address" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                Address
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                autoComplete="street-address"
-                placeholder="Address"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-              />
-            </div>
-
-            <div className="col-span-full sm:col-span-2">
-              <label htmlFor="city" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                City
-              </label>
-              <input
-                type="text"
-                id="city"
-                name="city"
-                autoComplete="address-level2"
-                placeholder="City"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-              />
-            </div>
-
-            <div className="col-span-full sm:col-span-2">
-              <label htmlFor="state" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                State
-              </label>
-              <input
-                type="text"
-                id="state"
-                name="state"
-                autoComplete="address-level1"
-                placeholder="State"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-              />
-            </div>
-
-            <div className="col-span-full sm:col-span-2">
-              <label htmlFor="postal-code" className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                Postal code
-              </label>
-              <input
-                id="postal-code"
-                name="postal-code"
-                autoComplete="postal-code"
-                placeholder="Postal code"
-                className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
-              />
-            </div>
+                  {field.type === 'select' ? (
+                    <select
+                      id={id}
+                      name={field.name}
+                      className={className}
+                      required={field.required}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
+                        {field.placeholder ?? 'Select an option'}
+                      </option>
+                      {(field.options ?? []).map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : field.type === 'textarea' ? (
+                    <textarea
+                      id={id}
+                      name={field.name}
+                      className={`${className} h-auto min-h-24 py-2`}
+                      placeholder={field.placeholder}
+                      autoComplete={field.autoComplete}
+                      required={field.required}
+                    />
+                  ) : (
+                    <input
+                      id={id}
+                      name={field.name}
+                      type={field.type ?? 'text'}
+                      className={className}
+                      placeholder={field.placeholder}
+                      autoComplete={field.autoComplete}
+                      min={field.min}
+                      max={field.max}
+                      required={field.required}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          <div className="my-6 h-px w-full bg-slate-200 dark:bg-slate-700" />
+          <div className="my-6 h-px w-full bg-[var(--border-color)]" />
 
-          <div className="flex items-center justify-end space-x-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="whitespace-nowrap rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-3 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-            >
-              {cancelLabel}
-            </button>
+          <div className="flex items-center justify-end gap-3">
+            {onCancel && (
+              <button
+                type="button"
+                onClick={onCancel}
+                className="whitespace-nowrap rounded-md border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+              >
+                {cancelLabel}
+              </button>
+            )}
             <button
               type="submit"
-              className="whitespace-nowrap rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus:ring-3 focus:ring-indigo-500/20"
+              style={{ backgroundColor: 'var(--theme-accent)' }}
+              className="whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
             >
               {submitLabel}
             </button>
@@ -159,6 +140,6 @@ export const FormLayout01: React.FC<FormLayout01Props> = ({
       </div>
     </div>
   );
-};
+}
 
 export default FormLayout01;
