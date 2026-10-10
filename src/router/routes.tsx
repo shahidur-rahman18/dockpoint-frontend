@@ -11,6 +11,7 @@ import { PlaceholderPage } from '../pages/PlaceholderPage';
 import { RequireAuth, SignInRoute } from '../components/auth/AuthRoutes';
 import { AdminDashboard } from '../pages/AdminDashboard';
 import { SignUpPage } from '../components/auth/SignUpPage';
+import { NotFound } from '../components/common/NotFound';
 
 const pending = (title: string, description: string) => ({
   element: <PlaceholderPage title={title} description={description} />,
@@ -57,7 +58,7 @@ export const routes: RouteObject[] = [
       { path: 'locations', ...pending('Locations', 'Clinic locations will appear here.') },
       { path: 'services', ...pending('Services', 'Available clinic services will appear here.') },
       { path: 'specializations', ...pending('Specializations', 'Medical specializations will appear here.') },
-      { path: '*', ...pending('Page Not Found', 'The page you are looking for does not exist or has been moved.') },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ];
