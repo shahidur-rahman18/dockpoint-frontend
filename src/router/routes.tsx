@@ -9,6 +9,7 @@ import { AdminSettingsPage } from '../pages/AdminSettingsPage';
 import { DoctorSettingsPage } from '../pages/DoctorSettingsPage';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 import { RequireAuth, SignInRoute } from '../components/auth/AuthRoutes';
+import { DoctorPasswordSetupRoute } from '../components/auth/DoctorPasswordSetupRoute';
 import { AdminDashboard } from '../pages/AdminDashboard';
 import { SignUpPage } from '../components/auth/SignUpPage';
 import { NotFound } from '../components/common/NotFound';
@@ -18,6 +19,7 @@ const pending = (title: string, description: string) => ({
 });
 
 export const routes: RouteObject[] = [
+  { path: '/setup-password', element: <DoctorPasswordSetupRoute /> },
   { path: '/admin/sign-in', element: <SignInRoute role="admin" /> },
   { path: '/doctor/sign-in', element: <SignInRoute role="doctor" /> },
   { path: '/sign-in', element: <Navigate to="/doctor/sign-in" replace /> },

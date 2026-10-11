@@ -14,6 +14,7 @@ interface SignInPageProps {
   copyrightText?: string;
   onSubmit?: (credentials: SignInCredentials) => void | Promise<void>;
   errorMessage?: string;
+  successMessage?: string;
   isSubmitting?: boolean;
   showRegister?: boolean;
   onForgotPassword?: () => void;
@@ -27,6 +28,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   copyrightText = `Copyright © ${new Date().getFullYear()} - ${brandName}`,
   onSubmit,
   errorMessage,
+  successMessage,
   isSubmitting = false,
   showRegister = true,
   onForgotPassword,
@@ -83,6 +85,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                 role="alert"
               >
                 {errorMessage}
+              </p>
+            )}
+            {successMessage && (
+              <p
+                className="m-0 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+                role="status"
+              >
+                {successMessage}
               </p>
             )}
             <div className="flex flex-col gap-2">

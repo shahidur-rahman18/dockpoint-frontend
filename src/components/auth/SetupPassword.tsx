@@ -6,7 +6,10 @@ interface SetupPasswordProps {
   title?: string;
   subtitle?: string;
   submitLabel?: string;
-  onSubmit: (password: string) => void;
+  isSubmitting?: boolean;
+  isSubmitDisabled?: boolean;
+  errorMessage?: string;
+  onSubmit: (password: string) => void | Promise<void>;
 }
 
 export const SetupPassword: React.FC<SetupPasswordProps> = ({
@@ -14,6 +17,9 @@ export const SetupPassword: React.FC<SetupPasswordProps> = ({
   title = 'Setup Password',
   subtitle = 'Create a password to secure your account',
   submitLabel = 'Set Password',
+  isSubmitting = false,
+  isSubmitDisabled = false,
+  errorMessage,
   onSubmit,
 }) => {
   const [password, setPassword] = useState('');
@@ -65,6 +71,14 @@ export const SetupPassword: React.FC<SetupPasswordProps> = ({
           </header>
 
           <form className="flex flex-col gap-[17px]" onSubmit={handleSubmit}>
+            {errorMessage && (
+              <p
+                className="m-0 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+                role="alert"
+              >
+                {errorMessage}
+              </p>
+            )}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium" htmlFor="setup-new-password">
                 New Password
@@ -137,10 +151,11 @@ export const SetupPassword: React.FC<SetupPasswordProps> = ({
             </div>
 
             <button
-              className="mt-px min-h-10 cursor-pointer rounded-[5px] border-0 bg-[var(--theme-accent)] text-[13px] font-bold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+              className="mt-px min-h-10 cursor-pointer rounded-[5px] border-0 bg-[var(--theme-accent)] text-[13px] font-bold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
               type="submit"
+              disabled={isSubmitting || isSubmitDisabled}
             >
-              {submitLabel}
+              {isSubmitting ? 'Setting password...' : submitLabel}
             </button>
           </form>
         </section>

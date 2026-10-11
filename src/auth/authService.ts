@@ -14,7 +14,7 @@ export interface LoginCredentials {
   password: string;
 }
 
-interface AuthTokens {
+export interface AuthTokens {
   access: string;
   refresh: string;
 }
@@ -63,32 +63,40 @@ export const loginWithApi = async (
       password: credentials.password,
     });
 
-    const { data: profile } = await apiClient.get<components['schemas']['UserProfile']>(
-      '/api/accounts/me/',
-      { headers: { Authorization: `Bearer ${tokens.access}` } },
-    );
+    const session = await getSessionWithAccessToken(tokens.access);
 
-    const role = profile.role === 'ADMIN'
-      ? 'admin'
-      : profile.role === 'DOCTOR'
-        ? 'doctor'
-        : null;
-
-    if (!role) {
-      throw new Error('This account role is not supported by this dashboard.');
-    }
-
-    if (role !== expectedRole) {
+    if (session.role !== expectedRole) {
       throw new Error(`This account does not have the ${expectedRole} role.`);
     }
 
     return {
-      session: { role, email: profile.email },
+      session,
       tokens,
     };
   } catch (error) {
     throw new Error(getApiErrorMessage(error));
   }
+};
+
+export const getSessionWithAccessToken = async (
+  accessToken: string,
+): Promise<AuthSession> => {
+  const { data: profile } = await apiClient.get<components['schemas']['UserProfile']>(
+    '/api/accounts/me/',
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+
+  const role = profile.role === 'ADMIN'
+    ? 'admin'
+    : profile.role === 'DOCTOR'
+      ? 'doctor'
+      : null;
+
+  if (!role) {
+    throw new Error('This account role is not supported by this dashboard.');
+  }
+
+  return { role, email: profile.email };
 };
 
 export const clearStoredAuth = (): void => {

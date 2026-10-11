@@ -7,7 +7,9 @@ import {
 } from 'react';
 import {
   clearStoredAuth,
+  getSessionWithAccessToken,
   loginWithApi,
+  type AuthTokens,
   type LoginCredentials,
   type UserRole,
 } from './authService';
@@ -23,6 +25,7 @@ interface AuthContextValue {
   role: UserRole | null;
   accessToken: string | null;
   login: (credentials: LoginCredentials, role: UserRole) => Promise<void>;
+  establishSession: (tokens: AuthTokens, expectedRole: UserRole) => Promise<void>;
   setAccessToken: (token: string | null) => void;
   logout: () => void;
 }
@@ -52,6 +55,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(authenticatedSession);
   }, []);
 
+  const establishSession = useCallback(async (
+    tokens: AuthTokens,
+    expectedRole: UserRole,
+  ) => {
+    clearAuthTokens();
+    setAccessTokenState(null);
+    setSession(null);
+
+    const authenticatedSession = await getSessionWithAccessToken(tokens.access);
+    if (authenticatedSession.role !== expectedRole) {
+      throw new Error(`This account does not have the ${expectedRole} role.`);
+    }
+
+    storeAccessToken(tokens.access);
+    setRefreshToken(tokens.refresh);
+    setAccessTokenState(tokens.access);
+    clearStoredAuth();
+    setSession(authenticatedSession);
+  }, []);
+
   const logout = useCallback(() => {
     clearStoredAuth();
     clearAuthTokens();
@@ -66,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: session?.role ?? null,
         accessToken,
         login,
+        establishSession,
         setAccessToken: setToken,
         logout,
       }}

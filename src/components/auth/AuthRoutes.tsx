@@ -10,9 +10,20 @@ const getHomePath = (role: UserRole) =>
 
 export function SignInRoute({ role }: { role: UserRole }) {
   const { role: authenticatedRole, login } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const passwordSetupComplete =
+    location.state !== null &&
+    typeof location.state === 'object' &&
+    'passwordSetupComplete' in location.state &&
+    location.state.passwordSetupComplete === true;
+  const automaticSignInUnavailable =
+    location.state !== null &&
+    typeof location.state === 'object' &&
+    'automaticSignInUnavailable' in location.state &&
+    location.state.automaticSignInUnavailable === true;
 
   if (authenticatedRole) {
     return <Navigate to={getHomePath(authenticatedRole)} replace />;
@@ -46,6 +57,13 @@ export function SignInRoute({ role }: { role: UserRole }) {
       }
       onSubmit={handleSubmit}
       errorMessage={errorMessage}
+      successMessage={
+        role === 'doctor' && passwordSetupComplete
+          ? automaticSignInUnavailable
+            ? 'Your password has been set, but automatic sign-in was unavailable. Sign in with your email and new password.'
+            : 'Your password has been set. Sign in with your email and new password.'
+          : undefined
+      }
       isSubmitting={isSubmitting}
       showRegister={role === 'doctor'}
     />

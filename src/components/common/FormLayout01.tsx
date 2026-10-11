@@ -14,6 +14,7 @@ export interface FormFieldConfig {
   autoComplete?: string;
   min?: string;
   max?: string;
+  step?: string;
   span?: 'half' | 'full';
   options?: FormFieldOption[];
 }
@@ -24,6 +25,9 @@ export interface FormLayout01Props {
   fields: FormFieldConfig[];
   submitLabel?: string;
   cancelLabel?: string;
+  isSubmitting?: boolean;
+  isSubmitDisabled?: boolean;
+  errorMessage?: string;
   onSubmit: (values: Record<string, string>, event: FormEvent<HTMLFormElement>) => void;
   onCancel?: () => void;
 }
@@ -34,6 +38,9 @@ export function FormLayout01({
   fields,
   submitLabel = 'Submit',
   cancelLabel = 'Cancel',
+  isSubmitting = false,
+  isSubmitDisabled = false,
+  errorMessage,
   onSubmit,
   onCancel,
 }: FormLayout01Props) {
@@ -54,6 +61,14 @@ export function FormLayout01({
         {subtitle && <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>}
 
         <form onSubmit={handleSubmit} className="mt-8">
+          {errorMessage && (
+            <p
+              className="mb-5 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+              role="alert"
+            >
+              {errorMessage}
+            </p>
+          )}
           <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             {fields.map((field) => {
               const id = `form-${field.name}`;
@@ -108,6 +123,7 @@ export function FormLayout01({
                       autoComplete={field.autoComplete}
                       min={field.min}
                       max={field.max}
+                      step={field.step}
                       required={field.required}
                     />
                   )}
@@ -123,6 +139,7 @@ export function FormLayout01({
               <button
                 type="button"
                 onClick={onCancel}
+                disabled={isSubmitting}
                 className="whitespace-nowrap rounded-md border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
               >
                 {cancelLabel}
@@ -130,10 +147,11 @@ export function FormLayout01({
             )}
             <button
               type="submit"
+              disabled={isSubmitting || isSubmitDisabled}
               style={{ backgroundColor: 'var(--theme-accent)' }}
-              className="whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+              className="whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
             >
-              {submitLabel}
+              {isSubmitting ? 'Submitting...' : submitLabel}
             </button>
           </div>
         </form>
