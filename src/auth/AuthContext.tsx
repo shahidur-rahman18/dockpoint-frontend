@@ -7,38 +7,68 @@ import {
 } from 'react';
 import {
   clearStoredAuth,
-  getStoredAuth,
-  loginWithMockCredentials,
+  loginWithApi,
   type LoginCredentials,
   type UserRole,
 } from './authService';
-import type { DoctorListItem } from '../types';
+import {
+  clearAuthTokens,
+  getAccessToken,
+  setAccessToken as storeAccessToken,
+  setRefreshToken,
+} from './accessTokenStore';
 
 interface AuthContextValue {
-  doctor: DoctorListItem | null;
+  email: string | null;
   role: UserRole | null;
+  accessToken: string | null;
   login: (credentials: LoginCredentials, role: UserRole) => Promise<void>;
+  setAccessToken: (token: string | null) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState(getStoredAuth);
+  const [session, setSession] = useState<{
+    role: UserRole;
+    email: string;
+  } | null>(null);
+  const [accessToken, setAccessTokenState] = useState(getAccessToken);
+
+  const setToken = useCallback((token: string | null) => {
+    storeAccessToken(token);
+    setAccessTokenState(token);
+  }, []);
 
   const login = useCallback(async (credentials: LoginCredentials, role: UserRole) => {
-    const authenticatedSession = loginWithMockCredentials(role, credentials);
+    clearAuthTokens();
+    setAccessTokenState(null);
+    const { session: authenticatedSession, tokens } = await loginWithApi(credentials, role);
+    storeAccessToken(tokens.access);
+    setRefreshToken(tokens.refresh);
+    setAccessTokenState(tokens.access);
+    clearStoredAuth();
     setSession(authenticatedSession);
   }, []);
 
   const logout = useCallback(() => {
     clearStoredAuth();
+    clearAuthTokens();
+    setAccessTokenState(null);
     setSession(null);
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ doctor: session?.doctor ?? null, role: session?.role ?? null, login, logout }}
+      value={{
+        email: session?.email ?? null,
+        role: session?.role ?? null,
+        accessToken,
+        login,
+        setAccessToken: setToken,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

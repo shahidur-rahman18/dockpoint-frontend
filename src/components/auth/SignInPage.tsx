@@ -5,7 +5,6 @@ import { Eye, EyeOff, LockKeyhole, Mail, Plus } from 'lucide-react';
 export interface SignInCredentials {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 interface SignInPageProps {
@@ -34,7 +33,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   onRegister,
 }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,7 +43,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({
     await onSubmit({
       email: String(formData.get('email') ?? ''),
       password: String(formData.get('password') ?? ''),
-      rememberMe,
     });
   };
 
@@ -129,16 +126,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               </div>
             </div>
 
-            <div className="mt-px flex min-h-[22px] items-center justify-between gap-3 text-[13px] sm:text-sm">
-              <label className="inline-flex cursor-pointer items-center gap-2">
-                <input
-                  className="size-3.5 accent-[var(--theme-accent)]"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(event) => setRememberMe(event.target.checked)}
-                />
-                <span>Remember Me</span>
-              </label>
+            <div className="mt-px flex min-h-[22px] items-center justify-end gap-3 text-[13px] sm:text-sm">
               {onForgotPassword ? (
                 <button
                   className="cursor-pointer border-0 bg-transparent p-0 text-rose-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
