@@ -4,8 +4,8 @@ import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 interface ActionDropdownProps {
   isOpen: boolean;
   onToggle: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export function ActionDropdown({
@@ -61,11 +61,13 @@ export function ActionDropdown({
           <button
             type="button"
             role="menuitem"
+            disabled={!onEdit}
+            title={!onEdit ? 'Editing is not connected to the API yet' : undefined}
             onClick={() => {
-              onEdit();
+              onEdit?.();
               onToggle();
             }}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-600 transition-colors enabled:cursor-pointer enabled:hover:bg-slate-50 enabled:hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Pencil className="w-3.5 h-3.5 text-slate-400" />
             <span>Edit</span>
@@ -73,11 +75,13 @@ export function ActionDropdown({
           <button
             type="button"
             role="menuitem"
+            disabled={!onDelete}
+            title={!onDelete ? 'Deleting is not connected to the API yet' : undefined}
             onClick={() => {
-              onDelete();
+              onDelete?.();
               onToggle();
             }}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-rose-600 transition-colors enabled:cursor-pointer enabled:hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Delete</span>

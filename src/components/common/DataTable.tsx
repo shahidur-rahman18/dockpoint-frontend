@@ -16,6 +16,7 @@ interface DataTableProps<TData> {
   initialPageSize?: number;
   pageSizeOptions?: number[];
   onRowClick?: (row: TData) => void;
+  fixedColumnWidths?: boolean;
 }
 
 export function DataTable<TData>({
@@ -26,6 +27,7 @@ export function DataTable<TData>({
   initialPageSize = 5,
   pageSizeOptions = [5, 10, 15],
   onRowClick,
+  fixedColumnWidths = false,
 }: DataTableProps<TData>) {
   const pageSizeSelectId = useId();
   const [pagination, setPagination] = useState({
@@ -36,6 +38,7 @@ export function DataTable<TData>({
   const table = useReactTable({
     data,
     columns,
+    defaultColumn: fixedColumnWidths ? { minSize: 0 } : undefined,
     state: { pagination },
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
@@ -59,7 +62,9 @@ export function DataTable<TData>({
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table
+          className={`w-full text-left border-collapse ${fixedColumnWidths ? 'table-fixed' : ''}`}
+        >
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
@@ -67,7 +72,12 @@ export function DataTable<TData>({
                 className="border-b border-slate-100 bg-slate-50/50 text-slate-500 text-xs font-semibold"
               >
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} colSpan={header.colSpan} className="py-3.5 px-4 first:pl-5">
+                  <th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    style={fixedColumnWidths ? { width: `${header.getSize()}%` } : undefined}
+                    className="py-3.5 px-4 first:pl-5"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -106,7 +116,15 @@ export function DataTable<TData>({
                   className={onRowClick ? 'cursor-pointer hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-indigo-600' : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="py-4 px-4 first:pl-5">
+                    <td
+                      key={cell.id}
+                      style={
+                        fixedColumnWidths
+                          ? { width: `${cell.column.getSize()}%` }
+                          : undefined
+                      }
+                      className={`${fixedColumnWidths ? 'py-3' : 'py-4'} px-4 first:pl-5`}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}

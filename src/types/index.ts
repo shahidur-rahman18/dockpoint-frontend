@@ -120,6 +120,7 @@ export interface DoctorListItem {
   fees: string;
   status: 'Available' | 'Unavailable';
   avatar: string;
+  chamberAddress?: string;
   profile?: DoctorProfile;
 }
 

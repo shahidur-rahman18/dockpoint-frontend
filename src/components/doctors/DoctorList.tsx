@@ -11,14 +11,14 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  UserRound,
 } from 'lucide-react';
 import { DataTable } from '../common/DataTable';
 import { ActionDropdown } from '../common/ActionDropdown';
-import { DeleteConfirmationModal } from '../common/DeleteConfirmationModal';
-import { EditDoctorDrawer } from './EditDoctorDrawer';
 import { DoctorCard } from './DoctorCard';
-import { doctorsListData } from '../../data/mockData';
 import type { DoctorListItem } from '../../types';
+import { useDoctors, useUpdateDoctorAvailability } from '../../hooks/useDoctors';
+import { getDoctorListErrorMessage } from '../../services/doctorService';
 
 const doctorDetailsPath = (doctor: DoctorListItem) => {
   const slug = doctor.name
@@ -32,6 +32,14 @@ const doctorDetailsPath = (doctor: DoctorListItem) => {
 
 export const DoctorList: React.FC = () => {
   const navigate = useNavigate();
+  const {
+    data: doctors,
+    error,
+    isError,
+    isPending,
+    refetch,
+  } = useDoctors();
+  const availabilityMutation = useUpdateDoctorAvailability();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<DoctorListItem['status'] | ''>('');
@@ -40,46 +48,10 @@ export const DoctorList: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [pageIndex, setPageIndex] = useState(0);
   const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
-  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState<DoctorListItem | null>(null);
-  const [doctorDataVersion, setDoctorDataVersion] = useState(0);
-  const [doctorToDelete, setDoctorToDelete] = useState<DoctorListItem | null>(null);
   const pageSize = 6;
 
   const toggleActionMenu = (doctorId: string) => {
     setOpenActionMenuId((prev) => (prev === doctorId ? null : doctorId));
-  };
-
-  const handleEditDoctor = (doctor: DoctorListItem) => {
-    setSelectedDoctor(doctor);
-    setIsEditDrawerOpen(true);
-  };
-
-  const handleSaveDoctor = (updatedDoctor: DoctorListItem) => {
-    // Update the doctor in the list
-    const index = doctorsListData.findIndex((d) => d.id === updatedDoctor.id);
-    if (index !== -1) {
-      doctorsListData[index] = updatedDoctor;
-    }
-  };
-
-  const handleDeleteDoctor = (doctor: DoctorListItem) => {
-    setDoctorToDelete(doctor);
-  };
-
-  const confirmDeleteDoctor = () => {
-    if (!doctorToDelete) return;
-
-    const doctorIndex = doctorsListData.findIndex((doctor) => doctor.id === doctorToDelete.id);
-    if (doctorIndex === -1) return;
-
-    doctorsListData.splice(doctorIndex, 1);
-    setDoctorDataVersion((version) => version + 1);
-    setPageIndex((currentPage) =>
-      Math.min(currentPage, Math.max(0, Math.ceil((filteredDoctors.length - 1) / pageSize) - 1)),
-    );
-    setOpenActionMenuId(null);
-    setDoctorToDelete(null);
   };
 
   const handleViewDoctor = (doctor: DoctorListItem) => {
@@ -93,7 +65,7 @@ export const DoctorList: React.FC = () => {
 
   const filteredDoctors = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
-    const result = doctorsListData.filter((doc) => {
+    const result = (doctors ?? []).filter((doc) => {
       const matchesQuery =
         !query ||
         [doc.name, doc.designation, doc.department, doc.email, doc.status].some((field) =>
@@ -129,11 +101,11 @@ export const DoctorList: React.FC = () => {
       default:
         return result;
     }
-  }, [searchTerm, departmentFilter, statusFilter, sortOrder, doctorDataVersion]);
+  }, [doctors, searchTerm, departmentFilter, statusFilter, sortOrder]);
 
   const departments = useMemo(
-    () => [...new Set(doctorsListData.map((doctor) => doctor.department))].sort(),
-    [doctorDataVersion],
+    () => [...new Set((doctors ?? []).map((doctor) => doctor.department))].sort(),
+    [doctors],
   );
 
   const paginatedGridDoctors = useMemo(() => {
@@ -147,20 +119,43 @@ export const DoctorList: React.FC = () => {
     () => [
       {
         accessorKey: 'name',
+        size: 25,
         header: 'Name & Designation',
         cell: ({ row }) => {
           const doctor = row.original;
 
           return (
-            <div className="flex items-center gap-3">
-              <img
-                src={doctor.avatar}
-                alt={doctor.name}
-                className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0 shadow-xs"
-              />
-              <div>
-                <div className="font-bold text-slate-800">{doctor.name}</div>
-                <div className="text-[11px] font-medium text-slate-400 mt-0.5">
+            <div className="flex min-w-0 items-center gap-3">
+              {doctor.avatar ? (
+                <button
+                  type="button"
+                  onClick={() => handleViewDoctor(doctor)}
+                  aria-label={`View details for ${doctor.name}`}
+                  className="shrink-0 cursor-pointer rounded-full focus-visible:outline-2 focus-visible:outline-indigo-600"
+                >
+                  <img
+                    src={doctor.avatar}
+                    alt=""
+                    className="size-10 rounded-full border border-slate-200 object-cover shadow-xs"
+                  />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleViewDoctor(doctor)}
+                  aria-label={`View details for ${doctor.name}`}
+                  className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400 focus-visible:outline-2 focus-visible:outline-indigo-600"
+                >
+                  <UserRound aria-hidden="true" className="size-5" />
+                </button>
+              )}
+              <div className="min-w-0">
+                <div className="whitespace-nowrap font-bold text-slate-800">
+                  {doctor.name}
+                </div>
+                <div
+                  className="mt-0.5 whitespace-nowrap text-[11px] font-medium text-slate-400"
+                >
                   {doctor.designation}
                 </div>
               </div>
@@ -170,54 +165,104 @@ export const DoctorList: React.FC = () => {
       },
       {
         accessorKey: 'department',
+        size: 12,
         header: 'Department',
         cell: ({ getValue }) => (
-          <span className="font-medium text-slate-600">{getValue<string>()}</span>
+          <span className="block whitespace-nowrap font-medium text-slate-600">
+            {getValue<string>()}
+          </span>
         ),
       },
       {
         accessorKey: 'phone',
+        size: 13,
         header: 'Phone',
         cell: ({ getValue }) => (
-          <span className="font-medium text-slate-600">{getValue<string>()}</span>
+          <span className="block whitespace-nowrap font-medium text-slate-600">
+            {getValue<string>()}
+          </span>
         ),
       },
       {
         accessorKey: 'email',
+        size: 17,
         header: 'Email',
         cell: ({ getValue }) => (
-          <span className="font-medium text-slate-600">{getValue<string>()}</span>
+          <span
+            className="block max-w-full truncate whitespace-nowrap font-medium text-slate-600"
+            title={getValue<string>()}
+          >
+            {getValue<string>()}
+          </span>
         ),
       },
       {
         accessorKey: 'fees',
+        size: 10,
         header: 'Fees',
-        cell: ({ getValue }) => (
-          <span className="font-bold text-slate-800">{getValue<string>()}</span>
-        ),
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
         cell: ({ getValue }) => {
-          const status = getValue<DoctorListItem['status']>();
-          const available = status === 'Available';
+          const fee = getValue<string>();
+          const amount = Number(fee.replace(/[^\d.-]/g, ''));
 
           return (
-            <span
-              className={`inline-block px-3 py-1 rounded-md border font-semibold text-[11px] ${
-                available
-                  ? 'text-emerald-600 bg-emerald-50 border-emerald-200/60'
-                  : 'text-rose-600 bg-rose-50 border-rose-200/60'
-              }`}
-            >
-              {status}
+            <span className="block whitespace-nowrap text-[11px] font-bold text-slate-800">
+              {/-?\d/.test(fee) && Number.isFinite(amount)
+                ? `৳ ${amount.toFixed(2)}`
+                : fee}
             </span>
           );
         },
       },
       {
+        accessorKey: 'status',
+        size: 13,
+        header: 'Status',
+        cell: ({ row }) => {
+          const doctor = row.original;
+          const status = doctor.status;
+          const available = status === 'Available';
+          const updating =
+            availabilityMutation.isPending &&
+            availabilityMutation.variables?.doctorId === doctor.id;
+
+          return (
+            <label className="relative inline-block">
+              <select
+                aria-label={`Availability for ${doctor.name}`}
+                aria-busy={updating}
+                value={status}
+                disabled={availabilityMutation.isPending}
+                onChange={(event) => {
+                  const nextStatus = event.target.value;
+                  if (nextStatus !== 'Available' && nextStatus !== 'Unavailable') return;
+                  if (nextStatus === status) return;
+
+                  availabilityMutation.reset();
+                  availabilityMutation.mutate({
+                    doctorId: doctor.id,
+                    isAvailable: nextStatus === 'Available',
+                  });
+                }}
+                className={`cursor-pointer appearance-none rounded-md border py-1 pl-3 pr-7 text-[11px] font-semibold transition-opacity disabled:cursor-wait disabled:opacity-60 ${
+                  available
+                    ? 'border-emerald-200/60 bg-emerald-50 text-emerald-600'
+                    : 'border-rose-200/60 bg-rose-50 text-rose-600'
+                }`}
+              >
+                <option  value="Available">Available</option>
+                <option  value="Unavailable">Unavailable</option>
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                className="pointer-events-none absolute right-2 top-1/2 size-3 -translate-y-1/2"
+              />
+            </label>
+          );
+        },
+      },
+      {
         id: 'actions',
+        size: 10,
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-1.5">
@@ -231,14 +276,12 @@ export const DoctorList: React.FC = () => {
             <ActionDropdown
               isOpen={openActionMenuId === row.original.id}
               onToggle={() => toggleActionMenu(row.original.id)}
-              onEdit={() => handleEditDoctor(row.original)}
-              onDelete={() => handleDeleteDoctor(row.original)}
             />
           </div>
         ),
       },
     ],
-    [openActionMenuId, toggleActionMenu, handleEditDoctor, handleDeleteDoctor, handleViewDoctor],
+    [openActionMenuId, toggleActionMenu],
   );
 
   return (
@@ -247,7 +290,7 @@ export const DoctorList: React.FC = () => {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Doctor List</h1>
           <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg">
-            Total Doctors : {filteredDoctors.length}
+            Total Doctors : {isPending ? '…' : doctors?.length ?? 0}
           </span>
         </div>
 
@@ -409,8 +452,54 @@ export const DoctorList: React.FC = () => {
         </div>
       </div>
 
-      {viewMode === 'grid' ? (
-        <div className="space-y-4">
+      {isPending && (
+        <div
+          role="status"
+          className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-sm font-medium text-slate-500"
+        >
+          Loading doctors…
+        </div>
+      )}
+
+      {isError && (
+        <div
+          role="alert"
+          className="flex flex-col items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center"
+        >
+          <p className="text-sm font-medium text-rose-700">
+            {getDoctorListErrorMessage(error)}
+          </p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-rose-700 shadow-sm ring-1 ring-rose-200 transition hover:bg-rose-100"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {!isPending && (!isError || (doctors?.length ?? 0) > 0) && (viewMode === 'grid' ? (
+
+         <>
+          {availabilityMutation.isError && (
+            <p
+              role="alert"
+              className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700"
+            >
+              {getDoctorListErrorMessage(availabilityMutation.error)}
+            </p>
+          )}
+          <DataTable
+            data={filteredDoctors}
+            columns={columns}
+            fixedColumnWidths
+            emptyMessage="No doctors found"
+            emptyDescription="Try adjusting your search keywords."
+          />
+        </>
+      ) : (
+       <div className="space-y-4">
           {paginatedGridDoctors.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedGridDoctors.map((doctor) => (
@@ -419,8 +508,6 @@ export const DoctorList: React.FC = () => {
                   doctor={doctor}
                   isActionMenuOpen={openActionMenuId === doctor.id}
                   onToggleActionMenu={() => toggleActionMenu(doctor.id)}
-                  onEdit={() => handleEditDoctor(doctor)}
-                  onDelete={() => handleDeleteDoctor(doctor)}
                   onView={() => handleViewDoctor(doctor)}
                 />
               ))}
@@ -428,7 +515,11 @@ export const DoctorList: React.FC = () => {
           ) : (
             <div className="bg-white rounded-2xl border border-slate-200/80 p-16 text-center">
               <p className="text-sm font-semibold text-slate-700">No doctors found</p>
-              <p className="text-xs font-medium text-slate-400 mt-1">Try adjusting your search keywords.</p>
+              <p className="text-xs font-medium text-slate-400 mt-1">
+                {doctors?.length
+                  ? 'Try adjusting your search keywords.'
+                  : 'There are no doctors to display.'}
+              </p>
             </div>
           )}
 
@@ -483,40 +574,12 @@ export const DoctorList: React.FC = () => {
             </div>
           )}
         </div>
-      ) : (
-        <DataTable
-          data={filteredDoctors}
-          columns={columns}
-          onRowClick={handleViewDoctor}
-          emptyMessage="No doctors found"
-          emptyDescription="Try adjusting your search keywords."
-        />
-      )}
+      ))}
 
       <div className="text-center pt-2 pb-2 text-xs font-medium text-slate-500 border-t border-slate-200/60">
-        2026 &copy;Preclinic, All Rights Reserved
+        2026 &copy;Docpoint, All Rights Reserved
       </div>
 
-      <EditDoctorDrawer
-        open={isEditDrawerOpen}
-        doctor={selectedDoctor}
-        onClose={() => {
-          setIsEditDrawerOpen(false);
-          setSelectedDoctor(null);
-        }}
-        onSave={handleSaveDoctor}
-      />
-      <DeleteConfirmationModal
-        open={doctorToDelete !== null}
-        title="Delete Confirmation"
-        description={
-          doctorToDelete
-            ? `Are you sure you want to delete ${doctorToDelete.name}?`
-            : 'Are you sure you want to delete?'
-        }
-        onCancel={() => setDoctorToDelete(null)}
-        onConfirm={confirmDeleteDoctor}
-      />
     </div>
   );
 };

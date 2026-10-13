@@ -268,6 +268,8 @@ export interface components {
              * Format: email
              */
             readonly email?: string;
+            first_name?: string;
+            last_name?: string;
             readonly role?: components["schemas"]["RoleEnum"];
             phone_number?: string | null;
             readonly is_verified?: boolean;
@@ -310,6 +312,8 @@ export interface components {
              * Format: email
              */
             readonly email: string;
+            first_name?: string;
+            last_name?: string;
             readonly role: components["schemas"]["RoleEnum"];
             phone_number?: string | null;
             readonly is_verified: boolean;
