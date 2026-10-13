@@ -14,7 +14,11 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ fields, formData
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="border-b border-slate-200 pb-4">
           <h2 className="text-lg font-semibold text-slate-900">Basic Information</h2>
-          <p className="mt-1 text-sm text-slate-500">Update your photo and personal details.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {fields.some((field) => field.type === 'image')
+              ? 'Update your photo and personal details.'
+              : 'Manage your personal and professional details.'}
+          </p>
         </div>
         <div className="pt-5">
           <DynamicFormRenderer fields={fields} formData={formData} onChange={onChange} section="basic" />

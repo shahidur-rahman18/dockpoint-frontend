@@ -2,7 +2,7 @@
 
 এই ডকুমেন্টটি Dockpoint frontend-এ বর্তমান DocPoint Django backend-এর API যুক্ত করার পরিকল্পনা। এটি React 19, TypeScript ও Vite frontend এবং backend-এ বর্তমানে থাকা Django REST Framework + SimpleJWT contract ধরে লেখা। Backend-এর API বা authentication contract বদলালে এই পরিকল্পনাও হালনাগাদ করতে হবে।
 
-## বাস্তবায়নের অগ্রগতি (২০২৬-১০-১১)
+## বাস্তবায়নের অগ্রগতি (২০২৬-১০-১৩)
 
 এই অংশটি ইতিমধ্যে করা কাজ এবং বাকি কাজ আলাদা করে দেখায়। কোনো ধাপ আংশিক হলে সেটিকে সম্পূর্ণ বলা হয়নি।
 
@@ -13,10 +13,10 @@
 | ৩. Environment config | সম্পন্ন | `.env.development`, `.env.example` যোগ এবং অন্য `.env*` ফাইল ignore করা হয়েছে। `/api/schema`-কে base URL হিসেবে দিলে login path-এ schema path দ্বিগুণ হয়ে 404 হচ্ছিল; সেটি ঠিক করা হয়েছে। |
 | ৪. OpenAPI TypeScript type | সম্পন্ন | Deployed `/api/schema/` থেকে type generate করা হয়েছে। Schema update হলে `npm run api:types` চালাতে হবে। |
 | ৫. Shared API client ও authentication | আংশিক | `src/api/apiClient.ts`-এ shared Axios client ও in-memory access-token authorization header আছে। Real login (`POST /api/accounts/login/`) এবং profile/role যাচাই (`GET /api/accounts/me/`) যুক্ত; password-setup থেকে পাওয়া token দিয়েও doctor session স্থাপন করা যায়। Access ও refresh token memory-তে থাকে। Refresh request, 401 single-flight/replay, retry marker এবং refresh failure handling এখনো বাকি। |
-| ৬. Service, hooks ও query policy | আংশিক | Admin doctor creation ও password setup-এর জন্য typed account/doctor service যুক্ত। বাকি account/doctor/appointment service, TanStack Query provider/hooks, query key ও retry policy এখনো যুক্ত হয়নি। |
-| ৭. UI ও data migration / tests | আংশিক | Login form mock login থেকে real API login-এ গেছে; admin doctor form API call, loading/error state এবং public password-setup route যুক্ত। Doctor create ও password setup success modal দেখায়; password setup response token pair দিলে modal বন্ধের পর doctor dashboard-এ যায়, pair না দিলে sign-in fallback থাকে। Dashboard ও doctor list data এখনো mock; email-link environment config, refresh, 403, logout ও API flow-এর পূর্ণ test বাকি। |
+| ৬. Service, hooks ও query policy | আংশিক | Admin doctor creation, password setup এবং doctor settings-এর typed API service যুক্ত। Doctor settings React Query-তে own-account (`/api/accounts/me/`) ও doctor detail (`/api/doctors/{id}/`) load করে; update শেষে profile query invalidate হয়। বাকি account/appointment service, query retry policy এবং auth refresh handling এখনো যুক্ত হয়নি। |
+| ৭. UI ও data migration / tests | আংশিক | Login form mock login থেকে real API login-এ গেছে; admin doctor form API call, loading/error state এবং public password-setup route যুক্ত। Doctor profile settings এখন API থেকে তথ্য দেখায়, account ও doctor profile field-গুলো আলাদা endpoint-এ PATCH করে, এবং loading/error/saving state দেখায়। বর্তমান API-তে না থাকা address/country/avatar field সরিয়ে supported chamber address দেখানো হয়েছে; email read-only। Doctor create ও password setup success modal দেখায়; password setup response token pair দিলে modal বন্ধের পর doctor dashboard-এ যায়, pair না দিলে sign-in fallback থাকে। Dashboard ও doctor list data এখনো mock; email-link environment config, refresh, 403, logout ও API flow-এর পূর্ণ test বাকি। |
 
-**সর্বশেষ build যাচাই:** doctor create এবং password-setup frontend ধাপের পর `npm run build` সফল হয়েছে। `.env.development`-এ বর্তমানে `VITE_API_BASE_URL=http://127.0.0.1:8000` আছে। ভুল URL/path ও CORS সংক্রান্ত আগের login সমস্যাগুলো সমাধান হয়েছে বলে ব্যবহারকারী নিশ্চিত করেছেন। Local frontend/backend origin আলাদা হলে backend CORS allowlist-এ frontend origin অনুমোদিত রাখতে হবে।
+**সর্বশেষ build যাচাই:** doctor profile settings API integration-এর পর `npm run build` সফল হয়েছে। `.env.development`-এ বর্তমানে `VITE_API_BASE_URL=http://127.0.0.1:8000` আছে। ভুল URL/path ও CORS সংক্রান্ত আগের login সমস্যাগুলো সমাধান হয়েছে বলে ব্যবহারকারী নিশ্চিত করেছেন। Local frontend/backend origin আলাদা হলে backend CORS allowlist-এ frontend origin অনুমোদিত রাখতে হবে।
 
 ## ১. বর্তমান backend contract
 

@@ -13,6 +13,7 @@ export type FormFieldConfig = {
   type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'image' | 'password' | 'checkbox';
   placeholder?: string;
   required?: boolean;
+  readOnly?: boolean;
   options?: { label: string; value: string }[];
   colSpan?: 1 | 2;
   section: 'basic' | 'address' | 'security' | 'notifications';

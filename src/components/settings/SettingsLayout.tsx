@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, CircleAlert } from 'lucide-react';
 import type { SettingsPageConfig, SettingsTabType } from '../../types/settings';
 import { IntegrationsSection } from './sections/IntegrationsSection';
 import { NotificationsSection } from './sections/NotificationsSection';
@@ -10,18 +10,24 @@ import { ProfileSection } from './sections/ProfileSection';
 interface SettingsLayoutProps {
   config: SettingsPageConfig;
   initialData?: Record<string, any>;
-  onSave?: (data: Record<string, any>) => void;
+  onSave?: (data: Record<string, any>) => Promise<void> | void;
+  isSaving?: boolean;
+  saveError?: string | null;
 }
 
 export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   config,
   initialData = {},
   onSave,
+  isSaving = false,
+  saveError = null,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
   const [successMessage, setSuccessMessage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const settingsBasePath = config.role === 'doctor' ? '/doctor-dashboard/settings' : '/settings';
   const requestedSection = location.pathname.slice(settingsBasePath.length + 1);
@@ -33,11 +39,20 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
     setFormData((previous) => ({ ...previous, [name]: value }));
   };
 
-  const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSave?.(formData);
-    setSuccessMessage(true);
-    window.setTimeout(() => setSuccessMessage(false), 3000);
+    setSuccessMessage(false);
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      await onSave?.(formData);
+      setSuccessMessage(true);
+      window.setTimeout(() => setSuccessMessage(false), 3000);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Unable to save your settings.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderActiveSection = () => {
@@ -70,6 +85,13 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
         </div>
       )}
 
+      {(saveError || submitError) && (
+        <div role="alert" className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          <CircleAlert className="h-5 w-5 shrink-0 text-rose-600" />
+          <span>{saveError || submitError}</span>
+        </div>
+      )}
+
       <form onSubmit={handleSave} className="space-y-6">
         {renderActiveSection()}
 
@@ -83,9 +105,10 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
           </button>
           <button
             type="submit"
-            className="rounded-lg bg-indigo-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-800"
+            disabled={isSaving || isSubmitting}
+            className="rounded-lg bg-indigo-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Save Changes
+            {isSaving || isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </form>

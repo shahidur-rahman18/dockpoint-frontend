@@ -75,52 +75,13 @@ export const doctorSettingsConfig: SettingsPageConfig = {
     { id: 'notifications', label: 'Notifications', iconName: 'Bell', description: 'Appointment alerts and notifications' },
   ],
   fields: [
-    // Basic Information
-    { name: 'profileImage', label: 'Profile Image', type: 'image', section: 'basic', colSpan: 2 },
     { name: 'firstName', label: 'First Name', type: 'text', placeholder: 'Enter first name', required: true, section: 'basic', colSpan: 1 },
     { name: 'lastName', label: 'Last Name', type: 'text', placeholder: 'Enter last name', required: true, section: 'basic', colSpan: 1 },
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter email address', required: true, section: 'basic', colSpan: 1 },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'Email address', required: true, section: 'basic', colSpan: 1, readOnly: true },
     { name: 'phoneNumber', label: 'Phone Number', type: 'tel', placeholder: 'Enter phone number', required: true, section: 'basic', colSpan: 1 },
-
-    // Address Information
-    { name: 'address1', label: 'Address Line 1', type: 'text', placeholder: 'Enter clinic address 1', section: 'address', colSpan: 1 },
-    { name: 'address2', label: 'Address Line 2', type: 'text', placeholder: 'Enter clinic address 2', section: 'address', colSpan: 1 },
-    {
-      name: 'country',
-      label: 'Country',
-      type: 'select',
-      placeholder: 'Select Country',
-      section: 'address',
-      colSpan: 1,
-      options: [
-        { label: 'United States', value: 'US' },
-        { label: 'Bangladesh', value: 'BD' },
-      ]
-    },
-    {
-      name: 'state',
-      label: 'State',
-      type: 'select',
-      placeholder: 'Select State',
-      section: 'address',
-      colSpan: 1,
-      options: [
-        { label: 'California', value: 'CA' },
-        { label: 'Dhaka', value: 'DH' },
-      ]
-    },
-    {
-      name: 'city',
-      label: 'City',
-      type: 'select',
-      placeholder: 'Select City',
-      section: 'address',
-      colSpan: 1,
-      options: [
-        { label: 'Los Angeles', value: 'LA' },
-        { label: 'Dhaka', value: 'DH' },
-      ]
-    },
-    { name: 'pincode', label: 'Pincode', type: 'text', placeholder: 'Enter pincode', section: 'address', colSpan: 1 },
+    { name: 'specialization', label: 'Specialization', type: 'text', placeholder: 'Enter specialization', section: 'basic', colSpan: 1 },
+    { name: 'qualification', label: 'Qualification', type: 'text', placeholder: 'Enter qualification', section: 'basic', colSpan: 1 },
+    { name: 'consultationFee', label: 'Consultation Fee', type: 'text', placeholder: 'Enter consultation fee', section: 'basic', colSpan: 1 },
+    { name: 'chamberAddress', label: 'Chamber Address', type: 'text', placeholder: 'Enter chamber address', section: 'address', colSpan: 2 },
   ]
 };

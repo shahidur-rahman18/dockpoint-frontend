@@ -93,8 +93,9 @@ export const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
               type={field.type}
               value={value}
               placeholder={field.placeholder}
+              readOnly={field.readOnly}
               onChange={(e) => onChange(field.name, e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all read-only:bg-slate-50 read-only:text-slate-500"
             />
           </div>
         );
