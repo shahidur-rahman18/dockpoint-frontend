@@ -13,6 +13,7 @@ import {
   ChevronRight,
   UserRound,
 } from 'lucide-react';
+import { LoaderOne } from '../common/LoaderOne';
 import { DataTable } from '../common/DataTable';
 import { ActionDropdown } from '../common/ActionDropdown';
 import { DoctorCard } from './DoctorCard';
@@ -455,8 +456,9 @@ export const DoctorList: React.FC = () => {
       {isPending && (
         <div
           role="status"
-          className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-sm font-medium text-slate-500"
+          className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-12 text-center text-sm font-medium text-slate-500"
         >
+          <LoaderOne />
           Loading doctors…
         </div>
       )}
