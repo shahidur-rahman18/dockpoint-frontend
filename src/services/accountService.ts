@@ -24,9 +24,20 @@ export interface DoctorSettingsUpdate {
   >;
 }
 
+export type MyAccountProfileUpdate = Pick<
+  PatchedUserProfile,
+  'first_name' | 'last_name' | 'phone_number'
+>;
+
 export const getMyAccountProfile = async (): Promise<MyAccountProfile> => {
   const { data } = await apiClient.get<MyAccountProfile>('/api/accounts/me/');
   return data;
+};
+
+export const updateMyAccountProfile = async (
+  update: MyAccountProfileUpdate,
+): Promise<void> => {
+  await apiClient.patch<MyAccountProfile>('/api/accounts/me/', update);
 };
 
 export const getDoctorProfile = async (doctorId: number): Promise<DoctorProfile> => {

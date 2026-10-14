@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
+import toast from 'react-hot-toast';
 import type { ReactNode } from 'react';
 import { SignInPage, type SignInCredentials } from './SignInPage';
 import { useAuth } from '../../auth/AuthContext';
@@ -12,7 +13,6 @@ export function SignInRoute({ role }: { role: UserRole }) {
   const { role: authenticatedRole, login } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const passwordSetupComplete =
     location.state !== null &&
@@ -30,14 +30,14 @@ export function SignInRoute({ role }: { role: UserRole }) {
   }
 
   const handleSubmit = async (credentials: SignInCredentials) => {
-    setErrorMessage('');
     setIsSubmitting(true);
 
     try {
       await login(credentials, role);
+      toast.success('Login successful!');
       navigate(getHomePath(role), { replace: true });
     } catch (error) {
-      setErrorMessage(
+      toast.error(
         error instanceof Error
           ? error.message
           : 'Unable to sign in. Please try again.',
@@ -56,7 +56,6 @@ export function SignInRoute({ role }: { role: UserRole }) {
           : 'Sign in to access your doctor dashboard'
       }
       onSubmit={handleSubmit}
-      errorMessage={errorMessage}
       successMessage={
         role === 'doctor' && passwordSetupComplete
           ? automaticSignInUnavailable

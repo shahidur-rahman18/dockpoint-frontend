@@ -13,7 +13,6 @@ interface SignInPageProps {
   subtitle?: string;
   copyrightText?: string;
   onSubmit?: (credentials: SignInCredentials) => void | Promise<void>;
-  errorMessage?: string;
   successMessage?: string;
   isSubmitting?: boolean;
   showRegister?: boolean;
@@ -27,7 +26,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   subtitle = 'Please enter your details to access the dashboard',
   copyrightText = `Copyright © ${new Date().getFullYear()} - ${brandName}`,
   onSubmit,
-  errorMessage,
   successMessage,
   isSubmitting = false,
   showRegister = true,
@@ -79,14 +77,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           </header>
 
           <form className="flex flex-col gap-[17px]" onSubmit={handleSubmit}>
-            {errorMessage && (
-              <p
-                className="m-0 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
-                role="alert"
-              >
-                {errorMessage}
-              </p>
-            )}
             {successMessage && (
               <p
                 className="m-0 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"

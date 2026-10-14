@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { CheckCircle2, CircleAlert } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { CircleAlert } from 'lucide-react';
+import { LoaderOne } from '../common/LoaderOne';
 import type { SettingsPageConfig, SettingsTabType } from '../../types/settings';
 import { IntegrationsSection } from './sections/IntegrationsSection';
 import { NotificationsSection } from './sections/NotificationsSection';
@@ -35,9 +37,10 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
-  const [successMessage, setSuccessMessage] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
+  const [avatarRemovalPending, setAvatarRemovalPending] = useState(false);
 
   const settingsBasePath = config.role === 'doctor' ? '/doctor-dashboard/settings' : '/settings';
   const requestedSection = location.pathname.slice(settingsBasePath.length + 1);
@@ -51,19 +54,28 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSuccessMessage(false);
     setSubmitError(null);
     setIsSubmitting(true);
     try {
+      if (pendingAvatarFile) {
+        await onAvatarUpload?.(pendingAvatarFile);
+      } else if (avatarRemovalPending) {
+        await onAvatarRemove?.();
+      }
       await onSave?.(formData);
-      setSuccessMessage(true);
-      window.setTimeout(() => setSuccessMessage(false), 3000);
+      setPendingAvatarFile(null);
+      setAvatarRemovalPending(false);
+      toast.success('Changes saved successfully.', { position: 'bottom-right' });
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Unable to save your settings.');
+      const message = error instanceof Error ? error.message : 'Unable to save your settings.';
+      setSubmitError(message);
+      toast.error(message, { position: 'bottom-right' });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const isBusy = isSaving || isSubmitting || avatarBusy;
 
   const renderActiveSection = () => {
     switch (activeTab) {
@@ -74,10 +86,18 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
             formData={formData}
             onChange={handleFieldChange}
             avatarUrl={avatarUrl}
-            avatarBusy={avatarBusy}
+            pendingAvatarFile={pendingAvatarFile}
+            avatarRemovalPending={avatarRemovalPending}
+            avatarBusy={isBusy}
             avatarError={avatarError}
-            onAvatarUpload={onAvatarUpload}
-            onAvatarRemove={onAvatarRemove}
+            onAvatarSelect={(image) => {
+              setPendingAvatarFile(image);
+              setAvatarRemovalPending(false);
+            }}
+            onAvatarRemove={() => {
+              setPendingAvatarFile(null);
+              setAvatarRemovalPending(true);
+            }}
           />
         );
       case 'security':
@@ -99,13 +119,6 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
         {config.subtitle && <p className="mt-1 text-sm text-slate-500">{config.subtitle}</p>}
       </header>
 
-      {successMessage && (
-        <div role="status" className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-sm">
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
-          <span>Settings saved successfully! Changes have been updated.</span>
-        </div>
-      )}
-
       {(saveError || submitError) && (
         <div role="alert" className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
           <CircleAlert className="h-5 w-5 shrink-0 text-rose-600" />
@@ -120,19 +133,28 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
           <button
             type="button"
             onClick={() => navigate(`${settingsBasePath}/${activeTab}`)}
-            className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            disabled={isSaving || isSubmitting}
-            className="rounded-lg bg-indigo-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isBusy}
+            className="cursor-pointer rounded-lg bg-indigo-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSaving || isSubmitting ? 'Saving...' : 'Save Changes'}
+            {isBusy ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </form>
+
+      {isBusy && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
+          <div className="flex flex-col items-center gap-3 rounded-xl bg-white px-8 py-6 shadow-lg" role="status" aria-live="polite">
+            <LoaderOne />
+            <p className="text-sm font-medium text-slate-600">Saving your changes...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
