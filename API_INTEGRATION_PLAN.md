@@ -58,7 +58,7 @@ Backend-এ বর্তমানে `JWTAuthentication` এবং SimpleJWT-এ
 * Protected request-এ `Authorization: Bearer <access-token>` header পাঠাতে হবে.
 * Backend settings-এ access token lifetime 60 মিনিট, refresh token lifetime 1 দিন, refresh rotation enabled, `AUTH_HEADER_TYPES` `Bearer` হিসেবে নির্ধারিত। এগুলো backend configuration-নির্ভর; পরিবর্তন হলে frontend-এ hardcode করা যাবে না।
 * Refresh request: `POST /api/accounts/token/refresh/` body-তে `{ "refresh": "<refresh-token>" }`। Rotation চালু থাকায় response-এ নতুন `refresh` token এলে সেটিও পুরোনোটির জায়গায় রাখতে হবে।
-* Access token memory/React auth state-এ রাখতে হবে। Reload-এর পর session চালু রাখার প্রয়োজন হলে refresh token `sessionStorage`-এ রাখা যেতে পারে; এটি JavaScript থেকে পড়া যায় এবং XSS হলে চুরি হওয়ার ঝুঁকি আছে. Token-কে `localStorage`-এ না রাখাই এই পরিকল্পনার default। `Remember me`-এর দীর্ঘস্থায়ী আচরণ নির্ধারণের আগে এই সীমাবদ্ধতা বিবেচনা করতে হবে।
+* বর্তমান frontend access ও refresh token memory-তে রাখে; reload-এর পর session restore এখনো নেই। এই API plan-এর পুরোনো `sessionStorage` বিকল্পটি আর লক্ষ্য implementation নয়—নিরাপদ cookie-ভিত্তিক session restore-এর জন্য [AUTHENTICATION_AUTHORIZATION_PLAN.md](./AUTHENTICATION_AUTHORIZATION_PLAN.md) অনুসরণ করতে হবে।
 * XSS ঝুঁকি কমাতে untrusted HTML render এড়াতে/স্যানিটাইজ করতে হবে এবং Content Security Policy (CSP) বিবেচনা করতে হবে। Bearer token JavaScript-এ ব্যবহৃত হওয়ায় HttpOnly cookie-এর মতো XSS token theft protection দেয় না।
 
 ### 401, 403 এবং refresh recovery
@@ -74,7 +74,7 @@ Backend-এ বর্তমানে `JWTAuthentication` এবং SimpleJWT-এ
 
 ## ৪. Cookie authentication: ভবিষ্যৎ backend enhancement
 
-HttpOnly cookie authentication বর্তমান backend implementation নয়, তাই frontend API integration-এর acceptance criteria-তে অন্তর্ভুক্ত নয়। পরে এই পদ্ধতি নিতে চাইলে backend-এ token cookie set/clear, cookie attributes, CSRF token issuance/validation, CORS credentials এবং logout/revocation endpoint implement ও test করতে হবে। Frontend ও API origin browser-এর দৃষ্টিতে cross-site হলে deployment অনুযায়ী `SameSite=None; Secure` প্রয়োজন হতে পারে; provider আলাদা হওয়াই একমাত্র নির্ধারক নয়। HttpOnly cookie JavaScript-এ token পড়া আটকায়, কিন্তু XSS দিয়ে ব্যবহারকারীর হয়ে request পাঠানো আটকায় না।
+HttpOnly cookie authentication বর্তমান backend implementation নয়। Authentication ও authorization-কে backend থেকে frontend পর্যন্ত ধাপে ধাপে implement করার বর্তমান পরিকল্পনা [AUTHENTICATION_AUTHORIZATION_PLAN.md](./AUTHENTICATION_AUTHORIZATION_PLAN.md)-এ আছে; ওই document-এর contract ও ধাপগুলো এই অংশের পুরোনো ভবিষ্যৎ-প্রস্তাবের বদলে অনুসরণ করতে হবে। Frontend ও API origin browser-এর দৃষ্টিতে cross-site হলে deployment অনুযায়ী `SameSite=None; Secure` প্রয়োজন হতে পারে; provider আলাদা হওয়াই একমাত্র নির্ধারক নয়। HttpOnly cookie JavaScript-এ token পড়া আটকায়, কিন্তু XSS দিয়ে ব্যবহারকারীর হয়ে request পাঠানো আটকায় না।
 
 ## ৫. OpenAPI contract ও TypeScript type
 
