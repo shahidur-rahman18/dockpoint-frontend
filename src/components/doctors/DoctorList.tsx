@@ -11,12 +11,12 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  UserRound,
 } from 'lucide-react';
 import { LoaderOne } from '../common/LoaderOne';
 import { DataTable } from '../common/DataTable';
 import { ActionDropdown } from '../common/ActionDropdown';
 import { DoctorCard } from './DoctorCard';
+import { DoctorAvatar } from './DoctorAvatar';
 import type { DoctorListItem } from '../../types';
 import { useDoctors, useUpdateDoctorAvailability } from '../../hooks/useDoctors';
 import { getDoctorListErrorMessage } from '../../services/doctorService';
@@ -127,29 +127,19 @@ export const DoctorList: React.FC = () => {
 
           return (
             <div className="flex min-w-0 items-center gap-3">
-              {doctor.avatar ? (
-                <button
-                  type="button"
-                  onClick={() => handleViewDoctor(doctor)}
-                  aria-label={`View details for ${doctor.name}`}
-                  className="shrink-0 cursor-pointer rounded-full focus-visible:outline-2 focus-visible:outline-indigo-600"
-                >
-                  <img
-                    src={doctor.avatar}
-                    alt=""
-                    className="size-10 rounded-full border border-slate-200 object-cover shadow-xs"
-                  />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleViewDoctor(doctor)}
-                  aria-label={`View details for ${doctor.name}`}
-                  className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400 focus-visible:outline-2 focus-visible:outline-indigo-600"
-                >
-                  <UserRound aria-hidden="true" className="size-5" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => handleViewDoctor(doctor)}
+                aria-label={`View details for ${doctor.name}`}
+                className="shrink-0 cursor-pointer rounded-full focus-visible:outline-2 focus-visible:outline-indigo-600"
+              >
+                <DoctorAvatar
+                  src={doctor.avatar}
+                  imageClassName="size-10 rounded-full border border-slate-200 object-cover shadow-xs"
+                  fallbackClassName="grid size-10 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400"
+                  iconClassName="size-5"
+                />
+              </button>
               <div className="min-w-0">
                 <div className="whitespace-nowrap font-bold text-slate-800">
                   {doctor.name}

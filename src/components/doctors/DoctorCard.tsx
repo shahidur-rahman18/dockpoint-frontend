@@ -1,7 +1,8 @@
-import { Calendar, UserRound } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import type { DoctorListItem } from '../../types';
 import { ActionDropdown } from '../common/ActionDropdown';
 import { Card } from '../common/Card';
+import { DoctorAvatar } from './DoctorAvatar';
 
 interface DoctorCardProps {
   doctor: DoctorListItem;
@@ -23,29 +24,19 @@ export function DoctorCard({
       <div>
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3.5">
-            {doctor.avatar ? (
-              <button
-                type="button"
-                onClick={onView}
-                aria-label={`View details for ${doctor.name}`}
-                className="shrink-0 cursor-pointer rounded-xl focus-visible:outline-2 focus-visible:outline-[var(--theme-accent)]"
-              >
-                <img
-                  src={doctor.avatar}
-                  alt=""
-                  className="size-16 rounded-xl border border-[var(--border-color)] object-cover shadow-sm"
-                />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={onView}
-                aria-label={`View details for ${doctor.name}`}
-                className="grid size-16 shrink-0 cursor-pointer place-items-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] text-[var(--text-muted)] focus-visible:outline-2 focus-visible:outline-[var(--theme-accent)]"
-              >
-                <UserRound aria-hidden="true" className="size-7" />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={onView}
+              aria-label={`View details for ${doctor.name}`}
+              className="shrink-0 cursor-pointer rounded-xl focus-visible:outline-2 focus-visible:outline-[var(--theme-accent)]"
+            >
+              <DoctorAvatar
+                src={doctor.avatar}
+                imageClassName="size-16 rounded-xl border border-[var(--border-color)] object-cover shadow-sm"
+                fallbackClassName="grid size-16 place-items-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] text-[var(--text-muted)]"
+                iconClassName="size-7"
+              />
+            </button>
             <div className="min-w-0">
               <h3 className="truncate text-sm font-bold text-[var(--text-primary)]">
                 {doctor.name}

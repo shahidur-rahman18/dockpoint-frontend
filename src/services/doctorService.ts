@@ -8,6 +8,15 @@ type DoctorProfile = components['schemas']['DoctorProfile'];
 type PatchedDoctorProfile = components['schemas']['PatchedDoctorProfile'];
 export type DoctorListQuery = NonNullable<operations['doctors_list']['parameters']['query']>;
 
+const getDoctorAvatarUrl = (userDetails: unknown): string => {
+  if (!userDetails || typeof userDetails !== 'object' || !('avatar_url' in userDetails)) {
+    return '';
+  }
+
+  const avatarUrl = userDetails.avatar_url;
+  return typeof avatarUrl === 'string' ? avatarUrl.trim() : '';
+};
+
 export const mapDoctorProfileToListItem = (doctor: DoctorProfile): DoctorListItem => {
   const firstName = doctor.user_details.first_name?.trim() ?? '';
   const lastName = doctor.user_details.last_name?.trim() ?? '';
@@ -23,7 +32,7 @@ export const mapDoctorProfileToListItem = (doctor: DoctorProfile): DoctorListIte
     email: doctor.user_details.email,
     fees: doctor.consultation_fee ?? '—',
     status: doctor.is_available ? 'Available' : 'Unavailable',
-    avatar: '',
+    avatar: getDoctorAvatarUrl(doctor.user_details),
     chamberAddress: doctor.chamber_address?.trim() || '—',
   };
 };
