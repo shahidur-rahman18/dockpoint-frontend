@@ -1,27 +1,35 @@
 import React from 'react';
+import { LoaderOne } from '../components/common/LoaderOne';
 import { SettingsLayout } from '../components/settings/SettingsLayout';
 import { doctorSettingsConfig } from '../components/settings/configs/settingsConfig';
 import {
-  getDoctorSettingsErrorMessage,
+  getProfileApiErrorMessage,
   type DoctorSettingsUpdate,
 } from '../services/accountService';
 import {
   useDoctorSettingsProfile,
   useUpdateDoctorSettingsProfile,
 } from '../hooks/useDoctorSettingsProfile';
+import { useUpdateMyAvatar } from '../hooks/useMyAccountProfile';
 
 export const DoctorSettingsPage: React.FC = () => {
   const profileQuery = useDoctorSettingsProfile();
   const updateProfile = useUpdateDoctorSettingsProfile();
+  const updateAvatar = useUpdateMyAvatar();
 
   if (profileQuery.isPending) {
-    return <p role="status" className="py-8 text-center text-sm text-slate-500">Loading your profile...</p>;
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <LoaderOne />
+        <p className="text-sm text-slate-500">Loading your profile...</p>
+      </div>
+    );
   }
 
   if (profileQuery.isError) {
     return (
       <div role="alert" className="space-y-3 rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-800">
-        <p>{getDoctorSettingsErrorMessage(profileQuery.error)}</p>
+        <p>{getProfileApiErrorMessage(profileQuery.error)}</p>
         <button
           type="button"
           onClick={() => profileQuery.refetch()}
@@ -70,8 +78,15 @@ export const DoctorSettingsPage: React.FC = () => {
       onSave={handleSave}
       isSaving={updateProfile.isPending}
       saveError={updateProfile.error
-        ? getDoctorSettingsErrorMessage(updateProfile.error)
+        ? getProfileApiErrorMessage(updateProfile.error)
         : null}
+      avatarUrl={profileQuery.data.account.avatar_url}
+      avatarBusy={updateAvatar.isPending}
+      avatarError={updateAvatar.error
+        ? getProfileApiErrorMessage(updateAvatar.error)
+        : null}
+      onAvatarUpload={(image) => updateAvatar.mutateAsync(image)}
+      onAvatarRemove={() => updateAvatar.mutateAsync(null)}
     />
   );
 };

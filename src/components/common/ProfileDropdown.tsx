@@ -26,6 +26,7 @@ export function ProfileDropdown({
   onLogout,
 }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const initials = name
     .split(/\s+/)
@@ -36,10 +37,11 @@ export function ProfileDropdown({
     .toUpperCase();
 
   const avatar = (size: 'small' | 'large') =>
-    avatarUrl ? (
+    avatarUrl && !avatarLoadFailed ? (
       <img
         src={avatarUrl}
         alt=""
+        onError={() => setAvatarLoadFailed(true)}
         className={`${size === 'small' ? 'w-8 h-8' : 'h-9 w-9'} rounded-full border border-slate-200 object-cover`}
       />
     ) : (

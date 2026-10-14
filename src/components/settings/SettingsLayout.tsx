@@ -13,6 +13,11 @@ interface SettingsLayoutProps {
   onSave?: (data: Record<string, any>) => Promise<void> | void;
   isSaving?: boolean;
   saveError?: string | null;
+  avatarUrl?: string | null;
+  avatarBusy?: boolean;
+  avatarError?: string | null;
+  onAvatarUpload?: (image: File) => Promise<void>;
+  onAvatarRemove?: () => Promise<void>;
 }
 
 export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
@@ -21,6 +26,11 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   onSave,
   isSaving = false,
   saveError = null,
+  avatarUrl,
+  avatarBusy = false,
+  avatarError = null,
+  onAvatarUpload,
+  onAvatarRemove,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,7 +68,18 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   const renderActiveSection = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileSection fields={config.fields} formData={formData} onChange={handleFieldChange} />;
+        return (
+          <ProfileSection
+            fields={config.fields}
+            formData={formData}
+            onChange={handleFieldChange}
+            avatarUrl={avatarUrl}
+            avatarBusy={avatarBusy}
+            avatarError={avatarError}
+            onAvatarUpload={onAvatarUpload}
+            onAvatarRemove={onAvatarRemove}
+          />
+        );
       case 'security':
       case 'password':
         return <PasswordSection />;

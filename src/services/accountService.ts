@@ -9,8 +9,10 @@ type PatchedUserProfile = components['schemas']['PatchedUserProfile'];
 type DoctorProfile = components['schemas']['DoctorProfile'];
 type PatchedDoctorProfile = components['schemas']['PatchedDoctorProfile'];
 
+export type MyAccountProfile = UserProfile & { avatar_url: string | null };
+
 export interface DoctorSettingsProfile {
-  account: UserProfile;
+  account: MyAccountProfile;
   doctor: DoctorProfile;
 }
 
@@ -22,18 +24,28 @@ export interface DoctorSettingsUpdate {
   >;
 }
 
-export const getDoctorSettingsProfile = async (): Promise<DoctorSettingsProfile> => {
-  const { data: account } = await apiClient.get<UserProfile>('/api/accounts/me/');
+export const getMyAccountProfile = async (): Promise<MyAccountProfile> => {
+  const { data } = await apiClient.get<MyAccountProfile>('/api/accounts/me/');
+  return data;
+};
 
-  if (account.role !== 'DOCTOR' || !account.doctor_profile?.id) {
-    throw new Error('The signed-in account does not have a doctor profile.');
-  }
-
+export const getDoctorProfile = async (doctorId: number): Promise<DoctorProfile> => {
   const { data: doctor } = await apiClient.get<DoctorProfile>(
-    `/api/doctors/${account.doctor_profile.id}/`,
+    `/api/doctors/${doctorId}/`,
   );
 
-  return { account, doctor };
+  return doctor;
+};
+
+export const updateMyAvatar = async (image: File | null): Promise<void> => {
+  if (image === null) {
+    await apiClient.patch<MyAccountProfile>('/api/accounts/me/', { avatar: null });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('avatar', image);
+  await apiClient.patch<MyAccountProfile>('/api/accounts/me/', formData);
 };
 
 export const updateDoctorSettingsProfile = async (
@@ -53,7 +65,7 @@ export const updateDoctorSettingsProfile = async (
   await Promise.all(requests);
 };
 
-export const getDoctorSettingsErrorMessage = (error: unknown): string => {
+export const getProfileApiErrorMessage = (error: unknown): string => {
   if (!axios.isAxiosError(error)) {
     return error instanceof Error ? error.message : 'Unable to load your profile. Please try again.';
   }
@@ -66,6 +78,18 @@ export const getDoctorSettingsErrorMessage = (error: unknown): string => {
 
   if (data && typeof data === 'object' && 'detail' in data && typeof data.detail === 'string') {
     return data.detail;
+  }
+
+  if (data && typeof data === 'object') {
+    for (const value of Object.values(data)) {
+      if (typeof value === 'string') {
+        return value;
+      }
+
+      if (Array.isArray(value) && typeof value[0] === 'string') {
+        return value[0];
+      }
+    }
   }
 
   return `The server could not process the profile request (HTTP ${error.response.status}). Please try again.`;

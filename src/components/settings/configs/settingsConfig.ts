@@ -12,7 +12,6 @@ export const adminSettingsConfig: SettingsPageConfig = {
   ],
   fields: [
     // Basic Information
-    { name: 'profileImage', label: 'Profile Image', type: 'image', section: 'basic', colSpan: 2 },
     { name: 'firstName', label: 'First Name', type: 'text', placeholder: 'Enter first name', required: true, section: 'basic', colSpan: 1 },
     { name: 'lastName', label: 'Last Name', type: 'text', placeholder: 'Enter last name', required: true, section: 'basic', colSpan: 1 },
     { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter email address', required: true, section: 'basic', colSpan: 1 },

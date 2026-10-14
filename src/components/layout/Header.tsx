@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { isDoctorDashboardPath } from './menuConfig';
 import { ProfileDropdown, type ProfileDropdownItem } from '../common/ProfileDropdown';
 import { useAuth } from '../../auth/AuthContext';
+import { useMyAccountProfile } from '../../hooks/useMyAccountProfile';
 
 interface HeaderProps {
   background: string;
@@ -27,10 +28,16 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
   const location = useLocation();
   const navigate = useNavigate();
   const { email, role, logout } = useAuth();
+  const accountQuery = useMyAccountProfile();
   const isDoctorDashboard = isDoctorDashboardPath(location.pathname);
   const settingsPath = isDoctorDashboard
     ? '/doctor-dashboard/settings'
     : '/settings';
+  const accountName = accountQuery.data
+    ? [accountQuery.data.first_name, accountQuery.data.last_name]
+        .filter((part) => part?.trim())
+        .join(' ')
+    : '';
   const profileMenuItems: ProfileDropdownItem[] = [
     {
       id: 'profile',
@@ -129,9 +136,9 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
         {/* User Profile Menu */}
         <div className="flex items-center pl-2 border-l border-slate-200">
           <ProfileDropdown
-            name={email ?? 'Account'}
+            name={accountName || email || 'Account'}
             role={role === 'admin' ? 'Admin' : 'Doctor'}
-            avatarUrl=""
+            avatarUrl={accountQuery.data?.avatar_url ?? undefined}
             items={profileMenuItems}
             onLogout={() => {
               logout();
