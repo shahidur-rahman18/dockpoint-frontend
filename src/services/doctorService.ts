@@ -6,6 +6,10 @@ import type { DoctorListItem } from '../types';
 type AdminDoctorCreate = components['schemas']['AdminDoctorCreate'];
 type DoctorProfile = components['schemas']['DoctorProfile'];
 type PatchedDoctorProfile = components['schemas']['PatchedDoctorProfile'];
+export type DoctorProfileUpdate = Pick<
+  PatchedDoctorProfile,
+  'specialization' | 'qualification' | 'consultation_fee' | 'chamber_address' | 'is_available'
+>;
 export type DoctorListQuery = NonNullable<operations['doctors_list']['parameters']['query']>;
 
 const getDoctorAvatarUrl = (userDetails: unknown): string => {
@@ -60,6 +64,22 @@ export const updateDoctorAvailability = async (
   return data;
 };
 
+export const updateDoctorProfile = async (
+  doctorId: number,
+  update: DoctorProfileUpdate,
+): Promise<DoctorProfile> => {
+  const { data } = await apiClient.patch<DoctorProfile>(
+    `/api/doctors/${doctorId}/`,
+    update,
+  );
+
+  return data;
+};
+
+export const deleteDoctor = async (doctorId: number): Promise<void> => {
+  await apiClient.delete(`/api/doctors/${doctorId}/`);
+};
+
 export const getDoctorListErrorMessage = (error: unknown): string => {
   if (!axios.isAxiosError(error)) {
     return error instanceof Error ? error.message : 'Unable to load doctors. Please try again.';
@@ -76,6 +96,43 @@ export const getDoctorListErrorMessage = (error: unknown): string => {
   }
 
   return `Unable to load doctors (HTTP ${error.response.status}). Please try again.`;
+};
+
+export const getDoctorMutationErrorMessage = (
+  error: unknown,
+  action: 'update' | 'delete',
+): string => {
+  const actionLabel = action === 'update' ? 'update' : 'delete';
+
+  if (!axios.isAxiosError(error)) {
+    return error instanceof Error
+      ? error.message
+      : `Unable to ${actionLabel} the doctor. Please try again.`;
+  }
+
+  if (!error.response) {
+    return 'Unable to reach the server. Check your connection and try again.';
+  }
+
+  const data: unknown = error.response.data;
+
+  if (data && typeof data === 'object' && 'detail' in data && typeof data.detail === 'string') {
+    return data.detail;
+  }
+
+  if (data && typeof data === 'object') {
+    for (const [field, value] of Object.entries(data)) {
+      if (typeof value === 'string') {
+        return `${field}: ${value}`;
+      }
+
+      if (Array.isArray(value) && typeof value[0] === 'string') {
+        return `${field}: ${value[0]}`;
+      }
+    }
+  }
+
+  return `Unable to ${actionLabel} the doctor (HTTP ${error.response.status}). Please try again.`;
 };
 
 export const createDoctor = async (payload: AdminDoctorCreate): Promise<AdminDoctorCreate> => {

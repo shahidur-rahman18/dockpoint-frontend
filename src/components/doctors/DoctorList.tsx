@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
+import toast from 'react-hot-toast';
 import {
   Search,
   Filter,
@@ -17,9 +18,17 @@ import { DataTable } from '../common/DataTable';
 import { ActionDropdown } from '../common/ActionDropdown';
 import { DoctorCard } from './DoctorCard';
 import { DoctorAvatar } from './DoctorAvatar';
+import { DeleteConfirmationModal } from '../common/DeleteConfirmationModal';
 import type { DoctorListItem } from '../../types';
-import { useDoctors, useUpdateDoctorAvailability } from '../../hooks/useDoctors';
-import { getDoctorListErrorMessage } from '../../services/doctorService';
+import {
+  useDeleteDoctor,
+  useDoctors,
+  useUpdateDoctorAvailability,
+} from '../../hooks/useDoctors';
+import {
+  getDoctorListErrorMessage,
+  getDoctorMutationErrorMessage,
+} from '../../services/doctorService';
 
 const doctorDetailsPath = (doctor: DoctorListItem) => {
   const slug = doctor.name
@@ -41,6 +50,7 @@ export const DoctorList: React.FC = () => {
     refetch,
   } = useDoctors();
   const availabilityMutation = useUpdateDoctorAvailability();
+  const deleteDoctorMutation = useDeleteDoctor();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<DoctorListItem['status'] | ''>('');
@@ -49,6 +59,7 @@ export const DoctorList: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [pageIndex, setPageIndex] = useState(0);
   const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
+  const [doctorToDelete, setDoctorToDelete] = useState<DoctorListItem | null>(null);
   const pageSize = 6;
 
   const toggleActionMenu = (doctorId: string) => {
@@ -57,6 +68,29 @@ export const DoctorList: React.FC = () => {
 
   const handleViewDoctor = (doctor: DoctorListItem) => {
     navigate(doctorDetailsPath(doctor));
+  };
+
+  const handleEditDoctor = (doctor: DoctorListItem) => {
+    navigate(`/doctors/${doctor.id}/edit`);
+  };
+
+  const handleRequestDeleteDoctor = (doctor: DoctorListItem) => {
+    deleteDoctorMutation.reset();
+    setDoctorToDelete(doctor);
+  };
+
+  const handleConfirmDeleteDoctor = () => {
+    if (!doctorToDelete || deleteDoctorMutation.isPending) return;
+
+    deleteDoctorMutation.mutate(Number(doctorToDelete.id), {
+      onSuccess: () => {
+        toast.success(`${doctorToDelete.name} deleted successfully.`, {
+          position: 'bottom-right',
+        });
+        setPageIndex(0);
+        setDoctorToDelete(null);
+      },
+    });
   };
 
   const goToPage = (page: number) => {
@@ -267,6 +301,8 @@ export const DoctorList: React.FC = () => {
             <ActionDropdown
               isOpen={openActionMenuId === row.original.id}
               onToggle={() => toggleActionMenu(row.original.id)}
+              onEdit={() => handleEditDoctor(row.original)}
+              onDelete={() => handleRequestDeleteDoctor(row.original)}
             />
           </div>
         ),
@@ -501,6 +537,8 @@ export const DoctorList: React.FC = () => {
                   isActionMenuOpen={openActionMenuId === doctor.id}
                   onToggleActionMenu={() => toggleActionMenu(doctor.id)}
                   onView={() => handleViewDoctor(doctor)}
+                  onEdit={() => handleEditDoctor(doctor)}
+                  onDelete={() => handleRequestDeleteDoctor(doctor)}
                 />
               ))}
             </div>
@@ -571,6 +609,29 @@ export const DoctorList: React.FC = () => {
       <div className="text-center pt-2 pb-2 text-xs font-medium text-slate-500 border-t border-slate-200/60">
         2026 &copy;Docpoint, All Rights Reserved
       </div>
+
+      <DeleteConfirmationModal
+        open={doctorToDelete !== null}
+        title="Delete Doctor"
+        description={
+          doctorToDelete
+            ? `Are you sure you want to delete ${doctorToDelete.name}? This action cannot be undone.`
+            : undefined
+        }
+        confirmLabel={deleteDoctorMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
+        isPending={deleteDoctorMutation.isPending}
+        error={
+          deleteDoctorMutation.error
+            ? getDoctorMutationErrorMessage(deleteDoctorMutation.error, 'delete')
+            : null
+        }
+        onCancel={() => {
+          if (deleteDoctorMutation.isPending) return;
+          setDoctorToDelete(null);
+          deleteDoctorMutation.reset();
+        }}
+        onConfirm={handleConfirmDeleteDoctor}
+      />
 
     </div>
   );

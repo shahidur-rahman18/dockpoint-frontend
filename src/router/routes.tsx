@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { DoctorList } from '../components/doctors/DoctorList';
 import { DoctorDetails } from '../components/doctors/DoctorDetails';
+import { DoctorEditPage } from '../components/doctors/DoctorEditPage';
 import { AddDoctor } from '../components/doctors/AddDoctor';
 import { DoctorSchedule } from '../components/doctors/DoctorSchedule';
 import { DoctorDashboard } from '../pages/DoctorDashboard';
@@ -35,6 +36,8 @@ export const routes: RouteObject[] = [
       { index: true, element: <Navigate to="/admin-dashboard" replace /> },
       { path: 'admin-dashboard', element: <AdminDashboard /> },
       { path: 'doctors', element: <DoctorList /> },
+      { path: 'doctors/:doctorId/edit', element: <DoctorEditPage /> },
+      { path: 'doctor-details', element: <Navigate to="/doctors" replace /> },
       { path: 'doctor-details/:doctorId/:doctorSlug', element: <DoctorDetails /> },
       { path: 'add-doctor', element: <AddDoctor /> },
       { path: 'doctor-schedule', element: <DoctorSchedule /> },

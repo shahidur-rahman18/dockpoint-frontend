@@ -9,6 +9,8 @@ interface DoctorCardProps {
   isActionMenuOpen: boolean;
   onToggleActionMenu: () => void;
   onView: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 export function DoctorCard({
@@ -16,6 +18,8 @@ export function DoctorCard({
   isActionMenuOpen,
   onToggleActionMenu,
   onView,
+  onEdit,
+  onDelete,
 }: DoctorCardProps) {
   const isAvailable = doctor.status === 'Available';
 
@@ -50,6 +54,8 @@ export function DoctorCard({
             <ActionDropdown
               isOpen={isActionMenuOpen}
               onToggle={onToggleActionMenu}
+              onEdit={onEdit}
+              onDelete={onDelete}
             />
           </div>
         </div>

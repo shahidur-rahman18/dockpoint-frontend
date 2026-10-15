@@ -12,8 +12,8 @@ interface ProfileSectionProps {
   avatarRemovalPending: boolean;
   avatarBusy?: boolean;
   avatarError?: string | null;
-  onAvatarSelect: (image: File) => void;
-  onAvatarRemove: () => void;
+  onAvatarSelect?: (image: File) => void;
+  onAvatarRemove?: () => void;
 }
 
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
@@ -68,12 +68,12 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
       return;
     }
 
-    onAvatarSelect(image);
+    onAvatarSelect?.(image);
   };
 
   const handleAvatarRemove = () => {
     setLocalError(null);
-    onAvatarRemove();
+    onAvatarRemove?.();
   };
 
   return (
