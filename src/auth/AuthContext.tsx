@@ -2,32 +2,26 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from 'react';
 import {
   clearStoredAuth,
-  getSessionWithAccessToken,
+  fetchUserSession,
   loginWithApi,
-  type AuthTokens,
   type LoginCredentials,
   type UserRole,
 } from './authService';
-import {
-  clearAuthTokens,
-  getAccessToken,
-  setAccessToken as storeAccessToken,
-  setRefreshToken,
-} from './accessTokenStore';
+import { apiClient } from '../api/apiClient';
 
 interface AuthContextValue {
   email: string | null;
   role: UserRole | null;
-  accessToken: string | null;
+  isLoading: boolean;
   login: (credentials: LoginCredentials, role: UserRole) => Promise<void>;
-  establishSession: (tokens: AuthTokens, expectedRole: UserRole) => Promise<void>;
-  setAccessToken: (token: string | null) => void;
-  logout: () => void;
+  establishSession: (expectedRole: UserRole) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,49 +31,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: UserRole;
     email: string;
   } | null>(null);
-  const [accessToken, setAccessTokenState] = useState(getAccessToken);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const setToken = useCallback((token: string | null) => {
-    storeAccessToken(token);
-    setAccessTokenState(token);
+  // অ্যাপ লোড বা রিফ্রেশ হওয়ার সাথে সাথে কুকি চেক করে সেশন রিস্টোর করা
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const userSession = await fetchUserSession();
+        setSession(userSession);
+      } catch {
+        // ইউজার লগইন করা না থাকলে সাইলেন্টলি নাল সেট করা হবে
+        setSession(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    restoreSession();
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials, role: UserRole) => {
-    clearAuthTokens();
-    setAccessTokenState(null);
-    const { session: authenticatedSession, tokens } = await loginWithApi(credentials, role);
-    storeAccessToken(tokens.access);
-    setRefreshToken(tokens.refresh);
-    setAccessTokenState(tokens.access);
-    clearStoredAuth();
-    setSession(authenticatedSession);
-  }, []);
-
-  const establishSession = useCallback(async (
-    tokens: AuthTokens,
-    expectedRole: UserRole,
-  ) => {
-    clearAuthTokens();
-    setAccessTokenState(null);
-    setSession(null);
-
-    const authenticatedSession = await getSessionWithAccessToken(tokens.access);
-    if (authenticatedSession.role !== expectedRole) {
-      throw new Error(`This account does not have the ${expectedRole} role.`);
+    setIsLoading(true);
+    try {
+      const { session: authenticatedSession } = await loginWithApi(credentials, role);
+      clearStoredAuth();
+      setSession(authenticatedSession);
+    } finally {
+      setIsLoading(false);
     }
-
-    storeAccessToken(tokens.access);
-    setRefreshToken(tokens.refresh);
-    setAccessTokenState(tokens.access);
-    clearStoredAuth();
-    setSession(authenticatedSession);
   }, []);
 
-  const logout = useCallback(() => {
-    clearStoredAuth();
-    clearAuthTokens();
-    setAccessTokenState(null);
-    setSession(null);
+  const establishSession = useCallback(async (expectedRole: UserRole) => {
+    setIsLoading(true);
+    try {
+      const authenticatedSession = await fetchUserSession();
+      if (authenticatedSession.role !== expectedRole) {
+        throw new Error(`This account does not have the ${expectedRole} role.`);
+      }
+      setSession(authenticatedSession);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      // ব্যাকএন্ডে লগআউট কল করে কুকি ক্লিয়ার করা
+      await apiClient.post('/accounts/logout/');
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      clearStoredAuth();
+      setSession(null);
+    }
   }, []);
 
   return (
@@ -87,10 +91,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         email: session?.email ?? null,
         role: session?.role ?? null,
-        accessToken,
+        isLoading,
         login,
         establishSession,
-        setAccessToken: setToken,
         logout,
       }}
     >

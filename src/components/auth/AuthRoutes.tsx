@@ -5,12 +5,13 @@ import type { ReactNode } from 'react';
 import { SignInPage, type SignInCredentials } from './SignInPage';
 import { useAuth } from '../../auth/AuthContext';
 import type { UserRole } from '../../auth/authService';
+import { LoaderOne } from '../common/LoaderOne';
 
 const getHomePath = (role: UserRole) =>
   role === 'admin' ? '/admin-dashboard' : '/doctor-dashboard';
 
 export function SignInRoute({ role }: { role: UserRole }) {
-  const { role: authenticatedRole, login } = useAuth();
+  const { role: authenticatedRole, login, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,6 +25,14 @@ export function SignInRoute({ role }: { role: UserRole }) {
     typeof location.state === 'object' &&
     'automaticSignInUnavailable' in location.state &&
     location.state.automaticSignInUnavailable === true;
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
+        <LoaderOne />
+      </div>
+    );
+  }
 
   if (authenticatedRole) {
     return <Navigate to={getHomePath(authenticatedRole)} replace />;
@@ -70,11 +79,19 @@ export function SignInRoute({ role }: { role: UserRole }) {
 }
 
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { role } = useAuth();
+  const { role, isLoading } = useAuth();
   const location = useLocation();
   const requiredRole: UserRole = location.pathname.startsWith('/doctor-dashboard')
     ? 'doctor'
     : 'admin';
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
+        <LoaderOne />
+      </div>
+    );
+  }
 
   if (!role) {
     const signInPath = requiredRole === 'admin' ? '/admin/sign-in' : '/doctor/sign-in';

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { apiClient } from '../api/apiClient';
-import type { AuthTokens } from '../auth/authService';
 import type { components } from '../types/schema';
 
 type PasswordSetupPayload = components['schemas']['PasswordSetup'];
@@ -30,19 +29,19 @@ export type MyAccountProfileUpdate = Pick<
 >;
 
 export const getMyAccountProfile = async (): Promise<MyAccountProfile> => {
-  const { data } = await apiClient.get<MyAccountProfile>('/api/accounts/me/');
+  const { data } = await apiClient.get<MyAccountProfile>('/accounts/me/');
   return data;
 };
 
 export const updateMyAccountProfile = async (
   update: MyAccountProfileUpdate,
 ): Promise<void> => {
-  await apiClient.patch<MyAccountProfile>('/api/accounts/me/', update);
+  await apiClient.patch<MyAccountProfile>('/accounts/me/', update);
 };
 
 export const getDoctorProfile = async (doctorId: number): Promise<DoctorProfile> => {
   const { data: doctor } = await apiClient.get<DoctorProfile>(
-    `/api/doctors/${doctorId}/`,
+    `/doctors/${doctorId}/`,
   );
 
   return doctor;
@@ -50,13 +49,13 @@ export const getDoctorProfile = async (doctorId: number): Promise<DoctorProfile>
 
 export const updateMyAvatar = async (image: File | null): Promise<void> => {
   if (image === null) {
-    await apiClient.patch<MyAccountProfile>('/api/accounts/me/', { avatar: null });
+    await apiClient.patch<MyAccountProfile>('/accounts/me/', { avatar: null });
     return;
   }
 
   const formData = new FormData();
   formData.append('avatar', image);
-  await apiClient.patch<MyAccountProfile>('/api/accounts/me/', formData);
+  await apiClient.patch<MyAccountProfile>('/accounts/me/', formData);
 };
 
 export const updateDoctorSettingsProfile = async (
@@ -66,11 +65,11 @@ export const updateDoctorSettingsProfile = async (
   const requests: Promise<unknown>[] = [];
 
   if (Object.keys(update.account).length > 0) {
-    requests.push(apiClient.patch<UserProfile>('/api/accounts/me/', update.account));
+    requests.push(apiClient.patch<UserProfile>('/accounts/me/', update.account));
   }
 
   if (Object.keys(update.doctor).length > 0) {
-    requests.push(apiClient.patch<DoctorProfile>(`/api/doctors/${doctorId}/`, update.doctor));
+    requests.push(apiClient.patch<DoctorProfile>(`/doctors/${doctorId}/`, update.doctor));
   }
 
   await Promise.all(requests);
@@ -108,22 +107,8 @@ export const getProfileApiErrorMessage = (error: unknown): string => {
 
 export const setupPassword = async (
   payload: PasswordSetupPayload,
-): Promise<AuthTokens | null> => {
-  const { data } = await apiClient.post<unknown>(
-    '/api/accounts/setup-password/',
-    payload,
-  );
-
-  if (data && typeof data === 'object' && 'access' in data && 'refresh' in data) {
-    const access = data.access;
-    const refresh = data.refresh;
-
-    if (typeof access === 'string' && typeof refresh === 'string') {
-      return { access, refresh };
-    }
-  }
-
-  return null;
+): Promise<void> => {
+  await apiClient.post('/accounts/setup-password/', payload);
 };
 
 export const getPasswordSetupErrorMessage = (error: unknown): string => {

@@ -42,7 +42,7 @@ export const mapDoctorProfileToListItem = (doctor: DoctorProfile): DoctorListIte
 };
 
 export const getDoctors = async (query?: DoctorListQuery): Promise<DoctorListItem[]> => {
-  const { data } = await apiClient.get<DoctorProfile[]>('/api/doctors/', {
+  const { data } = await apiClient.get<DoctorProfile[]>('/doctors/', {
     params: query,
   });
 
@@ -57,7 +57,7 @@ export const updateDoctorAvailability = async (
     is_available: isAvailable,
   };
   const { data } = await apiClient.patch<DoctorProfile>(
-    `/api/doctors/${doctorId}/`,
+    `/doctors/${doctorId}/`,
     payload,
   );
 
@@ -69,7 +69,7 @@ export const updateDoctorProfile = async (
   update: DoctorProfileUpdate,
 ): Promise<DoctorProfile> => {
   const { data } = await apiClient.patch<DoctorProfile>(
-    `/api/doctors/${doctorId}/`,
+    `/doctors/${doctorId}/`,
     update,
   );
 
@@ -77,7 +77,7 @@ export const updateDoctorProfile = async (
 };
 
 export const deleteDoctor = async (doctorId: number): Promise<void> => {
-  await apiClient.delete(`/api/doctors/${doctorId}/`);
+  await apiClient.delete(`/doctors/${doctorId}/`);
 };
 
 export const getDoctorListErrorMessage = (error: unknown): string => {
@@ -137,7 +137,7 @@ export const getDoctorMutationErrorMessage = (
 
 export const createDoctor = async (payload: AdminDoctorCreate): Promise<AdminDoctorCreate> => {
   const { data } = await apiClient.post<AdminDoctorCreate>(
-    '/api/accounts/admin/doctors/create/',
+    '/accounts/admin/doctors/create/',
     payload,
   );
 
