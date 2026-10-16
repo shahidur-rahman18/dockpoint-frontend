@@ -1,12 +1,9 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://docpoint-backend-1dzd.onrender.com/api/:path*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
 }
+
