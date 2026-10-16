@@ -9,27 +9,19 @@ import {
 import {
   clearStoredAuth,
   fetchUserSession,
-  getSessionWithAccessToken,
   loginWithApi,
-  type AuthTokens,
   type LoginCredentials,
   type UserRole,
 } from './authService';
-import {
-  clearAuthTokens,
-  getAccessToken,
-  getRefreshToken,
-  setAccessToken,
-  setRefreshToken,
-} from './accessTokenStore';
+import { apiClient } from '../api/apiClient';
 
 interface AuthContextValue {
   email: string | null;
   role: UserRole | null;
   isLoading: boolean;
   login: (credentials: LoginCredentials, role: UserRole) => Promise<void>;
-  establishSession: (tokens: AuthTokens, expectedRole: UserRole) => Promise<void>;
-  logout: () => void;
+  establishSession: (expectedRole: UserRole) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -41,14 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // অ্যাপ লোড বা রিফ্রেশ হওয়ার সাথে সাথে কুকি চেক করে সেশন রিস্টোর করা
   useEffect(() => {
     const restoreSession = async () => {
       try {
-        if (getAccessToken() || getRefreshToken()) {
-          setSession(await fetchUserSession());
-        }
+        const userSession = await fetchUserSession();
+        setSession(userSession);
       } catch {
-        clearAuthTokens();
+        // ইউজার লগইন করা না থাকলে সাইলেন্টলি নাল সেট করা হবে
         setSession(null);
       } finally {
         setIsLoading(false);
@@ -61,9 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (credentials: LoginCredentials, role: UserRole) => {
     setIsLoading(true);
     try {
-      const { session: authenticatedSession, tokens } = await loginWithApi(credentials, role);
-      setAccessToken(tokens.access);
-      setRefreshToken(tokens.refresh);
+      const { session: authenticatedSession } = await loginWithApi(credentials, role);
       clearStoredAuth();
       setSession(authenticatedSession);
     } finally {
@@ -71,29 +61,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const establishSession = useCallback(async (
-    tokens: AuthTokens,
-    expectedRole: UserRole,
-  ) => {
+  const establishSession = useCallback(async (expectedRole: UserRole) => {
     setIsLoading(true);
     try {
-      const authenticatedSession = await getSessionWithAccessToken(tokens.access);
+      const authenticatedSession = await fetchUserSession();
       if (authenticatedSession.role !== expectedRole) {
         throw new Error(`This account does not have the ${expectedRole} role.`);
       }
-      setAccessToken(tokens.access);
-      setRefreshToken(tokens.refresh);
-      clearStoredAuth();
       setSession(authenticatedSession);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const logout = useCallback(() => {
-    clearAuthTokens();
-    clearStoredAuth();
-    setSession(null);
+  const logout = useCallback(async () => {
+    try {
+      // ব্যাকএন্ডে লগআউট কল করে কুকি ক্লিয়ার করা
+      await apiClient.post('/accounts/logout/');
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      clearStoredAuth();
+      setSession(null);
+    }
   }, []);
 
   return (

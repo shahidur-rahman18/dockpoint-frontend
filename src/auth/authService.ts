@@ -14,11 +14,6 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface AuthTokens {
-  access: string;
-  refresh: string;
-}
-
 const getApiErrorMessage = (error: unknown): string => {
   if (!axios.isAxiosError(error)) {
     return error instanceof Error ? error.message : 'Unable to sign in. Please try again.';
@@ -49,52 +44,36 @@ const getApiErrorMessage = (error: unknown): string => {
   return `Sign in failed (HTTP ${error.response.status}). Please try again.`;
 };
 
+// কুকিভিত্তিক লগইন কল (এখানে /api/ বাদ দিয়ে শুধু /accounts/login/ দেওয়া হয়েছে)
 export const loginWithApi = async (
   credentials: LoginCredentials,
   expectedRole: UserRole,
-): Promise<{ session: AuthSession; tokens: AuthTokens }> => {
+): Promise<{ session: AuthSession }> => {
   try {
-    const { data: tokens } = await apiClient.post<
-      AuthTokens,
-      { data: AuthTokens },
-      Pick<components['schemas']['TokenObtainPair'], 'email' | 'password'>
-    >('/accounts/login/', {
+    await apiClient.post('/accounts/login/', {
       email: credentials.email.trim(),
       password: credentials.password,
     });
 
-    const session = await getSessionWithAccessToken(tokens.access);
+    // লগইন সফল হওয়ার পর কুকি ব্যবহার করে ইউজারের প্রফাইল ও রোল ফেচ করা হচ্ছে
+    const session = await fetchUserSession();
 
     if (session.role !== expectedRole) {
       throw new Error(`This account does not have the ${expectedRole} role.`);
     }
 
-    return { session, tokens };
+    return { session };
   } catch (error) {
     throw new Error(getApiErrorMessage(error));
   }
 };
 
+// কুকি স্বয়ংক্রিয়ভাবে পাঠিয়ে ইউজারের তথ্য নিয়ে আসা (এখানেও /api/ বাদ দেওয়া হয়েছে)
 export const fetchUserSession = async (): Promise<AuthSession> => {
   const { data: profile } = await apiClient.get<components['schemas']['UserProfile']>(
-    '/accounts/me/',
+    '/accounts/me/'
   );
 
-  return getAuthSession(profile);
-};
-
-export const getSessionWithAccessToken = async (
-  accessToken: string,
-): Promise<AuthSession> => {
-  const { data: profile } = await apiClient.get<components['schemas']['UserProfile']>(
-    '/accounts/me/',
-    { headers: { Authorization: `Bearer ${accessToken}` } },
-  );
-
-  return getAuthSession(profile);
-};
-
-const getAuthSession = (profile: components['schemas']['UserProfile']): AuthSession => {
   const role = profile.role === 'ADMIN'
     ? 'admin'
     : profile.role === 'DOCTOR'

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { apiClient } from '../api/apiClient';
-import type { AuthTokens } from '../auth/authService';
 import type { components } from '../types/schema';
 
 type PasswordSetupPayload = components['schemas']['PasswordSetup'];
@@ -108,17 +107,8 @@ export const getProfileApiErrorMessage = (error: unknown): string => {
 
 export const setupPassword = async (
   payload: PasswordSetupPayload,
-): Promise<AuthTokens | null> => {
-  const { data } = await apiClient.post<unknown>('/accounts/setup-password/', payload);
-
-  if (data && typeof data === 'object' && 'access' in data && 'refresh' in data) {
-    const { access, refresh } = data;
-    if (typeof access === 'string' && typeof refresh === 'string') {
-      return { access, refresh };
-    }
-  }
-
-  return null;
+): Promise<void> => {
+  await apiClient.post('/accounts/setup-password/', payload);
 };
 
 export const getPasswordSetupErrorMessage = (error: unknown): string => {
