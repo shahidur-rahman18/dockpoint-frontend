@@ -42,17 +42,21 @@ export function DoctorPasswordSetupRoute() {
     setIsSubmitting(true);
 
     try {
-      await setupPassword({
+      const tokens = await setupPassword({
         uid,
         token,
         new_password: newPassword,
       });
 
-      try {
-        await establishSession('doctor');
-      } catch {
+      if (tokens) {
+        try {
+          await establishSession(tokens, 'doctor');
+        } catch {
+          setSuccessDestination('sign-in');
+          setAutomaticSignInUnavailable(true);
+        }
+      } else {
         setSuccessDestination('sign-in');
-        setAutomaticSignInUnavailable(true);
       }
 
       setIsSuccessModalOpen(true);
