@@ -12,6 +12,13 @@ apiClient.interceptors.request.use((config) => {
   if (!baseURL) {
     throw new Error('VITE_API_BASE_URL must be configured before using the API.');
   }
+
+  // যদি লোকালস্টোরেজে টোকেন থাকে, তবে হেডারে যুক্ত করা হবে (ক্রস-ডোমেন হাইব্রিড সাপোর্ট)
+  const token = localStorage.getItem('dockpoint_access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   return config;
 });
 
@@ -34,11 +41,24 @@ apiClient.interceptors.response.use(
 
       try {
         const refreshUrl = `${baseURL}/accounts/token/refresh/`;
-        // রিফ্রেশ কল করার সময় কোনো ডাটা না থাকলে ফাকা অবজেক্ট পাঠাতে হবে
-        await axios.post(refreshUrl, {}, { withCredentials: true });
+        const storedRefreshToken = localStorage.getItem('dockpoint_refresh_token');
+
+        // রিফ্রেশ কল: কুকি থাকলে কুকি দিয়ে হবে, সাথে লোকালস্টোরেজের টোকেনও পাঠানো হবে
+        const { data } = await axios.post(
+          refreshUrl,
+          storedRefreshToken ? { refresh: storedRefreshToken } : {},
+          { withCredentials: true }
+        );
+
+        if (data?.access) {
+          localStorage.setItem('dockpoint_access_token', data.access);
+          originalRequest.headers.Authorization = `Bearer ${data.access}`;
+        }
 
         return apiClient(originalRequest);
       } catch (refreshError) {
+        localStorage.removeItem('dockpoint_access_token');
+        localStorage.removeItem('dockpoint_refresh_token');
         return Promise.reject(refreshError);
       }
     }

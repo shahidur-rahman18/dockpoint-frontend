@@ -50,12 +50,22 @@ export const loginWithApi = async (
   expectedRole: UserRole,
 ): Promise<{ session: AuthSession }> => {
   try {
-    await apiClient.post('/accounts/login/', {
+    const { data } = await apiClient.post<{
+      access?: string;
+      refresh?: string;
+    }>('/accounts/login/', {
       email: credentials.email.trim(),
       password: credentials.password,
     });
 
-    // লগইন সফল হওয়ার পর কুকি ব্যবহার করে ইউজারের প্রফাইল ও রোল ফেচ করা হচ্ছে
+    if (data?.access) {
+      localStorage.setItem('dockpoint_access_token', data.access);
+    }
+    if (data?.refresh) {
+      localStorage.setItem('dockpoint_refresh_token', data.refresh);
+    }
+
+    // লগইন সফল হওয়ার পর কুকি বা হেডার টোকেন ব্যবহার করে ইউজারের প্রফাইল ও রোল ফেচ করা হচ্ছে
     const session = await fetchUserSession();
 
     if (session.role !== expectedRole) {
@@ -68,7 +78,7 @@ export const loginWithApi = async (
   }
 };
 
-// কুকি স্বয়ংক্রিয়ভাবে পাঠিয়ে ইউজারের তথ্য নিয়ে আসা (এখানেও /api/ বাদ দেওয়া হয়েছে)
+// কুকি বা হেডার টোকেন স্বয়ংক্রিয়ভাবে পাঠিয়ে ইউজারের তথ্য নিয়ে আসা
 export const fetchUserSession = async (): Promise<AuthSession> => {
   const { data: profile } = await apiClient.get<components['schemas']['UserProfile']>(
     '/accounts/me/'
@@ -88,6 +98,8 @@ export const fetchUserSession = async (): Promise<AuthSession> => {
 };
 
 export const clearStoredAuth = (): void => {
+  localStorage.removeItem('dockpoint_access_token');
+  localStorage.removeItem('dockpoint_refresh_token');
   localStorage.removeItem('dockpoint-demo-doctor-id');
   sessionStorage.removeItem('dockpoint-demo-doctor-id');
   localStorage.removeItem('dockpoint-demo-role');
