@@ -73,7 +73,6 @@ export function SignInRoute({ role }: { role: UserRole }) {
           : undefined
       }
       isSubmitting={isSubmitting}
-      showRegister={role === 'doctor'}
     />
   );
 }

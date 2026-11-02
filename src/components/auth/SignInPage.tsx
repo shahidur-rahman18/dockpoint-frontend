@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router';
 import { Eye, EyeOff, LockKeyhole, Mail, Plus } from 'lucide-react';
 
 export interface SignInCredentials {
@@ -15,9 +14,7 @@ interface SignInPageProps {
   onSubmit?: (credentials: SignInCredentials) => void | Promise<void>;
   successMessage?: string;
   isSubmitting?: boolean;
-  showRegister?: boolean;
   onForgotPassword?: () => void;
-  onRegister?: () => void;
 }
 
 export const SignInPage: React.FC<SignInPageProps> = ({
@@ -28,9 +25,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   onSubmit,
   successMessage,
   isSubmitting = false,
-  showRegister = true,
   onForgotPassword,
-  onRegister,
 }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -149,27 +144,6 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </button>
           </form>
 
-          {showRegister && (
-            <p className="mt-[17px] text-center text-[13px] sm:text-sm">
-              Don&apos;t have an account yet?{' '}
-              {onRegister ? (
-                <button
-                  className="cursor-pointer border-0 bg-transparent p-0 text-[var(--theme-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
-                  type="button"
-                  onClick={onRegister}
-                >
-                  Register
-                </button>
-              ) : (
-                <Link
-                  className="text-[var(--theme-accent)] no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
-                  to="/sign-up"
-                >
-                  Register
-                </Link>
-              )}
-            </p>
-          )}
         </section>
 
         <footer className="mt-5 text-center text-xs text-[var(--text-secondary)] sm:mt-6 sm:text-sm">
