@@ -28,6 +28,83 @@
   }
 }
 
+.appointment-calendar .fc {
+  --fc-border-color: #e2e8f0;
+  --fc-button-bg-color: #3730a3;
+  --fc-button-border-color: #3730a3;
+  --fc-button-hover-bg-color: #312e81;
+  --fc-button-hover-border-color: #312e81;
+  --fc-button-active-bg-color: #312e81;
+  --fc-button-active-border-color: #312e81;
+  --fc-today-bg-color: #eef2ff;
+  color: #334155;
+  font-size: 0.8rem;
+}
+
+.appointment-page button {
+  cursor: pointer;
+}
+
+.appointment-page button:disabled {
+  cursor: not-allowed;
+}
+
+.appointment-calendar .fc .fc-col-header-cell {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.appointment-calendar .fc .fc-col-header-cell-cushion,
+.appointment-calendar .fc .fc-daygrid-day-number {
+  color: #475569;
+  padding: 0.6rem;
+  text-decoration: none;
+}
+
+.appointment-calendar .fc .fc-daygrid-day-frame {
+  min-height: 7rem;
+}
+
+.appointment-calendar .fc .fc-daygrid-day.appointment-date-range {
+  background-color: #eef2ff;
+}
+
+.appointment-calendar .fc .fc-event {
+  border: 0;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+}
+
+.theme-root[data-color-mode="dark"] .appointment-calendar .fc {
+  --fc-border-color: #202746;
+  --fc-page-bg-color: #090c2b;
+  --fc-neutral-bg-color: #111633;
+  --fc-list-event-hover-bg-color: #111633;
+  color: #d6e5ff;
+}
+
+.theme-root[data-color-mode="dark"] .appointment-calendar .fc .fc-col-header-cell {
+  background: #111633;
+}
+
+.theme-root[data-color-mode="dark"] .appointment-calendar .fc .fc-col-header-cell-cushion,
+.theme-root[data-color-mode="dark"] .appointment-calendar .fc .fc-daygrid-day-number {
+  color: #b4c9eb;
+}
+
+@media (max-width: 640px) {
+  .appointment-calendar .fc .fc-daygrid-day-frame {
+    min-height: 5rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .appointment-calendar .fc {
+    min-width: 42rem;
+  }
+}
+
 @keyframes chart-rise {
 	from {
 		opacity: 0.4;

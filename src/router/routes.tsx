@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { DoctorList } from '../components/doctors/DoctorList';
@@ -17,6 +18,11 @@ import { NotFound } from '../components/common/NotFound';
 const pending = (title: string, description: string) => ({
   element: <PlaceholderPage title={title} description={description} />,
 });
+const AppointmentCalendar = lazy(() =>
+  import('../components/appointments/AppointmentCalendar').then((module) => ({
+    default: module.AppointmentCalendar,
+  })),
+);
 
 export const routes: RouteObject[] = [
   { path: '/setup-password', element: <DoctorPasswordSetupRoute /> },
@@ -57,7 +63,14 @@ export const routes: RouteObject[] = [
       { path: 'applications', ...pending('Applications', 'Installed clinic applications will appear here.') },
       { path: 'layouts', ...pending('Layouts', 'Reusable dashboard layouts will appear here.') },
       { path: 'patients', ...pending('Patients', 'Patient directory will appear here.') },
-      { path: 'appointments', ...pending('Appointments', 'Appointment management will appear here.') },
+      {
+        path: 'appointments',
+        element: (
+          <Suspense fallback={<div className="p-8 text-center text-sm text-slate-500">Loading appointment calendar…</div>}>
+            <AppointmentCalendar />
+          </Suspense>
+        ),
+      },
       { path: 'queue-management', ...pending('Queue Management', 'Live patient queue will appear here.') },
       { path: 'locations', ...pending('Locations', 'Clinic locations will appear here.') },
       { path: 'services', ...pending('Services', 'Available clinic services will appear here.') },

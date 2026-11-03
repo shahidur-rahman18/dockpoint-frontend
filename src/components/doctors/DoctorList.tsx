@@ -292,8 +292,12 @@ export const DoctorList: React.FC = () => {
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-1.5">
             <button
-              aria-label={`Schedule ${row.original.name}`}
-              title="Schedule"
+              type="button"
+              onClick={() =>
+                navigate(`/appointments?doctorId=${encodeURIComponent(row.original.id)}`)
+              }
+              aria-label={`View appointments for ${row.original.name}`}
+              title={`View appointments for ${row.original.name}`}
               className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             >
               <Calendar className="w-4 h-4" />
