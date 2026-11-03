@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
-import { Eye, EyeOff, LockKeyhole, Mail, Plus, UserRound } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react';
+import docpointLogo from '../../assets/Docpoint.png';
 
 export interface SignUpDetails {
   name: string;
@@ -46,11 +47,12 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
           to="/"
           aria-label={`${brandName} home`}
         >
-          <span
-            className="grid size-[31px] place-items-center rounded-lg bg-[var(--theme-accent)] text-white"
-            aria-hidden="true"
-          >
-            <Plus size={25} strokeWidth={3.5} />
+          <span className="relative block size-11 shrink-0 overflow-hidden" aria-hidden="true">
+            <img
+              src={docpointLogo}
+              alt=""
+              className="absolute left-1/2 top-1/2 w-[88px] max-w-none -translate-x-1/2 -translate-y-1/2"
+            />
           </span>
           <span>{brandName}</span>
         </Link>

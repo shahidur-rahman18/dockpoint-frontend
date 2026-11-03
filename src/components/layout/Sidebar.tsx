@@ -6,6 +6,7 @@ import {
   PanelLeftClose,
   X,
 } from 'lucide-react';
+import docpointLogo from '../../assets/Docpoint.png';
 import { getNavGroups, isDoctorDashboardPath } from './menuConfig';
 import { UpgradeProCard } from '../doctor-dashboard/UpgradeProCard';
 
@@ -75,9 +76,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
               onClick={() => setCollapsed(false)}
               aria-label="Expand sidebar"
               title="Expand sidebar"
-              className="w-8 h-8 rounded-xl bg-indigo-900 flex items-center justify-center text-white font-bold shadow-xs cursor-pointer"
+              className="w-11 h-11 flex items-center justify-center cursor-pointer"
             >
-              <span className="text-lg leading-none font-black tracking-tight">P</span>
+              <span className="relative block w-11 h-11 shrink-0 overflow-hidden">
+                <img
+                  src={docpointLogo}
+                  alt="Dockpoint"
+                  className="absolute left-1/2 top-1/2 w-[88px] max-w-none -translate-x-1/2 -translate-y-1/2"
+                />
+              </span>
             </button>
           ) : (
             <>
@@ -85,9 +92,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
                 onClick={() => navigate('/')}
                 className="flex items-center gap-2.5 cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-xl bg-indigo-900 flex items-center justify-center text-white font-bold shadow-xs">
-                  <span className="text-lg leading-none font-black tracking-tight">D</span>
-                </div>
+                <span className="relative block w-11 h-11 shrink-0 overflow-hidden">
+                  <img
+                    src={docpointLogo}
+                    alt=""
+                    className="absolute left-1/2 top-1/2 w-[88px] max-w-none -translate-x-1/2 -translate-y-1/2"
+                  />
+                </span>
                 <span className="text-xl font-bold tracking-tight text-slate-800">Dockpoint</span>
               </button>
               <button
