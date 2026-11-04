@@ -23,6 +23,11 @@ const AppointmentCalendar = lazy(() =>
     default: module.AppointmentCalendar,
   })),
 );
+const DoctorAppointmentsPage = lazy(() =>
+  import('../pages/DoctorAppointmentsPage').then((module) => ({
+    default: module.DoctorAppointmentsPage,
+  })),
+);
 
 export const routes: RouteObject[] = [
   { path: '/setup-password', element: <DoctorPasswordSetupRoute /> },
@@ -47,7 +52,14 @@ export const routes: RouteObject[] = [
       { path: 'add-doctor', element: <AddDoctor /> },
       { path: 'doctor-schedule', element: <DoctorSchedule /> },
       { path: 'doctor-dashboard', element: <DoctorDashboard /> },
-      { path: 'doctor-dashboard/appointments', ...pending('Appointments', 'Your appointments will appear here.') },
+      {
+        path: 'doctor-dashboard/appointments',
+        element: (
+          <Suspense fallback={<div className="p-8 text-center text-sm text-slate-500">Loading appointments…</div>}>
+            <DoctorAppointmentsPage />
+          </Suspense>
+        ),
+      },
       { path: 'doctor-dashboard/schedule', ...pending('My Schedule', 'Your availability and schedule will appear here.') },
       { path: 'doctor-dashboard/prescriptions', ...pending('Prescriptions', 'Your prescriptions will appear here.') },
       { path: 'doctor-dashboard/leave', ...pending('Leave', 'Your leave requests will appear here.') },

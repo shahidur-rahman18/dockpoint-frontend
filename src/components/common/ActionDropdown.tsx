@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 interface ActionDropdownProps {
   isOpen: boolean;
   onToggle: () => void;
+  onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -11,6 +12,7 @@ interface ActionDropdownProps {
 export function ActionDropdown({
   isOpen,
   onToggle,
+  onView,
   onEdit,
   onDelete,
 }: ActionDropdownProps) {
@@ -58,6 +60,19 @@ export function ActionDropdown({
           role="menu"
           className="absolute right-0 mt-1 z-50 w-[152px] bg-white border border-slate-200 rounded-xl shadow-lg py-1.5"
         >
+          <button
+            type="button"
+            role="menuitem"
+            disabled={!onView}
+            onClick={() => {
+              onView?.();
+              onToggle();
+            }}
+            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-600 transition-colors enabled:cursor-pointer enabled:hover:bg-slate-50 enabled:hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Eye className="w-3.5 h-3.5 text-slate-400" />
+            <span>View</span>
+          </button>
           <button
             type="button"
             role="menuitem"
