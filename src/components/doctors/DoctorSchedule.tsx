@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { CalendarDays, ChevronDown, Eye, Filter, Plus, Search, Trash2, X } from 'lucide-react';
+import { Modal } from '../common/Modal';
 import { doctorsListData } from '../../data/mockData';
 import type { DoctorListItem, DoctorProfile } from '../../types';
 
@@ -42,13 +43,17 @@ function DoctorScheduleEditor({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4" role="presentation">
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="schedule-editor-title"
-        className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white shadow-2xl"
-      >
+    <Modal
+      open
+      title="Edit Doctor Schedule"
+      description={doctor.name}
+      size="lg"
+      showHeader={false}
+      ariaLabelledBy="schedule-editor-title"
+      contentClassName="!mt-0 -mx-5 -my-5 sm:-mx-6 sm:-my-6"
+      onClose={onClose}
+    >
+      <div className="max-h-[85vh] overflow-y-auto">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
           <div>
             <h2 id="schedule-editor-title" className="text-base font-bold text-slate-900">
@@ -123,8 +128,8 @@ function DoctorScheduleEditor({
             </button>
           </footer>
         </form>
-      </section>
-    </div>
+      </div>
+    </Modal>
   );
 }
 
@@ -174,18 +179,16 @@ function ScheduleDetailsModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+    <Modal
+      open
+      title="Schedule Details"
+      size="lg"
+      showHeader={false}
+      ariaLabelledBy="schedule-details-title"
+      contentClassName="!mt-0 -mx-5 -my-5 sm:-mx-6 sm:-my-6"
+      onClose={onClose}
     >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="schedule-details-title"
-        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-2xl"
-      >
+      <div className="max-h-[85vh] overflow-y-auto">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-3.5">
           <h2 id="schedule-details-title" className="text-sm font-semibold text-slate-900">
             Schedule Details
@@ -314,8 +317,8 @@ function ScheduleDetailsModal({
             </button>
           </footer>
         </form>
-      </section>
-    </div>
+      </div>
+    </Modal>
   );
 }
 

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
-import { SuccessModal } from '../common/FeedbackModals';
+import { Modal } from '../common/Modal';
 import { getPasswordSetupErrorMessage, setupPassword } from '../../services/accountService';
 import { SetupPassword } from './SetupPassword';
 
@@ -77,21 +78,35 @@ export function DoctorPasswordSetupRoute() {
             : 'This password setup link is incomplete. Please use the full link from your email.'
         }
       />
-      <SuccessModal
+      <Modal
         open={isSuccessModalOpen}
         title="Password Set Successfully"
-        description={
-          successDestination === 'dashboard'
+        size="sm"
+        showHeader={false}
+        contentClassName="!mt-0 -mx-1 text-center"
+        onClose={handleSuccessModalClose}
+      >
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+          <CheckCircle2 aria-hidden="true" className="size-8" />
+        </div>
+        <h2 className="text-base font-semibold text-[var(--text-primary)]">
+          Password Set Successfully
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+          {successDestination === 'dashboard'
             ? 'Your password has been set and your doctor account is signed in. Continue to your dashboard.'
             : automaticSignInUnavailable
               ? 'Your password has been set, but automatic sign-in was unavailable. Sign in with your email and new password.'
-              : 'Your password has been set. Sign in with your email and new password.'
-        }
-        buttonLabel={
-          successDestination === 'dashboard' ? 'Go to Dashboard' : 'Go to Sign In'
-        }
-        onClose={handleSuccessModalClose}
-      />
+              : 'Your password has been set. Sign in with your email and new password.'}
+        </p>
+        <button
+          type="button"
+          onClick={handleSuccessModalClose}
+          className="mt-5 min-h-10 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        >
+          {successDestination === 'dashboard' ? 'Go to Dashboard' : 'Go to Sign In'}
+        </button>
+      </Modal>
     </>
   );
 }

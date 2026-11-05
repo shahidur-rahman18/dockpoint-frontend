@@ -191,6 +191,44 @@
 	background-color: var(--bg-base) !important;
 }
 
+.theme-root[data-color-mode="dark"] [data-shared-modal] .bg-white {
+	background-color: var(--bg-surface) !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-shared-modal] .bg-slate-50,
+.theme-root[data-color-mode="dark"] [data-shared-modal] .bg-slate-100 {
+	background-color: var(--bg-subtle) !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-shared-modal] .text-slate-900,
+.theme-root[data-color-mode="dark"] [data-shared-modal] .text-slate-800,
+.theme-root[data-color-mode="dark"] [data-shared-modal] .text-slate-700 {
+	color: var(--text-primary) !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-shared-modal] .text-slate-600 {
+	color: var(--text-secondary) !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-shared-modal] .text-slate-500,
+.theme-root[data-color-mode="dark"] [data-shared-modal] .text-slate-400 {
+	color: var(--text-muted) !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-shared-modal] .border-slate-100,
+.theme-root[data-color-mode="dark"] [data-shared-modal] .border-slate-200 {
+	border-color: var(--border-color) !important;
+}
+
+.theme-root[data-color-mode="dark"] [data-shared-modal] input,
+.theme-root[data-color-mode="dark"] [data-shared-modal] select,
+.theme-root[data-color-mode="dark"] [data-shared-modal] textarea {
+	color-scheme: dark;
+	background-color: var(--bg-surface);
+	border-color: var(--border-color);
+	color: var(--text-primary);
+}
+
 .theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50,
 .theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50\/50,
 .theme-root[data-color-mode="dark"] > .dashboard-content .bg-slate-50\/60,

@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Modal } from '../common/Modal';
+import { SharedForm, type FormFieldConfig } from '../common/SharedForm';
 import type {
   AppointmentMode,
   AppointmentStatus,
@@ -32,9 +33,35 @@ interface AppointmentFormDialogProps {
   onSubmit: (appointment: AppointmentFormValues) => void;
 }
 
-const inputClass =
-  'w-full rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] px-3 py-2.5 text-sm font-normal text-[var(--text-primary)] outline-none transition focus:border-[var(--theme-accent)] focus:ring-2 focus:ring-[var(--theme-accent)]/15';
-const labelClass = 'block space-y-1.5 text-xs font-semibold text-[var(--text-secondary)]';
+const fields: FormFieldConfig[] = [
+  { name: 'patientName', label: 'Patient name', required: true },
+  { name: 'patientEmail', label: 'Patient email', type: 'email', required: true },
+  { name: 'patientPhone', label: 'Phone number', type: 'tel' },
+  {
+    name: 'mode',
+    label: 'Appointment type',
+    type: 'select',
+    options: [
+      { label: 'In-person', value: 'In-person' },
+      { label: 'Online', value: 'Online' },
+    ],
+  },
+  { name: 'appointmentDate', label: 'Date', type: 'date', required: true },
+  { name: 'startTime', label: 'Start time', type: 'time', required: true },
+  { name: 'endTime', label: 'End time', type: 'time', required: true },
+  {
+    name: 'status',
+    label: 'Status',
+    type: 'select',
+    options: [
+      { label: 'Pending', value: 'PENDING' },
+      { label: 'Confirmed', value: 'CONFIRMED' },
+      { label: 'Completed', value: 'COMPLETED' },
+      { label: 'Cancelled', value: 'CANCELLED' },
+    ],
+  },
+  { name: 'reason', label: 'Appointment reason', type: 'textarea', span: 'full' },
+];
 
 export function AppointmentFormDialog({
   open,
@@ -42,8 +69,7 @@ export function AppointmentFormDialog({
   onClose,
   onSubmit,
 }: AppointmentFormDialogProps) {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = (_values: Record<string, string>, event: FormEvent<HTMLFormElement>) => {
     const formData = new FormData(event.currentTarget);
     const mode = formData.get('mode');
     const status = formData.get('status');
@@ -77,118 +103,28 @@ export function AppointmentFormDialog({
     <Modal
       open={open}
       title={appointment ? 'Edit appointment' : 'New appointment'}
-      description="Demo only — changes are not saved to the server."
       size="lg"
       onClose={onClose}
     >
-      <form onSubmit={handleSubmit} className="max-h-[70vh] space-y-4 overflow-y-auto">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className={labelClass}>
-            Patient name
-            <input
-              required
-              name="patientName"
-              defaultValue={appointment?.patientName}
-              className={inputClass}
-            />
-          </label>
-          <label className={labelClass}>
-            Patient email
-            <input
-              required
-              type="email"
-              name="patientEmail"
-              defaultValue={appointment?.patientEmail}
-              className={inputClass}
-            />
-          </label>
-          <label className={labelClass}>
-            Phone number
-            <input
-              name="patientPhone"
-              defaultValue={appointment?.patientPhone}
-              className={inputClass}
-            />
-          </label>
-          <label className={labelClass}>
-            Appointment type
-            <select name="mode" defaultValue={appointment?.mode ?? 'In-person'} className={inputClass}>
-              <option value="In-person">In-person</option>
-              <option value="Online">Online</option>
-            </select>
-          </label>
-          <label className={labelClass}>
-            Date
-            <input
-              required
-              type="date"
-              name="appointmentDate"
-              defaultValue={appointment?.appointmentDate ?? getToday()}
-              className={inputClass}
-            />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label className={labelClass}>
-              Start time
-              <input
-                required
-                type="time"
-                name="startTime"
-                defaultValue={appointment?.startTime ?? '09:00'}
-                className={inputClass}
-              />
-            </label>
-            <label className={labelClass}>
-              End time
-              <input
-                required
-                type="time"
-                name="endTime"
-                defaultValue={appointment?.endTime ?? '09:30'}
-                className={inputClass}
-              />
-            </label>
-          </div>
-          <label className={labelClass}>
-            Status
-            <select
-              name="status"
-              defaultValue={appointment?.status ?? 'PENDING'}
-              className={inputClass}
-            >
-              <option value="PENDING">Pending</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-          </label>
-          <label className={`${labelClass} sm:col-span-2`}>
-            Appointment reason
-            <textarea
-              name="reason"
-              rows={3}
-              defaultValue={appointment?.reason}
-              className={`${inputClass} resize-y`}
-            />
-          </label>
-        </div>
-
-        <div className="flex justify-end gap-2 pt-1">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--bg-subtle)]"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="rounded-lg bg-indigo-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-indigo-700"
-          >
-            {appointment ? 'Save changes' : 'Create appointment'}
-          </button>
-        </div>
-      </form>
+      <div className="max-h-[70vh] overflow-y-auto">
+        <SharedForm
+          fields={fields}
+          initialValues={{
+            patientName: appointment?.patientName ?? '',
+            patientEmail: appointment?.patientEmail ?? '',
+            patientPhone: appointment?.patientPhone ?? '',
+            mode: appointment?.mode ?? 'In-person',
+            appointmentDate: appointment?.appointmentDate ?? getToday(),
+            startTime: appointment?.startTime ?? '09:00',
+            endTime: appointment?.endTime ?? '09:30',
+            status: appointment?.status ?? 'PENDING',
+            reason: appointment?.reason ?? '',
+          }}
+          submitLabel={appointment ? 'Save changes' : 'Create appointment'}
+          onCancel={onClose}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </Modal>
   );
 }

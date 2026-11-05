@@ -9,6 +9,11 @@ export interface ModalProps {
   title: string;
   description?: string;
   size?: ModalSize;
+  showHeader?: boolean;
+  ariaLabelledBy?: string;
+  contentClassName?: string;
+  overlayClassName?: string;
+  panelClassName?: string;
   onClose: () => void;
   children: ReactNode;
 }
@@ -27,6 +32,11 @@ export function Modal({
   title,
   description,
   size = 'md',
+  showHeader = true,
+  ariaLabelledBy,
+  contentClassName = '',
+  overlayClassName = '',
+  panelClassName = '',
   onClose,
   children,
 }: ModalProps) {
@@ -42,7 +52,9 @@ export function Modal({
     const previousFocus = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    dialogRef.current?.focus();
+    const initialFocusTarget =
+      dialogRef.current?.querySelector<HTMLElement>(focusableSelector) ?? dialogRef.current;
+    initialFocusTarget?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -85,7 +97,7 @@ export function Modal({
   return createPortal(
     <div
       data-shared-modal
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4"
+      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 ${overlayClassName}`}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -95,31 +107,34 @@ export function Modal({
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={description ? descriptionId : undefined}
-        className={`my-auto w-full ${sizeClasses[size]} rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-5 text-[var(--text-primary)] shadow-2xl outline-none sm:p-6`}
+        aria-labelledby={ariaLabelledBy ?? (showHeader ? titleId : undefined)}
+        aria-label={!showHeader && !ariaLabelledBy ? title : undefined}
+        aria-describedby={showHeader && description ? descriptionId : undefined}
+        className={`my-auto w-full ${sizeClasses[size]} rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-5 text-[var(--text-primary)] shadow-2xl outline-none sm:p-6 ${panelClassName}`}
       >
-        <header className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h2 id={titleId} className="text-lg font-bold text-[var(--text-primary)]">
-              {title}
-            </h2>
-            {description && (
-              <p id={descriptionId} className="mt-1 text-sm leading-5 text-[var(--text-secondary)]">
-                {description}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            aria-label="Close dialog"
-            onClick={onClose}
-            className="cursor-pointer shrink-0 rounded-lg p-2 text-[var(--text-secondary)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
-          >
-            <X className="size-4" />
-          </button>
-        </header>
-        <div data-modal-content className="mt-5">
+        {showHeader && (
+          <header className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 id={titleId} className="text-lg font-bold text-[var(--text-primary)]">
+                {title}
+              </h2>
+              {description && (
+                <p id={descriptionId} className="mt-1 text-sm leading-5 text-[var(--text-secondary)]">
+                  {description}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              aria-label="Close dialog"
+              onClick={onClose}
+              className="cursor-pointer shrink-0 rounded-lg p-2 text-[var(--text-secondary)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
+            >
+              <X className="size-4" />
+            </button>
+          </header>
+        )}
+        <div data-modal-content className={`${showHeader ? 'mt-5' : ''} ${contentClassName}`}>
           {children}
         </div>
       </section>
