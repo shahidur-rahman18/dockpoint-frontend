@@ -142,7 +142,7 @@ export function SharedForm({
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="min-h-9 whitespace-nowrap rounded-md border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--bg-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
+            className="min-h-9 cursor-pointer whitespace-nowrap rounded-md border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--bg-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
           >
             {cancelLabel}
           </button>
@@ -151,7 +151,7 @@ export function SharedForm({
           type="submit"
           disabled={isSubmitting || isSubmitDisabled}
           style={{ backgroundColor: 'var(--theme-accent)' }}
-          className="min-h-9 whitespace-nowrap rounded-md px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
+          className="min-h-9 cursor-pointer whitespace-nowrap rounded-md px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
         >
           {isSubmitting ? 'Submitting...' : submitLabel}
         </button>

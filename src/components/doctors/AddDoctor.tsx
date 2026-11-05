@@ -103,8 +103,8 @@ export function AddDoctor() {
 
   return (
     <>
-      <div className="flex items-center justify-center p-4 sm:p-8">
-        <section className="w-full max-w-2xl rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-5 shadow-sm sm:p-8">
+      <div className="mx-auto w-full max-w-4xl py-2 sm:py-4">
+        <section className="w-full rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-4 shadow-sm sm:p-6 lg:p-8">
           <h1 className="text-2xl font-semibold text-[var(--text-primary)]">New Doctor</h1>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             Add the doctor's details. The backend handles the account setup email.
@@ -139,7 +139,7 @@ export function AddDoctor() {
         <button
           type="button"
           onClick={() => navigate('/doctors')}
-          className="mt-5 min-h-10 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+          className="mt-5 min-h-10 cursor-pointer rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
         >
           Go to Doctors
         </button>
