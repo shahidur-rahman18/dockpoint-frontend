@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
@@ -56,11 +56,28 @@ export const DoctorList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<DoctorListItem['status'] | ''>('');
   const [sortOrder, setSortOrder] = useState('default');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const [pageIndex, setPageIndex] = useState(0);
   const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
   const [doctorToDelete, setDoctorToDelete] = useState<DoctorListItem | null>(null);
   const pageSize = 6;
+
+  useEffect(() => {
+    if (!isFilterOpen) return;
+
+    const handleOutsidePointerDown = (event: PointerEvent) => {
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsFilterOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsidePointerDown);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointerDown);
+  }, [isFilterOpen]);
 
   const toggleActionMenu = (doctorId: string) => {
     setOpenActionMenuId((prev) => (prev === doctorId ? null : doctorId));
@@ -305,6 +322,7 @@ export const DoctorList: React.FC = () => {
             <ActionDropdown
               isOpen={openActionMenuId === row.original.id}
               onToggle={() => toggleActionMenu(row.original.id)}
+              onView={() => handleViewDoctor(row.original)}
               onEdit={() => handleEditDoctor(row.original)}
               onDelete={() => handleRequestDeleteDoctor(row.original)}
             />
@@ -317,7 +335,7 @@ export const DoctorList: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Doctor List</h1>
           <span className="px-3 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg">
@@ -325,19 +343,20 @@ export const DoctorList: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          <button className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50">
             <span>Export</span>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
-          <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <div className="flex items-center rounded-lg border border-slate-200 bg-slate-100 p-1">
             <button
               onClick={() => {
                 setViewMode('table');
                 setOpenActionMenuId(null);
               }}
-              aria-label="List view"
+              aria-label="Table view"
+              aria-pressed={viewMode === 'table'}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 viewMode === 'table'
                   ? 'bg-white text-slate-800 shadow-xs'
@@ -351,7 +370,8 @@ export const DoctorList: React.FC = () => {
                 setViewMode('grid');
                 setOpenActionMenuId(null);
               }}
-              aria-label="Grid view"
+              aria-label="Card view"
+              aria-pressed={viewMode === 'grid'}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 viewMode === 'grid'
                   ? 'bg-white text-slate-800 shadow-xs'
@@ -366,7 +386,7 @@ export const DoctorList: React.FC = () => {
             type="button"
             onClick={() => navigate('/add-doctor')}
             style={{ background: 'var(--theme-accent)' }}
-            className="flex items-center gap-1.5 px-3.5 py-2 hover:brightness-90 text-white text-xs font-semibold rounded-lg shadow-xs transition-all cursor-pointer"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:brightness-90 sm:flex-none"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Doctor</span>
@@ -374,7 +394,7 @@ export const DoctorList: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xs sm:flex-row sm:items-center sm:justify-between sm:p-4">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -390,13 +410,13 @@ export const DoctorList: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-          <div className="relative">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center sm:justify-end sm:gap-2.5">
+          <div ref={filterDropdownRef} className="relative">
             <button
               type="button"
               onClick={() => setIsFilterOpen((open) => !open)}
               aria-expanded={isFilterOpen}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+              className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto sm:px-3.5"
             >
               <Filter className="w-3.5 h-3.5 text-slate-500" />
               <span>
@@ -407,7 +427,7 @@ export const DoctorList: React.FC = () => {
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
             {isFilterOpen && (
-              <div className="absolute right-0 z-20 mt-2 w-64 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
+              <div className="absolute left-0 z-20 mt-2 w-64 max-w-[calc(100vw-2rem)] space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-lg sm:left-auto sm:right-0">
                 <label className="block space-y-1.5 text-xs font-semibold text-slate-600">
                   Department
                   <select
@@ -452,7 +472,7 @@ export const DoctorList: React.FC = () => {
                       setStatusFilter('');
                       setPageIndex(0);
                     }}
-                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                    className="cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-700"
                   >
                     Clear filters
                   </button>
@@ -460,8 +480,8 @@ export const DoctorList: React.FC = () => {
               </div>
             )}
           </div>
-          <label className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl">
-            <span>Sort By:</span>
+          <label className="flex min-w-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold text-slate-700 sm:px-3.5">
+            <span className="shrink-0">Sort By:</span>
             <select
               aria-label="Sort doctors"
               value={sortOrder}
@@ -469,7 +489,7 @@ export const DoctorList: React.FC = () => {
                 setSortOrder(event.target.value);
                 setPageIndex(0);
               }}
-              className="max-w-36 bg-transparent outline-none cursor-pointer"
+              className="min-w-0 flex-1 appearance-none bg-transparent outline-none cursor-pointer sm:max-w-36"
             >
               <option value="default">Default</option>
               <option value="name-asc">Name (A–Z)</option>
@@ -478,7 +498,6 @@ export const DoctorList: React.FC = () => {
               <option value="fees-asc">Fees (Low to high)</option>
               <option value="fees-desc">Fees (High to low)</option>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 pointer-events-none" />
           </label>
         </div>
       </div>
@@ -504,14 +523,14 @@ export const DoctorList: React.FC = () => {
           <button
             type="button"
             onClick={() => void refetch()}
-            className="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-rose-700 shadow-sm ring-1 ring-rose-200 transition hover:bg-rose-100"
+            className="cursor-pointer rounded-lg bg-white px-4 py-2 text-xs font-semibold text-rose-700 shadow-sm ring-1 ring-rose-200 transition hover:bg-rose-100"
           >
             Retry
           </button>
         </div>
       )}
 
-      {!isPending && (!isError || (doctors?.length ?? 0) > 0) && (viewMode === 'grid' ? (
+      {!isPending && (!isError || (doctors?.length ?? 0) > 0) && (viewMode === 'table' ? (
 
          <>
           {availabilityMutation.isError && (
@@ -526,6 +545,7 @@ export const DoctorList: React.FC = () => {
             data={filteredDoctors}
             columns={columns}
             fixedColumnWidths
+            horizontalScrollOnSmallScreens
             emptyMessage="No doctors found"
             emptyDescription="Try adjusting your search keywords."
           />
@@ -541,6 +561,9 @@ export const DoctorList: React.FC = () => {
                   isActionMenuOpen={openActionMenuId === doctor.id}
                   onToggleActionMenu={() => toggleActionMenu(doctor.id)}
                   onView={() => handleViewDoctor(doctor)}
+                  onSchedule={() =>
+                    navigate(`/appointments?doctorId=${encodeURIComponent(doctor.id)}`)
+                  }
                   onEdit={() => handleEditDoctor(doctor)}
                   onDelete={() => handleRequestDeleteDoctor(doctor)}
                 />

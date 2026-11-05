@@ -9,6 +9,7 @@ interface DoctorCardProps {
   isActionMenuOpen: boolean;
   onToggleActionMenu: () => void;
   onView: () => void;
+  onSchedule: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
@@ -18,6 +19,7 @@ export function DoctorCard({
   isActionMenuOpen,
   onToggleActionMenu,
   onView,
+  onSchedule,
   onEdit,
   onDelete,
 }: DoctorCardProps) {
@@ -54,6 +56,7 @@ export function DoctorCard({
             <ActionDropdown
               isOpen={isActionMenuOpen}
               onToggle={onToggleActionMenu}
+              onView={onView}
               onEdit={onEdit}
               onDelete={onDelete}
             />
@@ -82,7 +85,10 @@ export function DoctorCard({
           type="button"
           aria-label={`Schedule ${doctor.name}`}
           title="Schedule Appointment"
-          onClick={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSchedule();
+          }}
           className="flex cursor-pointer items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] p-2 text-[var(--text-secondary)] shadow-sm transition-colors hover:text-[var(--theme-accent)]"
         >
           <Calendar aria-hidden="true" className="size-4" />

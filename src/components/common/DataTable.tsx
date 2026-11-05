@@ -17,6 +17,7 @@ interface DataTableProps<TData> {
   pageSizeOptions?: number[];
   onRowClick?: (row: TData) => void;
   fixedColumnWidths?: boolean;
+  horizontalScrollOnSmallScreens?: boolean;
 }
 
 export function DataTable<TData>({
@@ -28,6 +29,7 @@ export function DataTable<TData>({
   pageSizeOptions = [5, 10, 15],
   onRowClick,
   fixedColumnWidths = false,
+  horizontalScrollOnSmallScreens = false,
 }: DataTableProps<TData>) {
   const pageSizeSelectId = useId();
   const [pagination, setPagination] = useState({
@@ -63,7 +65,7 @@ export function DataTable<TData>({
     <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
       <div className="overflow-x-auto">
         <table
-          className={`w-full text-left border-collapse ${fixedColumnWidths ? 'table-fixed' : ''}`}
+          className={`w-full text-left border-collapse ${horizontalScrollOnSmallScreens ? 'min-w-[900px] xl:min-w-full' : ''} ${fixedColumnWidths ? 'table-fixed' : ''}`}
         >
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -142,8 +144,8 @@ export function DataTable<TData>({
         </table>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-slate-100">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-3 border-t border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="flex w-full flex-col items-start gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex items-center gap-2">
             <label
               htmlFor={pageSizeSelectId}
@@ -178,7 +180,7 @@ export function DataTable<TData>({
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex w-full items-center justify-end gap-1.5 sm:w-auto">
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
