@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import {
   flexRender,
   getCoreRowModel,
@@ -11,6 +11,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 interface DataTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
+  emptyState?: ReactNode;
   emptyMessage?: string;
   emptyDescription?: string;
   initialPageSize?: number;
@@ -23,6 +24,7 @@ interface DataTableProps<TData> {
 export function DataTable<TData>({
   data,
   columns,
+  emptyState,
   emptyMessage = 'No results found',
   emptyDescription = 'Try adjusting your search or filters.',
   initialPageSize = 5,
@@ -135,8 +137,12 @@ export function DataTable<TData>({
             ) : (
               <tr>
                 <td colSpan={table.getVisibleLeafColumns().length} className="py-16 text-center">
-                  <p className="text-sm font-semibold text-slate-700">{emptyMessage}</p>
-                  <p className="text-xs font-medium text-slate-400 mt-1">{emptyDescription}</p>
+                  {emptyState ?? (
+                    <>
+                      <p className="text-sm font-semibold text-slate-700">{emptyMessage}</p>
+                      <p className="text-xs font-medium text-slate-400 mt-1">{emptyDescription}</p>
+                    </>
+                  )}
                 </td>
               </tr>
             )}

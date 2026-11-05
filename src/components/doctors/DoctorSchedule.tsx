@@ -1,5 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
 import { CalendarDays, ChevronDown, Eye, Filter, Plus, Search, Trash2, X } from 'lucide-react';
+import { DataTable } from '../common/DataTable';
 import { Modal } from '../common/Modal';
 import { doctorsListData } from '../../data/mockData';
 import type { DoctorListItem, DoctorProfile } from '../../types';
@@ -61,7 +63,7 @@ function DoctorScheduleEditor({
             </h2>
             <p className="mt-1 text-xs text-slate-500">{doctor.name}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close schedule editor" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100">
+          <button type="button" onClick={onClose} aria-label="Close schedule editor" className="cursor-pointer rounded-lg p-2 text-slate-500 hover:bg-slate-100">
             <X className="h-4 w-4" />
           </button>
         </header>
@@ -100,7 +102,7 @@ function DoctorScheduleEditor({
                       ...current,
                       [day]: (current[day] ?? []).filter((_, slotIndex) => slotIndex !== index),
                     }))}
-                    className="mb-0.5 rounded-md border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
+                    className="mb-0.5 cursor-pointer rounded-md border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -112,7 +114,7 @@ function DoctorScheduleEditor({
                   ...current,
                   [day]: [...(current[day] ?? []), { session: '', from: '', to: '' }],
                 }))}
-                className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-200"
+                className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-200"
               >
                 <Plus className="h-3.5 w-3.5" /> Add time
               </button>
@@ -120,10 +122,10 @@ function DoctorScheduleEditor({
           ))}
 
           <footer className="sticky bottom-0 flex justify-end gap-2 border-t border-slate-200 bg-white pt-4">
-            <button type="button" onClick={onClose} className="rounded-md border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+            <button type="button" onClick={onClose} className="cursor-pointer rounded-md border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
               Cancel
             </button>
-            <button type="submit" style={{ background: 'var(--theme-accent)' }} className="rounded-md px-4 py-2 text-xs font-semibold text-white hover:brightness-90">
+            <button type="submit" style={{ background: 'var(--theme-accent)' }} className="cursor-pointer rounded-md px-4 py-2 text-xs font-semibold text-white hover:brightness-90">
               Save Schedule
             </button>
           </footer>
@@ -193,7 +195,7 @@ function ScheduleDetailsModal({
           <h2 id="schedule-details-title" className="text-sm font-semibold text-slate-900">
             Schedule Details
           </h2>
-          <button type="button" onClick={onClose} aria-label="Close schedule details" className="rounded p-1 text-slate-500 hover:bg-slate-100">
+          <button type="button" onClick={onClose} aria-label="Close schedule details" className="cursor-pointer rounded p-1 text-slate-500 hover:bg-slate-100">
             <X className="h-4 w-4" />
           </button>
         </header>
@@ -256,7 +258,7 @@ function ScheduleDetailsModal({
                   type="button"
                   onClick={() => setSelectedDay(day)}
                   aria-pressed={selectedDay === day}
-                  className={`shrink-0 rounded px-2.5 py-1.5 text-[11px] font-semibold ${selectedDay === day ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                  className={`shrink-0 cursor-pointer rounded px-2.5 py-1.5 text-[11px] font-semibold ${selectedDay === day ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
                 >
                   {day}
                 </button>
@@ -289,7 +291,7 @@ function ScheduleDetailsModal({
                   <button type="button" aria-label={`Remove ${selectedDay} session`} onClick={() => setSchedule((current) => ({
                     ...current,
                     [selectedDay]: (current[selectedDay] ?? []).filter((_, slotIndex) => slotIndex !== index),
-                  }))} className="mb-0.5 rounded-md border border-slate-200 p-2 text-slate-500 hover:bg-slate-50">
+                  }))} className="mb-0.5 cursor-pointer rounded-md border border-slate-200 p-2 text-slate-500 hover:bg-slate-50">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -302,17 +304,17 @@ function ScheduleDetailsModal({
                 ...current,
                 [selectedDay]: [...(current[selectedDay] ?? []), { session: '', from: '', to: '' }],
               }))}
-              className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-200"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-200"
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
           </section>
 
           <footer className="flex justify-end gap-2 border-t border-slate-200 pt-3">
-            <button type="button" onClick={onClose} className="rounded-md border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+            <button type="button" onClick={onClose} className="cursor-pointer rounded-md border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
               Cancel
             </button>
-            <button type="submit" style={{ background: 'var(--theme-accent)' }} className="rounded-md px-3.5 py-2 text-xs font-semibold text-white hover:brightness-90">
+            <button type="submit" style={{ background: 'var(--theme-accent)' }} className="cursor-pointer rounded-md px-3.5 py-2 text-xs font-semibold text-white hover:brightness-90">
               Save Changes
             </button>
           </footer>
@@ -351,6 +353,104 @@ export function DoctorSchedule() {
     if (sort === 'name') return [...doctors].sort((a, b) => a.name.localeCompare(b.name));
     return [...doctors].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
   }, [search, department, availability, sort]);
+
+  const columns = useMemo<ColumnDef<DoctorListItem, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'Doctor',
+        size: 30,
+        cell: ({ row }) => {
+          const doctor = row.original;
+
+          return (
+            <button
+              type="button"
+              onClick={() => setViewingDoctor(doctor)}
+              className="flex cursor-pointer items-center gap-2.5 text-left"
+            >
+              <img
+                src={doctor.avatar}
+                alt=""
+                className="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover"
+              />
+              <span>
+                <span className="block text-xs font-bold text-slate-800">{doctor.name}</span>
+                <span className="mt-0.5 block text-[11px] text-slate-500">
+                  {doctor.designation}
+                </span>
+              </span>
+            </button>
+          );
+        },
+      },
+      {
+        accessorKey: 'department',
+        header: 'Department',
+        size: 15,
+        cell: ({ row }) => (
+          <span className="text-xs text-slate-600">{row.original.department}</span>
+        ),
+      },
+      {
+        accessorKey: 'phone',
+        header: 'Phone',
+        size: 15,
+        cell: ({ row }) => <span className="text-xs text-slate-600">{row.original.phone}</span>,
+      },
+      {
+        id: 'availability',
+        header: 'Availability',
+        size: 28,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1.5">
+            {days.map((day) => {
+              const slots = (row.original.profile?.schedule[day] ?? []).filter(slotIsSet);
+              const set = slots.length > 0;
+              return (
+                <span
+                  key={day}
+                  title={`${day}${set ? `: ${slots.map((slot) => `${slot.from}-${slot.to}`).join(', ')}` : ': Not set'}`}
+                  aria-label={`${day}: ${set ? 'Available' : 'Not set'}`}
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold ${set ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-600'}`}
+                >
+                  {day[0]}
+                </span>
+              );
+            })}
+          </div>
+        ),
+      },
+      {
+        id: 'actions',
+        header: () => <div className="text-right">Actions</div>,
+        size: 12,
+        cell: ({ row }) => (
+          <div className="flex justify-end gap-1.5">
+            <button
+              type="button"
+              onClick={() => setEditingDoctor(row.original)}
+              aria-label={`Edit schedule for ${row.original.name}`}
+              title="Edit schedule"
+              className="cursor-pointer rounded-md border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 hover:text-indigo-700"
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewingDoctor(row.original)}
+              aria-label={`View ${row.original.name}`}
+              title="View schedule details"
+              className="cursor-pointer rounded-md border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 hover:text-indigo-700"
+            >
+              <Eye className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
 
   const saveSchedule = (
     doctor: DoctorListItem,
@@ -414,21 +514,21 @@ export function DoctorSchedule() {
   };
 
   return (
-    <div className="space-y-5">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+    <div className="mx-auto w-full space-y-5 py-2 sm:py-4">
+      <header className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-bold tracking-tight text-slate-900">Doctor Schedule</h1>
           <span className="rounded-md border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
             Total Doctors : {filteredDoctors.length}
           </span>
         </div>
-        <button type="button" onClick={exportCsv} className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+        <button type="button" onClick={exportCsv} className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 sm:w-auto">
           Export <ChevronDown className="h-3.5 w-3.5" />
         </button>
       </header>
 
-      <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
-        <label className="relative w-full sm:max-w-sm">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+        <label className="relative block w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             value={search}
@@ -438,22 +538,22 @@ export function DoctorSchedule() {
             className="w-full rounded-md border border-slate-200 py-2 pl-9 pr-3 text-xs outline-none focus:border-indigo-400"
           />
         </label>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <label className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-end">
+          <label className="inline-flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
             <Filter className="h-3.5 w-3.5" />
-            <select aria-label="Filter by department" value={department} onChange={(event) => setDepartment(event.target.value)} className="rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700">
+            <select aria-label="Filter by department" value={department} onChange={(event) => setDepartment(event.target.value)} className="min-w-0 flex-1 cursor-pointer rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700 sm:flex-none">
               <option value="">All Departments</option>
               {departments.map((item) => <option key={item}>{item}</option>)}
             </select>
           </label>
-          <select aria-label="Filter by availability" value={availability} onChange={(event) => setAvailability(event.target.value)} className="rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700">
+          <select aria-label="Filter by availability" value={availability} onChange={(event) => setAvailability(event.target.value)} className="w-full cursor-pointer rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700 sm:w-auto">
             <option value="">All Availability</option>
             <option value="scheduled">Schedule Set</option>
             <option value="unscheduled">Not Set</option>
           </select>
-          <label className="text-xs text-slate-500">
+          <label className="flex min-w-0 items-center gap-1 text-xs text-slate-500">
             Sort By:
-            <select aria-label="Sort doctors" value={sort} onChange={(event) => setSort(event.target.value)} className="ml-1 rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700">
+            <select aria-label="Sort doctors" value={sort} onChange={(event) => setSort(event.target.value)} className="min-w-0 flex-1 cursor-pointer rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700 sm:flex-none">
               <option value="recent">Recent</option>
               <option value="name">Name</option>
             </select>
@@ -461,73 +561,22 @@ export function DoctorSchedule() {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="w-full min-w-[850px] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-slate-200 text-[11px] font-semibold text-slate-800">
-              <th className="px-4 py-3">Doctor</th>
-              <th className="px-4 py-3">Department</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Availability</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDoctors.map((doctor) => (
-              <tr key={doctor.id} className="border-b border-slate-200 last:border-0 hover:bg-slate-50/60">
-                <td className="px-4 py-2">
-                  <button type="button" onClick={() => setViewingDoctor(doctor)} className="flex items-center gap-2.5 text-left">
-                    <img src={doctor.avatar} alt="" className="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" />
-                    <span>
-                      <span className="block text-xs font-bold text-slate-800">{doctor.name}</span>
-                      <span className="mt-0.5 block text-[11px] text-slate-500">{doctor.designation}</span>
-                    </span>
-                  </button>
-                </td>
-                <td className="px-4 py-2 text-xs text-slate-600">{doctor.department}</td>
-                <td className="px-4 py-2 text-xs text-slate-600">{doctor.phone}</td>
-                <td className="px-4 py-2">
-                  <div className="flex items-center gap-1.5">
-                    {days.map((day) => {
-                      const slots = (doctor.profile?.schedule[day] ?? []).filter(slotIsSet);
-                      const set = slots.length > 0;
-                      return (
-                        <span
-                          key={day}
-                          title={`${day}${set ? `: ${slots.map((slot) => `${slot.from}-${slot.to}`).join(', ')}` : ': Not set'}`}
-                          aria-label={`${day}: ${set ? 'Available' : 'Not set'}`}
-                          className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold ${set ? 'bg-indigo-700 text-white' : 'bg-slate-100 text-slate-600'}`}
-                        >
-                          {day[0]}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </td>
-                <td className="px-4 py-2">
-                  <div className="flex justify-end gap-1.5">
-                    <button type="button" onClick={() => setEditingDoctor(doctor)} aria-label={`Edit schedule for ${doctor.name}`} title="Edit schedule" className="rounded-md border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 hover:text-indigo-700">
-                      <CalendarDays className="h-3.5 w-3.5" />
-                    </button>
-                    <button type="button" onClick={() => setViewingDoctor(doctor)} aria-label={`View ${doctor.name}`} title="View schedule details" className="rounded-md border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 hover:text-indigo-700">
-                      <Eye className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filteredDoctors.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-12 text-center">
-                  <CalendarDays className="mx-auto h-8 w-8 text-slate-300" />
-                  <p className="mt-2 text-sm font-semibold text-slate-700">No doctors found</p>
-                  <p className="mt-1 text-xs text-slate-500">Try changing your search or filters.</p>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        data={filteredDoctors}
+        columns={columns}
+        fixedColumnWidths
+        horizontalScrollOnSmallScreens
+        initialPageSize={10}
+        emptyState={
+          <>
+            <CalendarDays className="mx-auto h-8 w-8 text-slate-300" />
+            <p className="mt-2 text-sm font-semibold text-slate-700">No doctors found</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Try changing your search or filters.
+            </p>
+          </>
+        }
+      />
 
       <p className="border-t border-slate-200/60 pt-3 text-center text-xs font-medium text-slate-500">
         2026 &copy;Preclinic, All Rights Reserved
