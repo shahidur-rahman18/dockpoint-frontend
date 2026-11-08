@@ -1,28 +1,20 @@
 import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-  CalendarDays,
-  Download,
-  Filter,
-  Plus,
-  Search,
-  X,
-} from 'lucide-react';
+import { Download, Filter, Search, X } from 'lucide-react';
 import { ActionDropdown } from '../components/common/ActionDropdown';
 import { DataTable } from '../components/common/DataTable';
-import { DeleteConfirmationModal } from '../components/common/DeleteConfirmationModal';
 import { Modal } from '../components/common/Modal';
+import { getProfileApiErrorMessage } from '../services/accountService';
+import { useDoctorSettingsProfile } from '../hooks/useDoctorSettingsProfile';
 import {
-  AppointmentFormDialog,
-  type AppointmentFormValues,
-} from '../components/appointments/AppointmentFormDialog';
-import {
-  doctorAppointmentsMockData,
-  type AppointmentMode,
-  type AppointmentStatus,
-  type DoctorAppointment,
-} from '../data/doctorAppointmentsMockData';
+  getDoctorAppointments,
+  getDoctorAppointmentsErrorMessage,
+  type Appointment,
+} from '../services/doctorAppointmentService';
+import type { components } from '../types/schema';
 
+type AppointmentStatus = components['schemas']['StatusEnum'];
 type SortOrder = 'recent' | 'oldest' | 'patient';
 
 const statusLabels: Record<AppointmentStatus, string> = {
@@ -60,83 +52,71 @@ const selectClass =
   'min-h-9 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100';
 
 export function DoctorAppointmentsPage() {
-  const [appointments, setAppointments] = useState(doctorAppointmentsMockData);
+  const profileQuery = useDoctorSettingsProfile();
+  const doctorId = profileQuery.data?.doctor.id;
+  const appointmentsQuery = useQuery({
+    queryKey: ['doctor-appointments', doctorId],
+    queryFn: () => {
+      if (doctorId === undefined) {
+        throw new Error('Doctor profile is not loaded. Please reload and try again.');
+      }
+      return getDoctorAppointments(doctorId);
+    },
+    enabled: doctorId !== undefined,
+  });
+
   const [query, setQuery] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'all'>('all');
-  const [modeFilter, setModeFilter] = useState<AppointmentMode | 'all'>('all');
   const [sortOrder, setSortOrder] = useState<SortOrder>('recent');
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [openActionId, setOpenActionId] = useState<string | null>(null);
-  const [formAppointment, setFormAppointment] = useState<DoctorAppointment | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [viewAppointment, setViewAppointment] = useState<DoctorAppointment | null>(null);
-  const [deleteAppointment, setDeleteAppointment] = useState<DoctorAppointment | null>(null);
+  const [openActionId, setOpenActionId] = useState<number | null>(null);
+  const [viewAppointment, setViewAppointment] = useState<Appointment | null>(null);
 
   const visibleAppointments = useMemo(() => {
+    const appointments = appointmentsQuery.data ?? [];
     const normalizedQuery = query.trim().toLowerCase();
     return appointments
       .filter((appointment) => {
         const matchesQuery =
           !normalizedQuery ||
           [
-            appointment.id,
-            appointment.patientName,
-            appointment.patientEmail,
-            appointment.patientPhone,
+            String(appointment.id),
+            String(appointment.patient),
+            appointment.patient_email,
+            appointment.symptoms_note ?? '',
           ].some((value) => value.toLowerCase().includes(normalizedQuery));
         const matchesDate =
-          (!fromDate || appointment.appointmentDate >= fromDate) &&
-          (!toDate || appointment.appointmentDate <= toDate);
-        const matchesStatus = statusFilter === 'all' || appointment.status === statusFilter;
-        const matchesMode = modeFilter === 'all' || appointment.mode === modeFilter;
-        return matchesQuery && matchesDate && matchesStatus && matchesMode;
+          (!fromDate || appointment.appointment_date >= fromDate) &&
+          (!toDate || appointment.appointment_date <= toDate);
+        const matchesStatus =
+          statusFilter === 'all' || appointment.status === statusFilter;
+        return matchesQuery && matchesDate && matchesStatus;
       })
       .sort((left, right) => {
-        if (sortOrder === 'patient') return left.patientName.localeCompare(right.patientName);
-        const dateComparison = `${left.appointmentDate} ${left.startTime}`.localeCompare(
-          `${right.appointmentDate} ${right.startTime}`,
+        if (sortOrder === 'patient') {
+          return left.patient_email.localeCompare(right.patient_email);
+        }
+        const dateComparison = `${left.appointment_date} ${left.time_slot_start}`.localeCompare(
+          `${right.appointment_date} ${right.time_slot_start}`,
         );
         return sortOrder === 'recent' ? -dateComparison : dateComparison;
       });
-  }, [appointments, fromDate, modeFilter, query, sortOrder, statusFilter, toDate]);
-
-  const closeForm = () => {
-    setIsFormOpen(false);
-    setFormAppointment(null);
-  };
-
-  const handleSaveAppointment = (values: AppointmentFormValues) => {
-    if (formAppointment) {
-      setAppointments((current) =>
-        current.map((item) =>
-          item.id === formAppointment.id ? { ...values, id: formAppointment.id } : item,
-        ),
-      );
-    } else {
-      setAppointments((current) => [
-        { ...values, id: `APT-${Date.now().toString().slice(-6)}` },
-        ...current,
-      ]);
-    }
-    closeForm();
-  };
+  }, [appointmentsQuery.data, fromDate, query, sortOrder, statusFilter, toDate]);
 
   const handleExport = () => {
     const rows = [
-      ['Appointment ID', 'Date', 'Start time', 'End time', 'Patient', 'Email', 'Phone', 'Mode', 'Status', 'Reason'],
+      ['Appointment ID', 'Date', 'Start time', 'End time', 'Patient email', 'Reason', 'Fee', 'Status'],
       ...visibleAppointments.map((item) => [
-        item.id,
-        item.appointmentDate,
-        item.startTime,
-        item.endTime,
-        item.patientName,
-        item.patientEmail,
-        item.patientPhone,
-        item.mode,
-        statusLabels[item.status],
-        item.reason,
+        String(item.id),
+        item.appointment_date,
+        item.time_slot_start,
+        item.time_slot_end,
+        item.patient_email,
+        item.symptoms_note ?? '',
+        item.total_fee ?? '',
+        item.status ? statusLabels[item.status] : 'Unknown',
       ]),
     ];
     const csv = rows
@@ -152,60 +132,50 @@ export function DoctorAppointmentsPage() {
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
   };
 
-  const columns = useMemo<ColumnDef<DoctorAppointment, unknown>[]>(
+  const columns = useMemo<ColumnDef<Appointment, unknown>[]>(
     () => [
       {
-        accessorKey: 'appointmentDate',
+        accessorKey: 'appointment_date',
         header: 'Date & Time',
         cell: ({ row }) => (
           <div className="whitespace-nowrap">
-            <p className="font-semibold text-slate-700">{formatDate(row.original.appointmentDate)}</p>
+            <p className="font-semibold text-slate-700">
+              {formatDate(row.original.appointment_date)}
+            </p>
             <p className="mt-1 text-[11px] text-slate-500">
-              {formatTime(row.original.startTime)} - {formatTime(row.original.endTime)}
+              {formatTime(row.original.time_slot_start)} - {formatTime(row.original.time_slot_end)}
             </p>
           </div>
         ),
       },
       {
-        accessorKey: 'patientName',
+        accessorKey: 'patient_email',
         header: 'Patient',
-        cell: ({ row }) => {
-          const patient = row.original;
-          const initials = patient.patientName
-            .split(/\s+/)
-            .slice(0, 2)
-            .map((part) => part[0])
-            .join('')
-            .toUpperCase();
-          return (
-            <div className="flex min-w-48 items-center gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-indigo-700">
-                {initials}
-              </span>
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-slate-800">{patient.patientName}</p>
-                <p className="mt-0.5 truncate text-[11px] text-slate-500">
-                  {patient.patientPhone || patient.patientEmail}
-                </p>
-              </div>
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="min-w-48">
+            <p className="font-semibold text-slate-800">{row.original.patient_email}</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Patient #{row.original.patient}</p>
+          </div>
+        ),
       },
       {
-        accessorKey: 'mode',
-        header: 'Mode',
-        cell: ({ getValue }) => <span className="text-slate-600">{getValue<string>()}</span>,
+        accessorKey: 'symptoms_note',
+        header: 'Reason',
+        cell: ({ getValue }) => (
+          <span className="line-clamp-2 text-slate-600">{getValue<string | null>() || '—'}</span>
+        ),
       },
       {
         accessorKey: 'status',
         header: 'Status',
         cell: ({ getValue }) => {
-          const status = getValue<AppointmentStatus>();
-          return (
+          const status = getValue<AppointmentStatus | undefined>();
+          return status ? (
             <span className={`inline-flex rounded-md px-2.5 py-1 text-[11px] font-semibold ${statusClasses[status]}`}>
               {statusLabels[status]}
             </span>
+          ) : (
+            <span className="text-slate-500">Unknown</span>
           );
         },
       },
@@ -223,11 +193,6 @@ export function DoctorAppointmentsPage() {
                   setOpenActionId((current) => (current === appointment.id ? null : appointment.id))
                 }
                 onView={() => setViewAppointment(appointment)}
-                onEdit={() => {
-                  setFormAppointment(appointment);
-                  setIsFormOpen(true);
-                }}
-                onDelete={() => setDeleteAppointment(appointment)}
               />
             </div>
           );
@@ -242,35 +207,51 @@ export function DoctorAppointmentsPage() {
     setFromDate('');
     setToDate('');
     setStatusFilter('all');
-    setModeFilter('all');
   };
   const hasActiveFilters =
-    Boolean(query || fromDate || toDate) || statusFilter !== 'all' || modeFilter !== 'all';
+    Boolean(query || fromDate || toDate) || statusFilter !== 'all';
+
+  if (profileQuery.isPending || (doctorId !== undefined && appointmentsQuery.isPending)) {
+    return <p className="p-8 text-center text-sm text-slate-500">Loading appointments…</p>;
+  }
+
+  const loadError = profileQuery.error ?? appointmentsQuery.error;
+  if (loadError) {
+    return (
+      <div className="space-y-3 rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-800">
+        <p>
+          {profileQuery.isError
+            ? getProfileApiErrorMessage(profileQuery.error)
+            : getDoctorAppointmentsErrorMessage(loadError)}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            if (profileQuery.isError) {
+              void profileQuery.refetch();
+            } else {
+              void appointmentsQuery.refetch();
+            }
+          }}
+          className="font-semibold underline underline-offset-2"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
       <header className="flex flex-col justify-between gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">Appointments</h1>
-          <p className="mt-1 text-xs text-slate-500">View and manage your patient appointments.</p>
+          <p className="mt-1 text-xs text-slate-500">View your patient appointments.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" onClick={handleExport} className={buttonClass}>
-            <Download className="size-3.5" />
-            Export CSV
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setFormAppointment(null);
-              setIsFormOpen(true);
-            }}
-            className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-indigo-800 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            <Plus className="size-4" />
-            New Appointment
-          </button>
-        </div>
+        <button type="button" onClick={handleExport} className={buttonClass}>
+          <Download className="size-3.5" />
+          Export CSV
+        </button>
       </header>
 
       <div className="border-b border-slate-200 bg-slate-100/60 px-2 py-3">
@@ -287,33 +268,29 @@ export function DoctorAppointmentsPage() {
                 className="min-h-9 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 outline-none placeholder:text-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               />
             </label>
-            <div className="grid min-h-9 w-full grid-cols-1 gap-1.5 rounded-md border border-slate-200 bg-white p-2 sm:w-[245px] sm:grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-1.5 sm:px-2.5 sm:py-0">
-              <CalendarDays aria-hidden="true" className="hidden size-3.5 shrink-0 text-slate-600 sm:block" />
-              <label className="flex min-w-0 items-center gap-2 sm:block">
-                <span className="w-8 shrink-0 text-[11px] font-medium text-slate-500 sm:hidden">From</span>
-                <span className="sr-only">Filter from date</span>
-                <input
-                  type="date"
-                  aria-label="From date"
-                  value={fromDate}
-                  max={toDate || undefined}
-                  onChange={(event) => setFromDate(event.target.value)}
-                  className="min-w-0 w-full border-0 bg-transparent p-0 text-xs text-slate-600 outline-none focus:ring-0"
-                />
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-slate-500" htmlFor="appointments-from-date">
+                From
               </label>
-              <span className="hidden text-xs text-slate-400 sm:block">to</span>
-              <label className="flex min-w-0 items-center gap-2 sm:block">
-                <span className="w-8 shrink-0 text-[11px] font-medium text-slate-500 sm:hidden">To</span>
-                <span className="sr-only">Filter to date</span>
-                <input
-                  type="date"
-                  aria-label="To date"
-                  value={toDate}
-                  min={fromDate || undefined}
-                  onChange={(event) => setToDate(event.target.value)}
-                  className="min-w-0 w-full border-0 bg-transparent p-0 text-xs text-slate-600 outline-none focus:ring-0"
-                />
+              <input
+                id="appointments-from-date"
+                type="date"
+                value={fromDate}
+                max={toDate || undefined}
+                onChange={(event) => setFromDate(event.target.value)}
+                className={`${selectClass} min-h-9`}
+              />
+              <label className="text-xs font-medium text-slate-500" htmlFor="appointments-to-date">
+                To
               </label>
+              <input
+                id="appointments-to-date"
+                type="date"
+                value={toDate}
+                min={fromDate || undefined}
+                onChange={(event) => setToDate(event.target.value)}
+                className={`${selectClass} min-h-9`}
+              />
             </div>
           </div>
 
@@ -360,18 +337,6 @@ export function DoctorAppointmentsPage() {
                 ))}
               </select>
             </label>
-            <label className="grid gap-1.5 text-xs font-semibold text-slate-600">
-              Mode
-              <select
-                value={modeFilter}
-                onChange={(event) => setModeFilter(event.target.value as AppointmentMode | 'all')}
-                className={selectClass}
-              >
-                <option value="all">All modes</option>
-                <option value="In-person">In-person</option>
-                <option value="Online">Online</option>
-              </select>
-            </label>
             {hasActiveFilters && (
               <button
                 type="button"
@@ -395,54 +360,34 @@ export function DoctorAppointmentsPage() {
         emptyDescription="Try changing your search or filters."
       />
 
-      <AppointmentFormDialog
-        open={isFormOpen}
-        appointment={formAppointment ?? undefined}
-        onClose={closeForm}
-        onSubmit={handleSaveAppointment}
-      />
-
       <Modal
         open={Boolean(viewAppointment)}
         title="Appointment details"
-        description={viewAppointment?.id}
+        description={viewAppointment ? `Appointment #${viewAppointment.id}` : undefined}
         size="md"
         onClose={() => setViewAppointment(null)}
       >
         {viewAppointment && (
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
             <dt className="text-[var(--text-secondary)]">Patient</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.patientName}</dd>
-            <dt className="text-[var(--text-secondary)]">Email</dt>
-            <dd className="break-all font-medium text-[var(--text-primary)]">{viewAppointment.patientEmail}</dd>
-            <dt className="text-[var(--text-secondary)]">Phone</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.patientPhone || 'Not provided'}</dd>
+            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.patient_email}</dd>
+            <dt className="text-[var(--text-secondary)]">Patient ID</dt>
+            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.patient}</dd>
             <dt className="text-[var(--text-secondary)]">Date & time</dt>
             <dd className="font-medium text-[var(--text-primary)]">
-              {formatDate(viewAppointment.appointmentDate)}, {formatTime(viewAppointment.startTime)} - {formatTime(viewAppointment.endTime)}
+              {formatDate(viewAppointment.appointment_date)}, {formatTime(viewAppointment.time_slot_start)} - {formatTime(viewAppointment.time_slot_end)}
             </dd>
-            <dt className="text-[var(--text-secondary)]">Mode</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.mode}</dd>
             <dt className="text-[var(--text-secondary)]">Status</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{statusLabels[viewAppointment.status]}</dd>
+            <dd className="font-medium text-[var(--text-primary)]">
+              {viewAppointment.status ? statusLabels[viewAppointment.status] : 'Unknown'}
+            </dd>
+            <dt className="text-[var(--text-secondary)]">Fee</dt>
+            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.total_fee ?? '—'}</dd>
             <dt className="text-[var(--text-secondary)]">Reason</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.reason || 'Not provided'}</dd>
+            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.symptoms_note || '—'}</dd>
           </dl>
         )}
       </Modal>
-
-      <DeleteConfirmationModal
-        open={Boolean(deleteAppointment)}
-        title="Delete appointment?"
-        description={`This will remove the demo appointment for ${deleteAppointment?.patientName ?? 'this patient'}.`}
-        onCancel={() => setDeleteAppointment(null)}
-        onConfirm={() => {
-          if (deleteAppointment) {
-            setAppointments((current) => current.filter((item) => item.id !== deleteAppointment.id));
-          }
-          setDeleteAppointment(null);
-        }}
-      />
     </div>
   );
 }
