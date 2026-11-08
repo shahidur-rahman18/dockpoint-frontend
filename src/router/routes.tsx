@@ -32,9 +32,9 @@ const DoctorAppointmentsPage = lazy(() =>
 
 export const routes: RouteObject[] = [
   { path: '/setup-password', element: <DoctorPasswordSetupRoute /> },
+  { path: '/sign-in', element: <SignInRoute /> },
   { path: '/admin/sign-in', element: <SignInRoute role="admin" /> },
   { path: '/doctor/sign-in', element: <SignInRoute role="doctor" /> },
-  { path: '/sign-in', element: <Navigate to="/doctor/sign-in" replace /> },
   { path: '/sign-up', element: <Navigate to="/doctor/sign-in" replace /> },
   {
     path: '/',

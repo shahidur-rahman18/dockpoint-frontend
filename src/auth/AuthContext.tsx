@@ -9,6 +9,8 @@ import {
 import {
   clearStoredAuth,
   fetchUserSession,
+  getDemoLoginEmail,
+  loginWithDemoApi,
   loginWithApi,
   type LoginCredentials,
   type UserRole,
@@ -20,6 +22,8 @@ interface AuthContextValue {
   role: UserRole | null;
   isLoading: boolean;
   login: (credentials: LoginCredentials, role: UserRole) => Promise<void>;
+  getDemoLoginEmail: (role: UserRole) => Promise<string>;
+  demoLogin: (role: UserRole) => Promise<void>;
   establishSession: (expectedRole: UserRole) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -61,6 +65,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const loadDemoLoginEmail = useCallback(
+    (role: UserRole) => getDemoLoginEmail(role),
+    [],
+  );
+
+  const demoLogin = useCallback(async (role: UserRole) => {
+    setIsLoading(true);
+    try {
+      const { session: authenticatedSession } = await loginWithDemoApi(role);
+      clearStoredAuth();
+      setSession(authenticatedSession);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const establishSession = useCallback(async (expectedRole: UserRole) => {
     setIsLoading(true);
     try {
@@ -93,6 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: session?.role ?? null,
         isLoading,
         login,
+        getDemoLoginEmail: loadDemoLoginEmail,
+        demoLogin,
         establishSession,
         logout,
       }}

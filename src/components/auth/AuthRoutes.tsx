@@ -10,11 +10,19 @@ import { LoaderOne } from '../common/LoaderOne';
 const getHomePath = (role: UserRole) =>
   role === 'admin' ? '/admin-dashboard' : '/doctor-dashboard';
 
-export function SignInRoute({ role }: { role: UserRole }) {
-  const { role: authenticatedRole, login, isLoading } = useAuth();
+export function SignInRoute({ role }: { role?: UserRole }) {
+  const {
+    role: authenticatedRole,
+    login,
+    getDemoLoginEmail,
+    demoLogin,
+    isLoading,
+  } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingDemoEmail, setIsLoadingDemoEmail] = useState(false);
+  const [demoEmail, setDemoEmail] = useState<string>();
   const passwordSetupComplete =
     location.state !== null &&
     typeof location.state === 'object' &&
@@ -38,11 +46,29 @@ export function SignInRoute({ role }: { role: UserRole }) {
     return <Navigate to={getHomePath(authenticatedRole)} replace />;
   }
 
+  const handleSelectRole = (selectedRole: UserRole) => {
+    navigate(`/${selectedRole}/sign-in`);
+  };
+
+  if (!role) {
+    return (
+      <SignInPage
+        title="Sign In"
+        subtitle="Choose your account type to continue"
+        onSelectRole={handleSelectRole}
+      />
+    );
+  }
+
   const handleSubmit = async (credentials: SignInCredentials) => {
     setIsSubmitting(true);
 
     try {
-      await login(credentials, role);
+      if (demoEmail) {
+        await demoLogin(role);
+      } else {
+        await login(credentials, role);
+      }
       toast.success('Login successful!');
       navigate(getHomePath(role), { replace: true });
     } catch (error) {
@@ -56,6 +82,17 @@ export function SignInRoute({ role }: { role: UserRole }) {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsLoadingDemoEmail(true);
+    try {
+      setDemoEmail(await getDemoLoginEmail(role));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Unable to load the demo account.');
+    } finally {
+      setIsLoadingDemoEmail(false);
+    }
+  };
+
   return (
     <SignInPage
       title={role === 'admin' ? 'Admin Sign In' : 'Doctor Sign In'}
@@ -65,6 +102,12 @@ export function SignInRoute({ role }: { role: UserRole }) {
           : 'Sign in to access your doctor dashboard'
       }
       onSubmit={handleSubmit}
+      selectedRole={role}
+      onSelectRole={handleSelectRole}
+      demoEmail={demoEmail}
+      onDemoLogin={handleDemoLogin}
+      isLoadingDemoEmail={isLoadingDemoEmail}
+      onUsePasswordLogin={() => setDemoEmail(undefined)}
       successMessage={
         role === 'doctor' && passwordSetupComplete
           ? automaticSignInUnavailable
@@ -93,8 +136,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   if (!role) {
-    const signInPath = requiredRole === 'admin' ? '/admin/sign-in' : '/doctor/sign-in';
-    return <Navigate to={signInPath} replace state={{ from: location }} />;
+    return <Navigate to="/sign-in" replace state={{ from: location }} />;
   }
 
   if (role !== requiredRole) {

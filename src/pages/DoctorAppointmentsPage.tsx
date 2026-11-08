@@ -5,6 +5,7 @@ import { Download, Filter, Search, X } from 'lucide-react';
 import { ActionDropdown } from '../components/common/ActionDropdown';
 import { DataTable } from '../components/common/DataTable';
 import { Modal } from '../components/common/Modal';
+import { DoctorAvatar } from '../components/doctors/DoctorAvatar';
 import { getProfileApiErrorMessage } from '../services/accountService';
 import { useDoctorSettingsProfile } from '../hooks/useDoctorSettingsProfile';
 import {
@@ -85,6 +86,8 @@ export function DoctorAppointmentsPage() {
             String(appointment.id),
             String(appointment.patient),
             appointment.patient_email,
+            appointment.patient_detail?.first_name ?? '',
+            appointment.patient_detail?.last_name ?? '',
             appointment.symptoms_note ?? '',
           ].some((value) => value.toLowerCase().includes(normalizedQuery));
         const matchesDate =
@@ -96,7 +99,9 @@ export function DoctorAppointmentsPage() {
       })
       .sort((left, right) => {
         if (sortOrder === 'patient') {
-          return left.patient_email.localeCompare(right.patient_email);
+          const leftName = `${left.patient_detail?.first_name ?? ''} ${left.patient_detail?.last_name ?? ''}`.trim();
+          const rightName = `${right.patient_detail?.first_name ?? ''} ${right.patient_detail?.last_name ?? ''}`.trim();
+          return (leftName || left.patient_email).localeCompare(rightName || right.patient_email);
         }
         const dateComparison = `${left.appointment_date} ${left.time_slot_start}`.localeCompare(
           `${right.appointment_date} ${right.time_slot_start}`,
@@ -151,12 +156,30 @@ export function DoctorAppointmentsPage() {
       {
         accessorKey: 'patient_email',
         header: 'Patient',
-        cell: ({ row }) => (
-          <div className="min-w-48">
-            <p className="font-semibold text-slate-800">{row.original.patient_email}</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">Patient #{row.original.patient}</p>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const patient = row.original.patient_detail;
+          const patientName = [patient?.first_name, patient?.last_name]
+            .filter(Boolean)
+            .join(' ') || row.original.patient_email;
+
+          return (
+            <div className="flex min-w-56 items-center gap-3">
+              <DoctorAvatar
+                src={patient?.avatar_url ?? ''}
+                alt={`${patientName} avatar`}
+                imageClassName="size-10 shrink-0 rounded-full object-cover"
+                fallbackClassName="grid size-10 shrink-0 place-items-center rounded-full bg-indigo-50 text-indigo-600"
+                iconClassName="size-5"
+              />
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-slate-800">{patientName}</p>
+                <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                  {row.original.patient_email} | Patient #{row.original.patient}
+                </p>
+              </div>
+            </div>
+          );
+        },
       },
       {
         accessorKey: 'symptoms_note',
@@ -354,8 +377,8 @@ export function DoctorAppointmentsPage() {
       <DataTable
         data={visibleAppointments}
         columns={columns}
-        initialPageSize={10}
-        pageSizeOptions={[5, 10, 15]}
+        initialPageSize={20}
+        pageSizeOptions={[10, 20, 50]}
         emptyMessage="No appointments found"
         emptyDescription="Try changing your search or filters."
       />

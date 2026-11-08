@@ -2,7 +2,15 @@ import axios from 'axios';
 import { apiClient } from '../api/apiClient';
 import type { components } from '../types/schema';
 
-export type Appointment = components['schemas']['Appointment'];
+export type Appointment = components['schemas']['Appointment'] & {
+  readonly patient_detail?: {
+    readonly id: number;
+    readonly email: string;
+    readonly first_name: string;
+    readonly last_name: string;
+    readonly avatar_url: string | null;
+  };
+};
 
 export const getDoctorAppointments = async (doctorId: number): Promise<Appointment[]> => {
   const { data } = await apiClient.get<Appointment[]>('/appointments/');

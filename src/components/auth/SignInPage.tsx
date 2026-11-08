@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import docpointLogo from '../../assets/Docpoint.png';
+import type { UserRole } from '../../auth/authService';
 
 export interface SignInCredentials {
   email: string;
@@ -16,6 +17,12 @@ interface SignInPageProps {
   successMessage?: string;
   isSubmitting?: boolean;
   onForgotPassword?: () => void;
+  selectedRole?: UserRole;
+  onSelectRole?: (role: UserRole) => void;
+  demoEmail?: string;
+  onDemoLogin?: () => void;
+  isLoadingDemoEmail?: boolean;
+  onUsePasswordLogin?: () => void;
 }
 
 export const SignInPage: React.FC<SignInPageProps> = ({
@@ -27,8 +34,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   successMessage,
   isSubmitting = false,
   onForgotPassword,
+  selectedRole,
+  onSelectRole,
+  demoEmail,
+  onDemoLogin,
+  isLoadingDemoEmail = false,
+  onUsePasswordLogin,
 }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,7 +87,27 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </p>
           </header>
 
-          <form className="flex flex-col gap-[17px]" onSubmit={handleSubmit}>
+          {onSelectRole && (
+            <div className="mb-5 grid grid-cols-2 gap-3" aria-label="Choose account type">
+              {(['admin', 'doctor'] as const).map((role) => (
+                <button
+                  key={role}
+                  className={`min-h-10 cursor-pointer rounded-md border px-3 text-sm font-semibold capitalize transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] ${
+                    selectedRole === role
+                      ? 'border-[var(--theme-accent)] bg-[var(--theme-accent)] text-white'
+                      : 'border-[var(--border-color)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+                  }`}
+                  type="button"
+                  onClick={() => onSelectRole(role)}
+                  aria-pressed={selectedRole === role}
+                >
+                  {role}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {selectedRole && <form className="flex flex-col gap-[17px]" onSubmit={handleSubmit}>
             {successMessage && (
               <p
                 className="m-0 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
@@ -93,12 +127,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                   type="email"
                   placeholder="Enter Email Address"
                   autoComplete="username"
+                  value={demoEmail ?? email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  readOnly={Boolean(demoEmail)}
                   required
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            {!demoEmail && <div className="flex flex-col gap-2">
               <label className="text-sm font-medium" htmlFor="sign-in-password">Password</label>
               <div className="flex min-h-10 items-center gap-[11px] rounded-md border border-[var(--border-color)] px-3 text-[var(--text-primary)] transition focus-within:border-[var(--theme-accent)] focus-within:ring-2 focus-within:ring-[var(--theme-accent)]/15">
                 <LockKeyhole size={16} aria-hidden="true" />
@@ -121,9 +158,9 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                   {passwordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-            </div>
+            </div>}
 
-            <div className="mt-px flex min-h-[22px] items-center justify-end gap-3 text-[13px] sm:text-sm">
+            {!demoEmail && <div className="mt-px flex min-h-[22px] items-center justify-end gap-3 text-[13px] sm:text-sm">
               {onForgotPassword ? (
                 <button
                   className="cursor-pointer border-0 bg-transparent p-0 text-rose-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)]"
@@ -135,7 +172,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               ) : (
                 <span className="text-rose-500">Forgot Password?</span>
               )}
-            </div>
+            </div>}
 
             <button
               className="mt-px min-h-10 cursor-pointer rounded-[5px] border-0 bg-[var(--theme-accent)] text-[13px] font-bold text-white transition hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
@@ -144,8 +181,28 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             >
               {isSubmitting ? 'Signing in...' : 'Login'}
             </button>
+            {onDemoLogin && (
+              <button
+                className="min-h-10 cursor-pointer rounded-[5px] border border-[var(--border-color)] bg-transparent text-[13px] font-bold text-[var(--text-primary)] transition hover:bg-[var(--bg-subtle)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--theme-accent)] disabled:cursor-wait disabled:opacity-70"
+                type="button"
+                onClick={onDemoLogin}
+                disabled={isLoadingDemoEmail || isSubmitting}
+              >
+                {isLoadingDemoEmail ? 'Loading demo account...' : 'Demo Login'}
+              </button>
+            )}
+            {demoEmail && onUsePasswordLogin && (
+              <button
+                className="cursor-pointer border-0 bg-transparent p-0 text-sm text-[var(--theme-accent)] underline"
+                type="button"
+                onClick={onUsePasswordLogin}
+                disabled={isSubmitting}
+              >
+                Use password login
+              </button>
+            )}
           </form>
-
+          }
         </section>
 
         <footer className="mt-5 text-center text-xs text-[var(--text-secondary)] sm:mt-6 sm:text-sm">

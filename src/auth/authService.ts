@@ -78,6 +78,44 @@ export const loginWithApi = async (
   }
 };
 
+export const getDemoLoginEmail = async (role: UserRole): Promise<string> => {
+  try {
+    const { data } = await apiClient.get<{ email: string }>('/accounts/demo-login/', {
+      params: { role },
+    });
+    return data.email;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error));
+  }
+};
+
+export const loginWithDemoApi = async (
+  role: UserRole,
+): Promise<{ session: AuthSession }> => {
+  try {
+    const { data } = await apiClient.post<{
+      access?: string;
+      refresh?: string;
+    }>('/accounts/demo-login/', { role });
+
+    if (data?.access) {
+      localStorage.setItem('dockpoint_access_token', data.access);
+    }
+    if (data?.refresh) {
+      localStorage.setItem('dockpoint_refresh_token', data.refresh);
+    }
+
+    const session = await fetchUserSession();
+    if (session.role !== role) {
+      throw new Error(`This account does not have the ${role} role.`);
+    }
+
+    return { session };
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error));
+  }
+};
+
 // কুকি বা হেডার টোকেন স্বয়ংক্রিয়ভাবে পাঠিয়ে ইউজারের তথ্য নিয়ে আসা
 export const fetchUserSession = async (): Promise<AuthSession> => {
   const { data: profile } = await apiClient.get<components['schemas']['UserProfile']>(
