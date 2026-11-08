@@ -110,6 +110,17 @@ export interface LeaveRequest {
   avatar: string;
 }
 
+export interface PatientListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  bloodGroup: string;
+  gender: string;
+  isVerified: boolean;
+}
+
 export interface DoctorListItem {
   id: string;
   name: string;

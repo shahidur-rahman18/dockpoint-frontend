@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { DoctorList } from '../components/doctors/DoctorList';
+import { PatientList } from '../components/patients/PatientList';
 import { DoctorDetails } from '../components/doctors/DoctorDetails';
 import { DoctorEditPage } from '../components/doctors/DoctorEditPage';
 import { AddDoctor } from '../components/doctors/AddDoctor';
@@ -74,7 +75,7 @@ export const routes: RouteObject[] = [
       { path: 'receptionist-dashboard', ...pending('Receptionist Dashboard', 'Receptionist dashboard will appear here.') },
       { path: 'applications', ...pending('Applications', 'Installed clinic applications will appear here.') },
       { path: 'layouts', ...pending('Layouts', 'Reusable dashboard layouts will appear here.') },
-      { path: 'patients', ...pending('Patients', 'Patient directory will appear here.') },
+      { path: 'patients', element: <PatientList /> },
       {
         path: 'appointments',
         element: (
