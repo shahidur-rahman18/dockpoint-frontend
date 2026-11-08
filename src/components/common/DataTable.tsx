@@ -27,7 +27,7 @@ export function DataTable<TData>({
   emptyState,
   emptyMessage = 'No results found',
   emptyDescription = 'Try adjusting your search or filters.',
-  initialPageSize = 5,
+  initialPageSize = 10,
   pageSizeOptions = [5, 10, 15],
   onRowClick,
   fixedColumnWidths = false,
