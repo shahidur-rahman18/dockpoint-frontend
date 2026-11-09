@@ -58,7 +58,7 @@ export const DoctorDetails: React.FC = () => {
             </button>
           )}
           <Link
-            to="/doctors"
+            to="/admin-dashboard/doctors"
             className="inline-flex min-h-10 items-center rounded-lg border border-[var(--border-color)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] transition hover:bg-[var(--bg-subtle)]"
           >
             Back to Doctors
@@ -105,7 +105,7 @@ export const DoctorDetails: React.FC = () => {
     <div className="space-y-5">
       <div>
         <Link
-          to="/doctors"
+          to="/admin-dashboard/doctors"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--theme-accent)]"
         >
           <span aria-hidden="true">‹</span>
@@ -171,7 +171,7 @@ export const DoctorDetails: React.FC = () => {
             </p>
           </div>
           <Link
-            to="/appointments"
+            to="/admin-dashboard/appointments"
             className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:brightness-90"
             style={{ background: 'var(--theme-accent)' }}
           >

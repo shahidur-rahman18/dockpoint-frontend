@@ -247,7 +247,7 @@ export const AppointmentCalendar = () => {
         <div className="flex items-start gap-3">
           <button
             type="button"
-            onClick={() => navigate('/doctors')}
+            onClick={() => navigate('/admin-dashboard/doctors')}
             aria-label="Back to doctors"
             className="mt-0.5 rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-indigo-700"
           >

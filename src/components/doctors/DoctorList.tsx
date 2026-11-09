@@ -37,7 +37,7 @@ const doctorDetailsPath = (doctor: DoctorListItem) => {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-  return `/doctor-details/${doctor.id}/${slug}`;
+  return `/admin-dashboard/doctor-details/${doctor.id}/${slug}`;
 };
 
 export const DoctorList: React.FC = () => {
@@ -88,7 +88,7 @@ export const DoctorList: React.FC = () => {
   };
 
   const handleEditDoctor = (doctor: DoctorListItem) => {
-    navigate(`/doctors/${doctor.id}/edit`);
+    navigate(`/admin-dashboard/doctors/${doctor.id}/edit`);
   };
 
   const handleRequestDeleteDoctor = (doctor: DoctorListItem) => {
@@ -384,7 +384,7 @@ export const DoctorList: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => navigate('/add-doctor')}
+            onClick={() => navigate('/admin-dashboard/add-doctor')}
             style={{ background: 'var(--theme-accent)' }}
             className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:brightness-90 sm:flex-none"
           >

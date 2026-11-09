@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
   const isDoctorDashboard = isDoctorDashboardPath(location.pathname);
   const settingsPath = isDoctorDashboard
     ? '/doctor-dashboard/settings'
-    : '/settings';
+    : '/admin-dashboard/settings';
   const accountName = accountQuery.data
     ? [accountQuery.data.first_name, accountQuery.data.last_name]
         .filter((part) => part?.trim())
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ background, colorMode, onToggleC
             onClick={() => navigate(
               isDoctorDashboard
                 ? '/doctor-dashboard/settings/profile'
-                : '/settings/profile',
+                : '/admin-dashboard/settings/profile',
             )}
             aria-label="Settings"
             className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-700 transition-colors cursor-pointer hidden sm:block"

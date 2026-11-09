@@ -45,13 +45,35 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, element: <Navigate to="/admin-dashboard" replace /> },
-      { path: 'admin-dashboard', element: <AdminDashboard /> },
-      { path: 'doctors', element: <DoctorList /> },
-      { path: 'doctors/:doctorId/edit', element: <DoctorEditPage /> },
-      { path: 'doctor-details', element: <Navigate to="/doctors" replace /> },
-      { path: 'doctor-details/:doctorId/:doctorSlug', element: <DoctorDetails /> },
-      { path: 'add-doctor', element: <AddDoctor /> },
-      { path: 'doctor-schedule', element: <DoctorSchedule /> },
+      {
+        path: 'admin-dashboard',
+        children: [
+          { index: true, element: <AdminDashboard /> },
+          { path: 'doctors', element: <DoctorList /> },
+          { path: 'doctors/:doctorId/edit', element: <DoctorEditPage /> },
+          { path: 'doctor-details', element: <Navigate to="/admin-dashboard/doctors" replace /> },
+          { path: 'doctor-details/:doctorId/:doctorSlug', element: <DoctorDetails /> },
+          { path: 'add-doctor', element: <AddDoctor /> },
+          { path: 'doctor-schedule', element: <DoctorSchedule /> },
+          { path: 'settings', element: <AdminSettingsPage /> },
+          { path: 'settings/:section', element: <AdminSettingsPage /> },
+          { path: 'applications', ...pending('Applications', 'Installed clinic applications will appear here.') },
+          { path: 'layouts', ...pending('Layouts', 'Reusable dashboard layouts will appear here.') },
+          { path: 'patients', element: <PatientList /> },
+          {
+            path: 'appointments',
+            element: (
+              <Suspense fallback={<div className="p-8 text-center text-sm text-slate-500">Loading appointment calendar…</div>}>
+                <AppointmentCalendar />
+              </Suspense>
+            ),
+          },
+          { path: 'queue-management', ...pending('Queue Management', 'Live patient queue will appear here.') },
+          { path: 'locations', ...pending('Locations', 'Clinic locations will appear here.') },
+          { path: 'services', ...pending('Services', 'Available clinic services will appear here.') },
+          { path: 'specializations', ...pending('Specializations', 'Medical specializations will appear here.') },
+        ],
+      },
       { path: 'doctor-dashboard', element: <DoctorDashboard /> },
       {
         path: 'doctor-dashboard/appointments',
@@ -67,27 +89,10 @@ export const routes: RouteObject[] = [
       { path: 'doctor-dashboard/reviews', ...pending('Reviews', 'Your patient reviews will appear here.') },
       { path: 'doctor-dashboard/settings', element: <DoctorSettingsPage /> },
       { path: 'doctor-dashboard/settings/:section', element: <DoctorSettingsPage /> },
-      { path: 'settings', element: <AdminSettingsPage /> },
-      { path: 'settings/:section', element: <AdminSettingsPage /> },
       { path: 'patient-dashboard', ...pending('Patient Dashboard', 'Patient-facing dashboard will appear here.') },
       { path: 'pharmacist-dashboard', ...pending('Pharmacist Dashboard', 'Pharmacy dashboard will appear here.') },
       { path: 'nurse-dashboard', ...pending('Nurse Dashboard', 'Nurse dashboard will appear here.') },
       { path: 'receptionist-dashboard', ...pending('Receptionist Dashboard', 'Receptionist dashboard will appear here.') },
-      { path: 'applications', ...pending('Applications', 'Installed clinic applications will appear here.') },
-      { path: 'layouts', ...pending('Layouts', 'Reusable dashboard layouts will appear here.') },
-      { path: 'patients', element: <PatientList /> },
-      {
-        path: 'appointments',
-        element: (
-          <Suspense fallback={<div className="p-8 text-center text-sm text-slate-500">Loading appointment calendar…</div>}>
-            <AppointmentCalendar />
-          </Suspense>
-        ),
-      },
-      { path: 'queue-management', ...pending('Queue Management', 'Live patient queue will appear here.') },
-      { path: 'locations', ...pending('Locations', 'Clinic locations will appear here.') },
-      { path: 'services', ...pending('Services', 'Available clinic services will appear here.') },
-      { path: 'specializations', ...pending('Specializations', 'Medical specializations will appear here.') },
       { path: '*', element: <NotFound /> },
     ],
   },

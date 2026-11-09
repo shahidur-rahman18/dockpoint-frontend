@@ -139,7 +139,7 @@ export const DoctorEditPage: React.FC = () => {
             </button>
           )}
           <Link
-            to="/doctors"
+            to="/admin-dashboard/doctors"
             className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Back to Doctors
@@ -191,7 +191,7 @@ const DoctorEditForm: React.FC<DoctorEditFormProps> = ({ doctor }) => {
       {
         onSuccess: () => {
           toast.success('Doctor profile updated successfully.', { position: 'bottom-right' });
-          navigate('/doctors');
+          navigate('/admin-dashboard/doctors');
         },
       },
     );
@@ -201,7 +201,7 @@ const DoctorEditForm: React.FC<DoctorEditFormProps> = ({ doctor }) => {
     <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <header>
         <Link
-          to="/doctors"
+          to="/admin-dashboard/doctors"
           className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-indigo-700"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
@@ -251,7 +251,7 @@ const DoctorEditForm: React.FC<DoctorEditFormProps> = ({ doctor }) => {
         <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-5">
           <button
             type="button"
-            onClick={() => navigate('/doctors')}
+            onClick={() => navigate('/admin-dashboard/doctors')}
             disabled={updateDoctor.isPending}
             className="cursor-pointer rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
           >

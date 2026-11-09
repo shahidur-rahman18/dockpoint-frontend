@@ -116,7 +116,7 @@ export function AddDoctor() {
               onSubmit={(values) => handleSubmit(values)}
               isSubmitting={isSubmitting}
               errorMessage={errorMessage}
-              onCancel={() => navigate('/doctors')}
+              onCancel={() => navigate('/admin-dashboard/doctors')}
             />
           </div>
         </section>
@@ -127,7 +127,7 @@ export function AddDoctor() {
         size="sm"
         showHeader={false}
         contentClassName="!mt-0 -mx-1 text-center"
-        onClose={() => navigate('/doctors')}
+        onClose={() => navigate('/admin-dashboard/doctors')}
       >
         <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
           <CheckCircle2 aria-hidden="true" className="size-8" />
@@ -138,7 +138,7 @@ export function AddDoctor() {
         </p>
         <button
           type="button"
-          onClick={() => navigate('/doctors')}
+          onClick={() => navigate('/admin-dashboard/doctors')}
           className="mt-5 min-h-10 cursor-pointer rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
         >
           Go to Doctors

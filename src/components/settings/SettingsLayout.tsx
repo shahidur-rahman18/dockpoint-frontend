@@ -42,7 +42,9 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [avatarRemovalPending, setAvatarRemovalPending] = useState(false);
 
-  const settingsBasePath = config.role === 'doctor' ? '/doctor-dashboard/settings' : '/settings';
+  const settingsBasePath = config.role === 'doctor'
+    ? '/doctor-dashboard/settings'
+    : '/admin-dashboard/settings';
   const requestedSection = location.pathname.slice(settingsBasePath.length + 1);
   const activeTab = config.tabs.some((tab) => tab.id === requestedSection)
     ? requestedSection as SettingsTabType
