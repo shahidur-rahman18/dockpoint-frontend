@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "api:types": "openapi-typescript https://docpoint-backend-1dzd.onrender.com/api/schema/ -o src/types/schema.d.ts"
+    "api:types": "openapi-typescript http://127.0.0.1:8000/api/schema/ -o src/types/schema.d.ts"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

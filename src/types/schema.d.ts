@@ -140,6 +140,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/doctors/me/schedule/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["doctors_me_schedule_retrieve"];
+        put: operations["doctors_me_schedule_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/doctors/{id}/": {
         parameters: {
             query?: never;
@@ -220,6 +236,20 @@ export interface components {
             chamber_address?: string | null;
             is_available?: boolean;
         };
+        AvailabilitySlot: {
+            /** Format: time */
+            start: string;
+            /** Format: time */
+            end: string;
+        };
+        DoctorSchedule: {
+            /** Format: date */
+            effective_from: string | null;
+            /** Format: date */
+            effective_until: string | null;
+            timezone: string;
+            weekly_schedule: components["schemas"]["WeeklySchedule"];
+        };
         PasswordSetup: {
             uid: string;
             token: string;
@@ -275,6 +305,15 @@ export interface components {
             readonly is_verified?: boolean;
             readonly doctor_profile?: components["schemas"]["AccountDoctorProfile"];
             readonly patient_profile?: components["schemas"]["PatientProfile"];
+        };
+        WeeklySchedule: {
+            MONDAY: components["schemas"]["AvailabilitySlot"][];
+            TUESDAY: components["schemas"]["AvailabilitySlot"][];
+            WEDNESDAY: components["schemas"]["AvailabilitySlot"][];
+            THURSDAY: components["schemas"]["AvailabilitySlot"][];
+            FRIDAY: components["schemas"]["AvailabilitySlot"][];
+            SATURDAY: components["schemas"]["AvailabilitySlot"][];
+            SUNDAY: components["schemas"]["AvailabilitySlot"][];
         };
         PatientProfile: {
             readonly id: number;
@@ -785,6 +824,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DoctorProfile"];
+                };
+            };
+        };
+    };
+    doctors_me_schedule_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DoctorSchedule"];
+                };
+            };
+        };
+    };
+    doctors_me_schedule_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DoctorSchedule"];
+                "application/x-www-form-urlencoded": components["schemas"]["DoctorSchedule"];
+                "multipart/form-data": components["schemas"]["DoctorSchedule"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DoctorSchedule"];
                 };
             };
         };

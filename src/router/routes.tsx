@@ -8,6 +8,7 @@ import { DoctorEditPage } from '../components/doctors/DoctorEditPage';
 import { AddDoctor } from '../components/doctors/AddDoctor';
 import { DoctorSchedule } from '../components/doctors/DoctorSchedule';
 import { DoctorDashboard } from '../pages/DoctorDashboard';
+import { DoctorMySchedulePage } from '../pages/DoctorMySchedulePage';
 import { AdminSettingsPage } from '../pages/AdminSettingsPage';
 import { DoctorSettingsPage } from '../pages/DoctorSettingsPage';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
@@ -83,7 +84,7 @@ export const routes: RouteObject[] = [
           </Suspense>
         ),
       },
-      { path: 'doctor-dashboard/schedule', ...pending('My Schedule', 'Your availability and schedule will appear here.') },
+      { path: 'doctor-dashboard/schedule', element: <DoctorMySchedulePage /> },
       { path: 'doctor-dashboard/prescriptions', ...pending('Prescriptions', 'Your prescriptions will appear here.') },
       { path: 'doctor-dashboard/leave', ...pending('Leave', 'Your leave requests will appear here.') },
       { path: 'doctor-dashboard/reviews', ...pending('Reviews', 'Your patient reviews will appear here.') },

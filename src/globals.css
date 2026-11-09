@@ -399,6 +399,40 @@
 	background-color: var(--bg-subtle) !important;
 }
 
+@media print {
+	body * {
+		visibility: hidden !important;
+	}
+
+	.my-schedule-page,
+	.my-schedule-page * {
+		visibility: visible !important;
+	}
+
+	.my-schedule-page {
+		position: absolute !important;
+		top: 0 !important;
+		left: 0 !important;
+		width: 100% !important;
+		max-width: none !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		color: #111827 !important;
+	}
+
+	.my-schedule-page .schedule-export-control,
+	.my-schedule-page .schedule-export-menu,
+	.my-schedule-page .schedule-row-controls,
+	.my-schedule-page .schedule-page-actions {
+		display: none !important;
+	}
+
+	.my-schedule-page .schedule-card {
+		background: #fff !important;
+		box-shadow: none !important;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.chart-bar-enter,
 	.chart-line-enter {

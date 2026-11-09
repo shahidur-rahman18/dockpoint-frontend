@@ -121,3 +121,12 @@ Backend-এ সংশ্লিষ্ট endpoint যোগ হওয়ার প�
 5. Axios client, Bearer header, single-flight refresh queue, retry marker, explicit error handling implement করা.
 6. Auth/account, doctor, appointment service-уудыг contract-এ থাকা API অনুযায়ী implement করা; TanStack Query provider, hooks ও query policies wire করা।
 7. Mock login/data থেকে real API-তে surface-ভিত্তিক migration করে login, refresh, failed refresh, 403, logout, query retry, mutation non-retry এবং loading/error UI test করা।
+
+## ৯. Doctor weekly schedule API integration (২০২৬-১১-০৯)
+
+* `GET /api/doctors/me/schedule/` authenticated doctor's own weekly availability ফেরত দেয়; প্রথমবার schedule save না থাকলে empty weekdays এবং `Asia/Dhaka` timezone ফেরে।
+* `PUT /api/doctors/me/schedule/` সম্পূর্ণ weekly schedule replace করে। Payload-এ `effective_from`, optional `effective_until`, `timezone`, এবং Monday–Sunday-এর start/end time slots থাকে। Doctor ID পাঠানো হয় না।
+* Frontend service ও React Query hook: `src/services/doctorScheduleService.ts` এবং `src/hooks/useDoctorSchedule.ts`; page: `src/pages/DoctorMySchedulePage.tsx`। Loading, request error, save state, success feedback ও cancel/reset handle করা হয়।
+* API schema থেকে type refresh: `npm run api:types`। Local development-এ `.env.development` `/api` ব্যবহার করে এবং Vite proxy request backend `http://127.0.0.1:8000`-এ পাঠায়।
+* Appointment booking-এ doctor-এর saved availability backend-এ যাচাই হয়। Frontend-এর `Location` ও monthly recurrence এই API contract-এর অংশ নয়; weekly recurrence timezone অনুযায়ী প্রযোজ্য।
+* যাচাই: `npm run build` সফল। Authenticated browser session-এ schedule page load হয়েছে; live mutation smoke test করা হয়নি, যাতে user-এর schedule data অনিচ্ছাকৃতভাবে বদলে না যায়।
