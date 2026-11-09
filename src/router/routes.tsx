@@ -7,6 +7,7 @@ import { DoctorDetails } from '../components/doctors/DoctorDetails';
 import { DoctorEditPage } from '../components/doctors/DoctorEditPage';
 import { AddDoctor } from '../components/doctors/AddDoctor';
 import { DoctorSchedule } from '../components/doctors/DoctorSchedule';
+import { LoaderOne } from '../components/common/LoaderOne';
 import { DoctorDashboard } from '../pages/DoctorDashboard';
 import { DoctorMySchedulePage } from '../pages/DoctorMySchedulePage';
 import { AdminSettingsPage } from '../pages/AdminSettingsPage';
@@ -79,7 +80,14 @@ export const routes: RouteObject[] = [
       {
         path: 'doctor-dashboard/appointments',
         element: (
-          <Suspense fallback={<div className="p-8 text-center text-sm text-slate-500">Loading appointments…</div>}>
+          <Suspense
+            fallback={
+              <div className="flex min-h-[40vh] w-full flex-col items-center justify-center gap-3 px-3 py-10 text-center sm:px-5" role="status">
+                <LoaderOne />
+                <p className="text-sm text-slate-500">Loading appointments…</p>
+              </div>
+            }
+          >
             <DoctorAppointmentsPage />
           </Suspense>
         ),

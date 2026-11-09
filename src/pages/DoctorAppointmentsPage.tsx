@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { Download, Filter, Search, X } from 'lucide-react';
 import { ActionDropdown } from '../components/common/ActionDropdown';
 import { DataTable } from '../components/common/DataTable';
+import { LoaderOne } from '../components/common/LoaderOne';
 import { Modal } from '../components/common/Modal';
 import { DoctorAvatar } from '../components/doctors/DoctorAvatar';
 import { getProfileApiErrorMessage } from '../services/accountService';
@@ -50,7 +51,7 @@ const formatTime = (time: string) => {
 const buttonClass =
   'inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600';
 const selectClass =
-  'min-h-9 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100';
+  'min-h-9 min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100';
 
 export function DoctorAppointmentsPage() {
   const profileQuery = useDoctorSettingsProfile();
@@ -235,13 +236,18 @@ export function DoctorAppointmentsPage() {
     Boolean(query || fromDate || toDate) || statusFilter !== 'all';
 
   if (profileQuery.isPending || (doctorId !== undefined && appointmentsQuery.isPending)) {
-    return <p className="p-8 text-center text-sm text-slate-500">Loading appointments…</p>;
+    return (
+      <div className="flex min-h-[40vh] w-full flex-col items-center justify-center gap-3 px-3 py-10 text-center sm:px-5" role="status">
+        <LoaderOne />
+        <p className="text-sm text-slate-500">Loading appointments…</p>
+      </div>
+    );
   }
 
   const loadError = profileQuery.error ?? appointmentsQuery.error;
   if (loadError) {
     return (
-      <div className="space-y-3 rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-800">
+      <div className="mx-auto w-full max-w-5xl space-y-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 sm:p-5">
         <p>
           {profileQuery.isError
             ? getProfileApiErrorMessage(profileQuery.error)
@@ -265,22 +271,22 @@ export function DoctorAppointmentsPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto w-full min-w-0 max-w-[1440px] space-y-4 sm:space-y-5">
       <header className="flex flex-col justify-between gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">Appointments</h1>
           <p className="mt-1 text-xs text-slate-500">View your patient appointments.</p>
         </div>
-        <button type="button" onClick={handleExport} className={buttonClass}>
+        <button type="button" onClick={handleExport} className={`${buttonClass} w-full sm:w-auto`}>
           <Download className="size-3.5" />
           Export CSV
         </button>
       </header>
 
-      <div className="border-b border-slate-200 bg-slate-100/60 px-2 py-3">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-            <label className="relative block sm:w-[190px]">
+      <div className="min-w-0 border-b border-slate-200 bg-slate-100/60 px-2 py-3 dark:bg-transparent sm:px-3">
+        <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+            <label className="relative block w-full lg:w-[190px]">
               <span className="sr-only">Search appointments</span>
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
               <input
@@ -288,10 +294,10 @@ export function DoctorAppointmentsPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search"
-                className="min-h-9 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 outline-none placeholder:text-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                className="min-h-9 w-full min-w-0 rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 outline-none placeholder:text-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               />
             </label>
-            <div className="flex items-center gap-2">
+            <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-2 sm:flex sm:flex-wrap">
               <label className="text-xs font-medium text-slate-500" htmlFor="appointments-from-date">
                 From
               </label>
@@ -301,7 +307,7 @@ export function DoctorAppointmentsPage() {
                 value={fromDate}
                 max={toDate || undefined}
                 onChange={(event) => setFromDate(event.target.value)}
-                className={`${selectClass} min-h-9`}
+                className={`${selectClass} w-full sm:w-auto`}
               />
               <label className="text-xs font-medium text-slate-500" htmlFor="appointments-to-date">
                 To
@@ -312,28 +318,28 @@ export function DoctorAppointmentsPage() {
                 value={toDate}
                 min={fromDate || undefined}
                 onChange={(event) => setToDate(event.target.value)}
-                className={`${selectClass} min-h-9`}
+                className={`${selectClass} w-full sm:w-auto`}
               />
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center xl:justify-end">
             <button
               type="button"
               aria-expanded={filtersOpen}
               onClick={() => setFiltersOpen((open) => !open)}
-              className={`${buttonClass} min-h-9 rounded-md px-3 ${filtersOpen ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : ''}`}
+              className={`${buttonClass} w-full min-h-9 rounded-md px-3 sm:w-auto ${filtersOpen ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : ''}`}
             >
               <Filter className="size-3.5" />
               Filters
             </button>
-            <label className="flex items-center gap-2">
-              <span className="whitespace-nowrap text-xs text-slate-500">Sort by</span>
+            <label className="flex min-w-0 items-center justify-between gap-2 sm:justify-start">
+              <span className="shrink-0 whitespace-nowrap text-xs text-slate-500">Sort by</span>
               <select
                 aria-label="Sort appointments"
                 value={sortOrder}
                 onChange={(event) => setSortOrder(event.target.value as SortOrder)}
-                className={selectClass}
+                className={`${selectClass} flex-1 sm:flex-none`}
               >
                 <option value="recent">Recent</option>
                 <option value="oldest">Oldest</option>
@@ -344,7 +350,7 @@ export function DoctorAppointmentsPage() {
         </div>
 
         {filtersOpen && (
-          <div className="mt-3 flex flex-col gap-3 border-t border-slate-200 pt-3 sm:flex-row sm:items-end">
+          <div className="mt-3 flex min-w-0 flex-col gap-3 border-t border-slate-200 pt-3 sm:flex-row sm:flex-wrap sm:items-end">
             <label className="grid gap-1.5 text-xs font-semibold text-slate-600">
               Status
               <select
@@ -352,7 +358,7 @@ export function DoctorAppointmentsPage() {
                 onChange={(event) =>
                   setStatusFilter(event.target.value as AppointmentStatus | 'all')
                 }
-                className={selectClass}
+                className={`${selectClass} w-full sm:w-auto`}
               >
                 <option value="all">All statuses</option>
                 {Object.entries(statusLabels).map(([value, label]) => (
@@ -379,6 +385,7 @@ export function DoctorAppointmentsPage() {
         columns={columns}
         initialPageSize={20}
         pageSizeOptions={[10, 20, 50]}
+        horizontalScrollOnSmallScreens
         emptyMessage="No appointments found"
         emptyDescription="Try changing your search or filters."
       />
@@ -391,23 +398,23 @@ export function DoctorAppointmentsPage() {
         onClose={() => setViewAppointment(null)}
       >
         {viewAppointment && (
-          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
+          <dl className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-[minmax(5rem,auto)_minmax(0,1fr)] sm:gap-y-3">
             <dt className="text-[var(--text-secondary)]">Patient</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.patient_email}</dd>
+            <dd className="min-w-0 break-words font-medium text-[var(--text-primary)] sm:mb-0">{viewAppointment.patient_email}</dd>
             <dt className="text-[var(--text-secondary)]">Patient ID</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.patient}</dd>
+            <dd className="min-w-0 break-words font-medium text-[var(--text-primary)]">{viewAppointment.patient}</dd>
             <dt className="text-[var(--text-secondary)]">Date & time</dt>
-            <dd className="font-medium text-[var(--text-primary)]">
+            <dd className="min-w-0 break-words font-medium text-[var(--text-primary)]">
               {formatDate(viewAppointment.appointment_date)}, {formatTime(viewAppointment.time_slot_start)} - {formatTime(viewAppointment.time_slot_end)}
             </dd>
             <dt className="text-[var(--text-secondary)]">Status</dt>
-            <dd className="font-medium text-[var(--text-primary)]">
+            <dd className="min-w-0 font-medium text-[var(--text-primary)]">
               {viewAppointment.status ? statusLabels[viewAppointment.status] : 'Unknown'}
             </dd>
             <dt className="text-[var(--text-secondary)]">Fee</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.total_fee ?? '—'}</dd>
+            <dd className="min-w-0 font-medium text-[var(--text-primary)]">{viewAppointment.total_fee ?? '—'}</dd>
             <dt className="text-[var(--text-secondary)]">Reason</dt>
-            <dd className="font-medium text-[var(--text-primary)]">{viewAppointment.symptoms_note || '—'}</dd>
+            <dd className="min-w-0 break-words font-medium text-[var(--text-primary)]">{viewAppointment.symptoms_note || '—'}</dd>
           </dl>
         )}
       </Modal>
