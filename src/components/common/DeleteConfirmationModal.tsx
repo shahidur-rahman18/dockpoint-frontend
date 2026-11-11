@@ -77,7 +77,7 @@ export function DeleteConfirmationModal({
         aria-modal="true"
         aria-labelledby="delete-confirmation-title"
         aria-describedby="delete-confirmation-description"
-        className="w-full max-w-sm rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] px-6 py-5 text-center shadow-xl"
+        className="shared-delete-dialog w-full max-w-sm rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] px-6 py-5 text-center shadow-xl"
       >
         <div className="mx-auto mb-3 flex size-11 items-center justify-center rounded-md bg-red-600 text-white">
           <Trash2 aria-hidden="true" className="size-5" />

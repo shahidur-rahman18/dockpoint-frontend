@@ -64,7 +64,7 @@ export function DataTable<TData>({
         );
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+    <div className="shared-data-table bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
       <div className="overflow-x-auto">
         <table
           className={`w-full text-left border-collapse ${horizontalScrollOnSmallScreens ? 'min-w-[900px] xl:min-w-full' : ''} ${fixedColumnWidths ? 'table-fixed' : ''}`}
@@ -90,7 +90,7 @@ export function DataTable<TData>({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-slate-100 text-xs">
+          <tbody className="divide-y divide-slate-100">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <tr
@@ -150,7 +150,7 @@ export function DataTable<TData>({
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <div className="table-pagination flex flex-col gap-3 border-t border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex w-full flex-col items-start gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex items-center gap-2">
             <label

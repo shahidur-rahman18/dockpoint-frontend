@@ -29,10 +29,10 @@ export const DoctorStatCard = ({ stat }: DoctorStatCardProps) => {
         >
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
-        <p className="truncate text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <p className="truncate text-sm font-normal text-slate-500">
           {stat.title}
         </p>
-        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+        <p className="mt-1 text-lg font-bold tracking-tight text-slate-900">
           {stat.value}
         </p>
         <p className={`mt-2 text-xs font-semibold ${stat.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>

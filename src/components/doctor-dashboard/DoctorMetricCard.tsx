@@ -35,8 +35,8 @@ export const DoctorMetricCard = ({ metric }: DoctorMetricCardProps) => {
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium text-slate-500">{metric.label}</p>
-          <p className="mt-0.5 text-xl font-bold tracking-tight text-slate-900">
+          <p className="truncate text-sm font-normal text-slate-500">{metric.label}</p>
+          <p className="mt-0.5 text-lg font-bold tracking-tight text-slate-900">
             {metric.value}
           </p>
         </div>

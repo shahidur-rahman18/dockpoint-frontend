@@ -94,7 +94,7 @@ export function ProfileDropdown({
         <div
           role="menu"
           aria-label="Profile menu"
-          className="absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
+          className="profile-dropdown-menu absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
         >
           <div className="mb-1 flex items-center gap-2.5 rounded-lg bg-slate-50 px-2.5 py-2">
             {avatar('large')}

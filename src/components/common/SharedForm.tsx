@@ -59,6 +59,7 @@ export function SharedForm({
 
   return (
     <form
+      className="shared-form"
       onSubmit={handleSubmit}
       onInput={(event) => {
         event.currentTarget.querySelectorAll('input').forEach((input) => {

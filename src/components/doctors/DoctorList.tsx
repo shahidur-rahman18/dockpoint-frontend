@@ -247,9 +247,9 @@ export const DoctorList: React.FC = () => {
           const amount = Number(fee.replace(/[^\d.-]/g, ''));
 
           return (
-            <span className="block whitespace-nowrap text-[11px] font-bold text-slate-800">
+            <span className="block whitespace-nowrap font-medium text-slate-600">
               {/-?\d/.test(fee) && Number.isFinite(amount)
-                ? `৳ ${amount.toFixed(2)}`
+                ? `$ ${amount.toFixed(2)}`
                 : fee}
             </span>
           );

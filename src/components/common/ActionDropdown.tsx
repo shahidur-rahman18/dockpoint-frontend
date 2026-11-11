@@ -115,7 +115,7 @@ export function ActionDropdown({
               right: menuPosition?.right ?? 0,
               visibility: menuPosition ? 'visible' : 'hidden',
             }}
-            className="z-50 w-[152px] bg-white border border-slate-200 rounded-xl shadow-lg py-1.5"
+            className="action-dropdown-menu z-50 w-[152px] bg-white border border-slate-200 rounded-xl shadow-lg py-1.5"
           >
             <button
               type="button"

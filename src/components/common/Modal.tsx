@@ -110,7 +110,7 @@ export function Modal({
         aria-labelledby={ariaLabelledBy ?? (showHeader ? titleId : undefined)}
         aria-label={!showHeader && !ariaLabelledBy ? title : undefined}
         aria-describedby={showHeader && description ? descriptionId : undefined}
-        className={`my-auto w-full ${sizeClasses[size]} rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-5 text-[var(--text-primary)] shadow-2xl outline-none sm:p-6 ${panelClassName}`}
+        className={`shared-modal my-auto w-full ${sizeClasses[size]} rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-5 text-[var(--text-primary)] shadow-2xl outline-none sm:p-6 ${panelClassName}`}
       >
         {showHeader && (
           <header className="flex items-start justify-between gap-4">

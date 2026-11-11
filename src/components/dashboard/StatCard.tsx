@@ -47,7 +47,7 @@ export const StatCard: React.FC<StatCardProps> = ({ stat }) => {
 
         <div className="text-right">
           <span
-            className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold ${
+            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
               stat.isPositive
                 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
                 : 'bg-rose-50 text-rose-600 border border-rose-200/60'
@@ -55,15 +55,15 @@ export const StatCard: React.FC<StatCardProps> = ({ stat }) => {
           >
             {stat.change}
           </span>
-          <p className="text-[10px] text-slate-400 mt-0.5">{stat.timeframe}</p>
+          <p className="text-[13px] text-slate-400 mt-0.5">{stat.timeframe}</p>
         </div>
       </div>
 
       {/* Main content row: Number & Title on left, Mini Chart visual on right */}
       <div className="flex items-end justify-between mt-2">
         <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{stat.title}</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1 tracking-tight">{stat.value}</p>
+          <p className="text-sm font-normal text-slate-500">{stat.title}</p>
+          <p className="text-lg font-bold text-slate-900 mt-1 tracking-tight">{stat.value}</p>
         </div>
 
         {/* Mini SVG Chart Visualization matching image */}

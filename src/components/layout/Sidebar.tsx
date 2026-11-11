@@ -124,11 +124,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
         </div>
 
       {/* Sidebar Nav Links */}
-      <div className={`pt-0 pb-4 space-y-6 flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
+      <div className={`sidebar-nav pt-0 pb-4 space-y-6 flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
         {(['Main Menu', 'Clinic', 'Settings'] as const).map((section) => (
           <div key={section}>
             {!collapsed && (
-              <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="sidebar-section-title px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 {section}
               </span>
             )}
@@ -137,25 +137,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
                 const Icon = group.icon;
 
                 if (!group.items) {
+                  const isDashboard = group.label === 'Dashboard';
+                  const isActive = isDashboard
+                    ? location.pathname === group.path
+                    : isItemActive(group.path);
+
                   return (
                     <button
                       key={group.id}
                       onClick={() => group.path && navigate(group.path)}
                       title={collapsed ? group.label : undefined}
-                      aria-current={isItemActive(group.path) ? 'page' : undefined}
-                      className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
-                        isItemActive(group.path)
-                          ? 'bg-indigo-50/70 text-slate-800'
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`sidebar-menu-item w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
+                        isActive
+                          ? 'bg-indigo-50 text-indigo-700'
                           : 'text-slate-600 hover:bg-slate-50'
                       }`}
                     >
                       <span className="flex items-center gap-2.5">
                         <Icon
-                          className={`w-4 h-4 ${isItemActive(group.path) ? 'text-slate-500' : 'text-slate-400'}`}
+                          className={`w-4 h-4 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`}
                         />
                         {!collapsed && <span>{group.label}</span>}
                       </span>
-                      {!collapsed && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+                      {!collapsed && !isDashboard && (
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      )}
                     </button>
                   );
                 }
@@ -168,7 +175,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
                       onClick={() => (collapsed ? setCollapsed(false) : toggleGroup(group.id))}
                       title={collapsed ? group.label : undefined}
                       aria-expanded={!collapsed ? isOpen : undefined}
-                      className={`w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
+                      data-active={group.items.some((item) => isItemActive(item.path))}
+                      className={`sidebar-group-trigger w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
                         group.items.some((item) => isItemActive(item.path))
                           ? 'text-slate-800'
                           : 'text-slate-600 hover:bg-slate-50'
@@ -196,8 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
                               key={item.path}
                               onClick={() => navigate(item.path)}
                               aria-current={isActive ? 'page' : undefined}
-                              style={isActive ? { background: 'var(--theme-accent)', color: '#fff' } : undefined}
-                              className={`w-full text-left px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer block ${
+                              className={`sidebar-submenu-item w-full text-left px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer block ${
                                 isActive
                                   ? 'font-semibold'
                                   : 'font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50'
