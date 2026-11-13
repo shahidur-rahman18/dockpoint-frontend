@@ -27,7 +27,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
 
   useEffect(() => {
     const activeExpandableGroups = navGroups
-      .filter((group) => group.items?.some((item) => isItemActive(item.path)))
+      .filter(
+        (group) =>
+          group.items?.some((item) => isItemActive(item.path, item.exact)) ||
+          isItemActive(group.activePath),
+      )
       .map((group) => group.id);
 
     if (activeExpandableGroups.length > 0) {
@@ -35,8 +39,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
     }
   }, [location.pathname]);
 
-  const isItemActive = (path?: string) => {
+  const isItemActive = (path?: string, exact = false) => {
     if (!path) return false;
+    if (exact) return location.pathname === path;
     if (path === '/' || path === '/doctor-dashboard') return location.pathname === path;
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
@@ -175,9 +180,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
                       onClick={() => (collapsed ? setCollapsed(false) : toggleGroup(group.id))}
                       title={collapsed ? group.label : undefined}
                       aria-expanded={!collapsed ? isOpen : undefined}
-                      data-active={group.items.some((item) => isItemActive(item.path))}
+                      data-active={group.items.some((item) => isItemActive(item.path)) || isItemActive(group.activePath)}
                       className={`sidebar-group-trigger w-full py-2 flex items-center text-xs font-semibold rounded-lg transition-colors cursor-pointer ${collapsed ? 'justify-center px-0' : 'justify-between px-3'} ${
-                        group.items.some((item) => isItemActive(item.path))
+                        group.items.some((item) => isItemActive(item.path)) || isItemActive(group.activePath)
                           ? 'text-slate-800'
                           : 'text-slate-600 hover:bg-slate-50'
                       }`}
@@ -197,7 +202,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ background, mobileOpen = false
                     {!collapsed && isOpen && (
                       <div className="ml-4 pl-3 border-l border-slate-100 my-1 space-y-1">
                         {group.items.map((item) => {
-                          const isActive = isItemActive(item.path);
+                          const isActive = isItemActive(item.path, item.exact);
 
                           return (
                             <button

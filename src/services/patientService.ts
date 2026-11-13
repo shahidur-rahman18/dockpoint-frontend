@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { apiClient } from '../api/apiClient';
-import type { PatientListItem } from '../types';
 
-interface PatientApiResponse {
+export interface PatientApiResponse {
   id: number;
   email: string;
   first_name?: string;
@@ -17,34 +16,64 @@ interface PatientApiResponse {
     blood_group?: string;
     address?: string;
     emergency_contact?: string | null;
+    profile_complete?: boolean;
+    missing_fields?: string[];
   } | null;
 }
 
-export const mapPatientToListItem = (patient: PatientApiResponse): PatientListItem => {
+export interface PatientRecord {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  bloodGroup: string;
+  gender: string;
+  dateOfBirth: string;
+  address: string;
+  emergencyContact: string;
+  isVerified: boolean;
+  profileComplete: boolean;
+  missingFields: string[];
+}
+
+export const mapPatientToRecord = (patient: PatientApiResponse): PatientRecord => {
   const firstName = patient.first_name?.trim() ?? '';
   const lastName = patient.last_name?.trim() ?? '';
-  const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
   return {
     id: String(patient.id),
-    name: fullName || 'Name not provided',
+    name: [firstName, lastName].filter(Boolean).join(' ') || 'Name not provided',
     email: patient.email,
     phone: patient.phone_number?.trim() || '—',
     avatar: patient.avatar_url?.trim() || '',
     bloodGroup: patient.patient_profile?.blood_group || '—',
-    gender: patient.patient_profile?.gender || '—',
+    gender: patient.patient_profile?.gender
+      ? patient.patient_profile.gender.charAt(0) +
+        patient.patient_profile.gender.slice(1).toLowerCase()
+      : '—',
+    dateOfBirth: patient.patient_profile?.date_of_birth || '—',
+    address: patient.patient_profile?.address?.trim() || '—',
+    emergencyContact: patient.patient_profile?.emergency_contact?.trim() || '—',
     isVerified: patient.is_verified ?? false,
+    profileComplete: patient.patient_profile?.profile_complete ?? false,
+    missingFields: patient.patient_profile?.missing_fields ?? [],
   };
 };
 
-export const getPatients = async (): Promise<PatientListItem[]> => {
+export const getPatients = async (): Promise<PatientRecord[]> => {
   const { data } = await apiClient.get<PatientApiResponse[]>('/accounts/admin/patients/');
-  return data.map(mapPatientToListItem);
+  return data.map(mapPatientToRecord);
 };
 
-export const getPatientListErrorMessage = (error: unknown): string => {
+export const getPatient = async (id: string): Promise<PatientRecord> => {
+  const { data } = await apiClient.get<PatientApiResponse>(`/accounts/admin/patients/${id}/`);
+  return mapPatientToRecord(data);
+};
+
+export const getPatientApiErrorMessage = (error: unknown): string => {
   if (!axios.isAxiosError(error)) {
-    return error instanceof Error ? error.message : 'Unable to load patients. Please try again.';
+    return error instanceof Error ? error.message : 'Unable to load patient data. Please try again.';
   }
 
   if (!error.response) {
@@ -56,5 +85,5 @@ export const getPatientListErrorMessage = (error: unknown): string => {
     return data.detail;
   }
 
-  return `Unable to load patients (HTTP ${error.response.status}). Please try again.`;
+  return `Unable to load patient data (HTTP ${error.response.status}). Please try again.`;
 };

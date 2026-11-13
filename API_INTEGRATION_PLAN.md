@@ -13,8 +13,8 @@
 | ৩. Environment config | সম্পন্ন | `.env.development`, `.env.example` যোগ এবং অন্য `.env*` ফাইল ignore করা হয়েছে। `/api/schema`-কে base URL হিসেবে দিলে login path-এ schema path দ্বিগুণ হয়ে 404 হচ্ছিল; সেটি ঠিক করা হয়েছে। |
 | ৪. OpenAPI TypeScript type | সম্পন্ন | Deployed `/api/schema/` থেকে type generate করা হয়েছে। Schema update হলে `npm run api:types` চালাতে হবে। |
 | ৫. Shared API client ও authentication | আংশিক | `src/api/apiClient.ts`-এ shared Axios client ও in-memory access-token authorization header আছে। Real login (`POST /api/accounts/login/`) এবং profile/role যাচাই (`GET /api/accounts/me/`) যুক্ত; password-setup থেকে পাওয়া token দিয়েও doctor session স্থাপন করা যায়। Access ও refresh token memory-তে থাকে। Refresh request, 401 single-flight/replay, retry marker এবং refresh failure handling এখনো বাকি। |
-| ৬. Service, hooks ও query policy | আংশিক | Admin doctor creation, password setup এবং doctor settings-এর typed API service যুক্ত। Doctor settings React Query-তে own-account (`/api/accounts/me/`) ও doctor detail (`/api/doctors/{id}/`) load করে; update শেষে profile query invalidate হয়। বাকি account/appointment service, query retry policy এবং auth refresh handling এখনো যুক্ত হয়নি। |
-| ৭. UI ও data migration / tests | আংশিক | Login form mock login থেকে real API login-এ গেছে; admin doctor form API call, loading/error state এবং public password-setup route যুক্ত। Doctor profile settings এখন API থেকে তথ্য দেখায়, account ও doctor profile field-গুলো আলাদা endpoint-এ PATCH করে, এবং loading/error/saving state দেখায়। বর্তমান API-তে না থাকা address/country/avatar field সরিয়ে supported chamber address দেখানো হয়েছে; email read-only। Doctor create ও password setup success modal দেখায়; password setup response token pair দিলে modal বন্ধের পর doctor dashboard-এ যায়, pair না দিলে sign-in fallback থাকে। Dashboard ও doctor list data এখনো mock; email-link environment config, refresh, 403, logout ও API flow-এর পূর্ণ test বাকি। |
+| ৬. Service, hooks ও query policy | আংশিক | Admin doctor creation, patient list/detail, password setup এবং doctor settings-এর API service যুক্ত। Patient list ও details React Query-তে `/api/accounts/admin/patients/` এবং `/api/accounts/admin/patients/{id}/` load করে. Doctor settings React Query-তে own-account (`/api/accounts/me/`) ও doctor detail (`/api/doctors/{id}/`) load করে; update শেষে profile query invalidate হয়। বাকি account/appointment service, query retry policy এবং auth refresh handling এখনো যুক্ত হয়নি। |
+| ৭. UI ও data migration / tests | আংশিক | Login form mock login থেকে real API login-এ গেছে; admin doctor form API call, loading/error state এবং public password-setup route যুক্ত। Patient list/detail API data ব্যবহার করে; demo patient seed command ও backend API test আছে। Patient create এখনো backend API-তে যুক্ত নয়। Doctor profile settings এখন API থেকে তথ্য দেখায়, account ও doctor profile field-গুলো আলাদা endpoint-এ PATCH করে, এবং loading/error/saving state দেখায়। বর্তমান API-তে না থাকা address/country/avatar field সরিয়ে supported chamber address দেখানো হয়েছে; email read-only। Doctor create ও password setup success modal দেখায়; password setup response token pair দিলে modal বন্ধের পর doctor dashboard-এ যায়, pair না দিলে sign-in fallback থাকে। Dashboard ও doctor list data এখনো mock; email-link environment config, refresh, 403, logout ও API flow-এর পূর্ণ test বাকি। |
 
 **সর্বশেষ build যাচাই:** doctor profile settings API integration-এর পর `npm run build` সফল হয়েছে। `.env.development`-এ বর্তমানে `VITE_API_BASE_URL=http://127.0.0.1:8000` আছে। ভুল URL/path ও CORS সংক্রান্ত আগের login সমস্যাগুলো সমাধান হয়েছে বলে ব্যবহারকারী নিশ্চিত করেছেন। Local frontend/backend origin আলাদা হলে backend CORS allowlist-এ frontend origin অনুমোদিত রাখতে হবে।
 
@@ -29,11 +29,13 @@ Backend-এর URL configuration এবং settings অনুযায়ী:
 | নিজের profile দেখা/আপডেট | GET/PATCH/PUT | `/api/accounts/me/` |
 | Password setup | POST | `/api/accounts/setup-password/` |
 | Admin থেকে doctor তৈরি | POST | `/api/accounts/admin/doctors/create/` |
+| Admin patient list | GET | `/api/accounts/admin/patients/` |
+| Admin patient details | GET | `/api/accounts/admin/patients/{id}/` |
 | Doctor API | Router endpoints | `/api/doctors/` |
 | Appointment API | Router endpoints | `/api/appointments/` |
 | Raw OpenAPI schema | GET | `/api/schema/` |
 
-Doctor ও appointment-এর সুনির্দিষ্ট action/path এবং request/response schema OpenAPI document থেকে নিতে হবে। বর্তমানে আলাদা patient বা invoice endpoint দেখা যায়নি; `/api/accounts/me/` response-এ patient profile অন্তর্ভুক্ত থাকতে পারে। Backend-এ route যোগ না হওয়া পর্যন্ত patient/invoice service endpoint ধরে নেওয়া যাবে না।
+Admin patient list/details endpoint-এ user-এর সঙ্গে nested `patient_profile` পাঠানো হয় এবং দুটিই admin-only। Patient invoice endpoint নেই। Doctor ও appointment-এর সুনির্দিষ্ট action/path এবং request/response schema OpenAPI document থেকে নিতে হবে।
 
 ### Admin doctor onboarding handoff
 

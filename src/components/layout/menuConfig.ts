@@ -20,6 +20,7 @@ import {
 export interface NavItem {
   label: string;
   path: string;
+  exact?: boolean;
 }
 
 export interface NavGroup {
@@ -28,6 +29,7 @@ export interface NavGroup {
   icon: LucideIcon;
   section: 'Main Menu' | 'Clinic' | 'Settings';
   path?: string;
+  activePath?: string;
   items?: NavItem[];
   defaultOpen?: boolean;
 }
@@ -54,7 +56,18 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
       { label: 'Doctor Schedule', path: '/admin-dashboard/doctor-schedule' },
     ],
   },
-  { id: 'patients', label: 'Patients', icon: Users, section: 'Clinic', path: '/admin-dashboard/patients' },
+  {
+    id: 'patients',
+    label: 'Patients',
+    icon: Users,
+    section: 'Clinic',
+    activePath: '/admin-dashboard/patients',
+    defaultOpen: true,
+    items: [
+      { label: 'Patients List', path: '/admin-dashboard/patients', exact: true },
+      { label: 'Add Patient', path: '/admin-dashboard/patients/create' },
+    ],
+  },
   { id: 'appointments', label: 'Appointments', icon: CalendarCheck, section: 'Clinic', path: '/admin-dashboard/appointments' },
   { id: 'queue', label: 'Queue Management', icon: ListOrdered, section: 'Clinic', path: '/admin-dashboard/queue-management' },
   { id: 'locations', label: 'Locations', icon: MapPin, section: 'Clinic', path: '/admin-dashboard/locations' },
