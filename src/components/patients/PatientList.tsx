@@ -1,33 +1,85 @@
 import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { LayoutGrid, List, Plus, Search, SlidersHorizontal } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import toast from 'react-hot-toast';
 import { DataTable } from '../common/DataTable';
+import { ActionDropdown } from '../common/ActionDropdown';
 import { Card } from '../common/Card';
+import { DeleteConfirmationModal } from '../common/DeleteConfirmationModal';
+import { LoaderOne } from '../common/LoaderOne';
 import { DoctorAvatar } from '../doctors/DoctorAvatar';
-import { usePatients } from '../../hooks/usePatients';
-import { getPatientApiErrorMessage, type PatientRecord } from '../../services/patientService';
+import { useDeletePatient, usePatients } from '../../hooks/usePatients';
+import {
+  getPatientApiErrorMessage,
+  getPatientMutationErrorMessage,
+  type PatientRecord,
+} from '../../services/patientService';
+
+const getPatientAge = (dateOfBirth: string): number | null => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) return null;
+
+  const birthDate = new Date(`${dateOfBirth}T00:00:00`);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  if (
+    today.getMonth() < birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+  ) {
+    age -= 1;
+  }
+  return age >= 0 ? age : null;
+};
 
 export function PatientList() {
+  const navigate = useNavigate();
   const { data: patients = [], error, isError, isPending, refetch } = usePatients();
+  const deletePatient = useDeletePatient();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('recent');
   const [statusFilter, setStatusFilter] = useState('all');
   const [view, setView] = useState<'list' | 'grid'>('list');
+  const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
+  const [patientToDelete, setPatientToDelete] = useState<PatientRecord | null>(null);
+
+  const handleConfirmDeletePatient = () => {
+    if (!patientToDelete || deletePatient.isPending) return;
+
+    deletePatient.mutate(patientToDelete.id, {
+      onSuccess: () => {
+        toast.success(`${patientToDelete.name} deleted permanently.`, {
+          position: 'bottom-right',
+        });
+        setPatientToDelete(null);
+      },
+    });
+  };
 
   const filteredPatients = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     const result = patients.filter((patient) => {
       const matchesQuery =
         !query ||
-        [patient.name, patient.email, patient.phone, patient.address, patient.bloodGroup, patient.gender]
+        [
+          patient.name,
+          patient.email,
+          patient.phone,
+          patient.address,
+          patient.doctor?.name ?? '',
+          patient.doctor?.specialization ?? '',
+        ]
           .some((value) => value.toLowerCase().includes(query));
       const matchesStatus =
         statusFilter === 'all' ||
-        (statusFilter === 'verified' ? patient.isVerified : !patient.isVerified);
+        (statusFilter === 'available'
+          ? patient.doctor?.isAvailable === true
+          : statusFilter === 'unavailable' && patient.doctor?.isAvailable === false);
       return matchesQuery && matchesStatus;
     });
 
+    if (sortOrder === 'recent') {
+      result.sort((a, b) => (b.lastVisit ?? '').localeCompare(a.lastVisit ?? ''));
+    }
     if (sortOrder === 'name-asc') result.sort((a, b) => a.name.localeCompare(b.name));
     if (sortOrder === 'name-desc') result.sort((a, b) => b.name.localeCompare(a.name));
     return result;
@@ -37,10 +89,11 @@ export function PatientList() {
     () => [
       {
         accessorKey: 'name',
-        size: 25,
+        size: 22,
         header: 'Patient',
         cell: ({ row }) => {
           const patient = row.original;
+          const age = getPatientAge(patient.dateOfBirth);
           return (
             <Link to={`/admin-dashboard/patients/${patient.id}`} className="flex min-w-0 items-center gap-3">
               <DoctorAvatar
@@ -52,7 +105,10 @@ export function PatientList() {
               />
               <span className="min-w-0">
                 <span className="block truncate font-semibold text-slate-800">{patient.name}</span>
-                <span className="mt-0.5 block truncate text-[11px] text-slate-400">{patient.email}</span>
+                <span className="mt-0.5 block truncate text-[11px] text-slate-400">
+                  {age === null ? '' : `${age}, `}
+                  {patient.gender}
+                </span>
               </span>
             </Link>
           );
@@ -60,45 +116,106 @@ export function PatientList() {
       },
       {
         accessorKey: 'phone',
-        size: 17,
+        size: 13,
         header: 'Phone',
         cell: ({ getValue }) => <span className="whitespace-nowrap text-slate-600">{getValue<string>()}</span>,
       },
       {
-        accessorKey: 'gender',
-        size: 11,
-        header: 'Gender',
-        cell: ({ getValue }) => <span className="whitespace-nowrap text-slate-600">{getValue<string>()}</span>,
-      },
-      {
-        accessorKey: 'bloodGroup',
-        size: 12,
-        header: 'Blood Group',
-        cell: ({ getValue }) => <span className="whitespace-nowrap text-slate-600">{getValue<string>()}</span>,
+        accessorKey: 'doctor',
+        size: 20,
+        header: 'Doctor',
+        cell: ({ row }) => {
+          const doctor = row.original.doctor;
+          if (!doctor) return <span className="text-slate-400">—</span>;
+
+          return (
+            <div className="flex min-w-0 items-center gap-2">
+              <DoctorAvatar
+                src={doctor.avatar}
+                alt={doctor.name}
+                imageClassName="size-10 rounded-full border border-slate-200 object-cover"
+                fallbackClassName="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400"
+                iconClassName="size-4"
+              />
+              <span className="min-w-0">
+                <span className="block truncate font-semibold text-slate-800">{doctor.name}</span>
+                <span className="mt-0.5 block truncate text-[11px] text-slate-400">
+                  {doctor.specialization || '—'}
+                </span>
+              </span>
+            </div>
+          );
+        },
       },
       {
         accessorKey: 'address',
-        size: 23,
+        size: 19,
         header: 'Address',
         cell: ({ getValue }) => <span className="line-clamp-2 text-slate-600">{getValue<string>()}</span>,
       },
       {
-        accessorKey: 'isVerified',
+        accessorKey: 'lastVisit',
         size: 12,
-        header: 'Status',
+        header: 'Last Visit',
         cell: ({ getValue }) => {
-          const isVerified = getValue<boolean>();
+          const lastVisit = getValue<string | null>();
+          if (!lastVisit) return <span className="whitespace-nowrap text-slate-400">—</span>;
+
           return (
-            <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-              isVerified ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-            }`}>
-              {isVerified ? 'Email verified' : 'Email unverified'}
+            <span className="whitespace-nowrap text-slate-600">
+              {new Intl.DateTimeFormat('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                timeZone: 'UTC',
+              }).format(new Date(`${lastVisit}T00:00:00Z`))}
             </span>
           );
         },
       },
+      {
+        accessorKey: 'doctor.isAvailable',
+        id: 'status',
+        size: 8,
+        header: 'Status',
+        cell: ({ row }) => {
+          const isAvailable = row.original.doctor?.isAvailable;
+          if (isAvailable === undefined) return <span className="text-slate-400">—</span>;
+
+          return (
+            <span className={`inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-[11px] font-medium ${
+              isAvailable ? 'border-emerald-500 text-emerald-600' : 'border-rose-500 text-rose-600'
+            }`}>
+              {isAvailable ? 'Available' : 'Unavailable'}
+            </span>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        size: 6,
+        header: '',
+        cell: ({ row }) => (
+          <div className="flex justify-end">
+            <ActionDropdown
+              isOpen={openActionMenuId === row.original.id}
+              onToggle={() =>
+                setOpenActionMenuId((current) =>
+                  current === row.original.id ? null : row.original.id,
+                )
+              }
+              onView={() => navigate(`/admin-dashboard/patients/${row.original.id}`)}
+              onEdit={() => navigate(`/admin-dashboard/patients/${row.original.id}/edit`)}
+              onDelete={() => {
+                deletePatient.reset();
+                setPatientToDelete(row.original);
+              }}
+            />
+          </div>
+        ),
+      },
     ],
-    [],
+    [deletePatient, navigate, openActionMenuId],
   );
 
   return (
@@ -138,16 +255,16 @@ export function PatientList() {
         <div className="flex flex-wrap items-center gap-2">
           <label className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm text-slate-600">
             <SlidersHorizontal aria-hidden="true" className="size-4 text-slate-400" />
-            <span className="sr-only">Filter by verification status</span>
+            <span className="sr-only">Filter by doctor availability</span>
             <select
-              aria-label="Filter by verification status"
+              aria-label="Filter by doctor availability"
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
               className="max-w-32 bg-transparent outline-none"
             >
               <option value="all">All Status</option>
-              <option value="verified">Email verified</option>
-              <option value="unverified">Email unverified</option>
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
             </select>
           </label>
           <label className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm text-slate-600">
@@ -168,7 +285,10 @@ export function PatientList() {
               type="button"
               aria-label="List view"
               aria-pressed={view === 'list'}
-              onClick={() => setView('list')}
+              onClick={() => {
+                setView('list');
+                setOpenActionMenuId(null);
+              }}
               className={`grid size-8 cursor-pointer place-items-center rounded-md ${view === 'list' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-400 hover:bg-slate-50'}`}
             >
               <List aria-hidden="true" className="size-4" />
@@ -177,7 +297,10 @@ export function PatientList() {
               type="button"
               aria-label="Grid view"
               aria-pressed={view === 'grid'}
-              onClick={() => setView('grid')}
+              onClick={() => {
+                setView('grid');
+                setOpenActionMenuId(null);
+              }}
               className={`grid size-8 cursor-pointer place-items-center rounded-md ${view === 'grid' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-400 hover:bg-slate-50'}`}
             >
               <LayoutGrid aria-hidden="true" className="size-4" />
@@ -187,8 +310,11 @@ export function PatientList() {
       </Card>
 
       {isPending ? (
-        <Card role="status" className="flex min-h-48 items-center justify-center p-8 text-sm text-slate-500">
-          Loading patients…
+        <Card className="flex min-h-48 items-center justify-center p-8 text-sm font-medium text-slate-500">
+          <div className="flex flex-col items-center gap-3">
+            <LoaderOne />
+            <span>Loading patients…</span>
+          </div>
         </Card>
       ) : isError ? (
         <Card role="alert" className="flex flex-col items-center gap-3 p-8 text-center">
@@ -253,6 +379,28 @@ export function PatientList() {
       <p className="border-t border-slate-200/70 py-3 text-center text-xs text-slate-500">
         2026 © Dockpoint, All Rights Reserved
       </p>
+      <DeleteConfirmationModal
+        open={patientToDelete !== null}
+        title="Permanently Delete Patient"
+        description={
+          patientToDelete
+            ? `Delete ${patientToDelete.name} permanently? Their appointments and medical history will also be deleted. This cannot be undone.`
+            : undefined
+        }
+        confirmLabel={deletePatient.isPending ? 'Deleting...' : 'Delete Permanently'}
+        isPending={deletePatient.isPending}
+        error={
+          deletePatient.error
+            ? getPatientMutationErrorMessage(deletePatient.error, 'delete')
+            : null
+        }
+        onCancel={() => {
+          if (deletePatient.isPending) return;
+          setPatientToDelete(null);
+          deletePatient.reset();
+        }}
+        onConfirm={handleConfirmDeletePatient}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { DoctorList } from '../components/doctors/DoctorList';
 import { PatientList } from '../components/patients/PatientList';
 import { PatientCreate } from '../components/patients/PatientCreate';
 import { PatientDetails } from '../components/patients/PatientDetails';
+import { PatientEditPage } from '../components/patients/PatientEditPage';
 import { DoctorDetails } from '../components/doctors/DoctorDetails';
 import { DoctorEditPage } from '../components/doctors/DoctorEditPage';
 import { AddDoctor } from '../components/doctors/AddDoctor';
@@ -65,6 +66,7 @@ export const routes: RouteObject[] = [
           { path: 'layouts', ...pending('Layouts', 'Reusable dashboard layouts will appear here.') },
           { path: 'patients', element: <PatientList /> },
           { path: 'patients/create', element: <PatientCreate /> },
+          { path: 'patients/:patientId/edit', element: <PatientEditPage /> },
           { path: 'patients/:patientId', element: <PatientDetails /> },
           {
             path: 'appointments',
